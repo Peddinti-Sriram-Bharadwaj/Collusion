@@ -1,0 +1,11 @@
+seed=0 delta=0.2757 parse_failures=0
+seed=1 delta=0.2368 parse_failures=0
+seed=2 delta=0.2753 parse_failures=0
+seed=3 delta=0.2979 parse_failures=0
+seed=4 delta=0.2377 parse_failures=0
+seed=5 delta=0.2837 parse_failures=0
+seed=6 delta=0.2417 parse_failures=0
+seed=7 delta=0.2815 parse_failures=0
+seed=8 delta=0.2715 parse_failures=0
+seed=9 delta=0.2831 parse_failures=0
+DONE
