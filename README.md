@@ -553,6 +553,78 @@ the cases where the failure is systematic rather than occasional.
 
 ---
 
+## RQ 3.3 — Does knowing your peer's identity change collusion?
+
+<details>
+<summary><b>Why</b></summary>
+
+An "interlocutor awareness" line of work suggests LLMs can identify
+same-family peers from reasoning style alone, with downstream
+jailbreak/reward-hacking implications. We ask the narrower question that
+line of work doesn't: does *knowing* (or being told) who your pricing
+rival is change whether you collude with them? To keep every claim made
+to the agent truthful, "same"/"different" peer-info text is only ever
+paired with an actually matching/mismatched model configuration — we
+never tell an agent something false. Real heterogeneity is created using
+the two locally available Ollama models: `qwen2.5:7b-instruct` and the
+much smaller `qwen2.5:0.5b-instruct`.
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Two agents, stateless mode, 30 rounds, 10 seeds per condition. Added
+`peer_info` (injects a sentence naming the rival as the same or a
+different AI model) and `models` (per-agent model override) to
+`run_llm_episode()`:
+
+- **Same actual, told "same"**: both agents `qwen2.5:7b-instruct`, told they share the same model.
+- **Different actual, told "different"**: one 7b / one 0.5b agent, told they're different models.
+- **Different actual, no info**: same 7b/0.5b pairing, no peer-identity text at all.
+- Control: existing same-model/no-info baseline (Δ=0.85, n=15) stands in for the fourth cell.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Condition | Δ (mean, 95% CI) | n | Parse failures |
+|---|---|---|---|
+| Baseline (same model, no info) | 0.85 (0.82–0.89) | 15 | 0/900 |
+| Same model, told "same" | 0.887 (0.857–0.917) | 10 | 0/600 |
+| Different models, told "different" | 0.613 (0.563–0.664) | 10 | 23/600 |
+| Different models, no info | 0.578 (0.503–0.654) | 10 | 9/600 |
+
+The parse-failure counts for the heterogeneous conditions come
+specifically from the 0.5b model occasionally emitting malformed output —
+not a systemic Ollama outage (cf. the silent-failure incident in RQ 3.2);
+low and episode-to-episode, not uniform, so treated as legitimate noise
+rather than invalid data.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+- **Being told "same" adds nothing over already being the same model** —
+  0.887's CI overlaps the 0.85 baseline directly.
+- **Real capability heterogeneity substantially lowers Δ** — both
+  heterogeneous conditions drop to ~0.58–0.61, clearly below baseline and
+  the same-model condition.
+- **Being explicitly told "different" adds nothing on top of actual
+  heterogeneity** — 0.613 vs. 0.578 overlap almost completely.
+
+So the effect lives entirely in *actual* model heterogeneity, not in the
+agent's *stated belief* about its peer. This tempers the hoped-for
+novel finding: the honest interpretation is that a much weaker model
+(0.5b) reasons and signals worse — it parses prices worse (9–23 failures
+vs. 0) and plausibly can't sustain the same implicit coordination a 7b
+model can with another 7b — rather than agents making a strategic
+inference ("you're different, so I won't cooperate with you") purely
+from being told so. Peer-identity *information*, in isolation, does not
+appear to be a lever on collusion in this setup.
+</details>
+
+---
+
 ## Related work / benchmarks surveyed (for RQ 3.1–3.4)
 
 <details>
@@ -591,9 +663,9 @@ the cases where the failure is systematic rather than occasional.
 </details>
 
 <details>
-<summary><b>Peer identification (relevant to RQ 3.3, not yet run)</b></summary>
+<summary><b>Peer identification (relevant to RQ 3.3, reproduced/extended above)</b></summary>
 
-- An "interlocutor awareness" paper (exact canonical source unconfirmed, found via mirror) reports LLMs reliably identify same-family peers from reasoning style and linguistic patterns, with downstream jailbreak/reward-hacking implications.
+- An "interlocutor awareness" paper (exact canonical source unconfirmed, found via mirror) reports LLMs reliably identify same-family peers from reasoning style and linguistic patterns, with downstream jailbreak/reward-hacking implications. Our RQ 3.3 result above is a direct, narrower test of whether that kind of identity information affects *cooperation*, not just identification — and finds it does not, independent of real model heterogeneity.
 </details>
 
 **Caveat**: the above is compiled from search-result abstracts/summaries,
@@ -628,7 +700,8 @@ scripts/            One-off LLM experiment runners (long-running, saved incremen
   run_llm_plant.py        Regulator-plant intervention (stateless)
   run_llm_chat.py         Multi-turn chat-mode spot-check
   run_llm_rq32.py         RQ 3.2: prompt-warning and hard-veto interventions
-tests/              108 tests covering every module above
+  run_llm_rq33.py         RQ 3.3: peer-identity info and real model heterogeneity
+tests/              114 tests covering every module above
 results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
@@ -641,7 +714,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 108 tests
+python -m pytest -q                # 114 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -659,6 +732,8 @@ python scripts/run_llm_4agents.py      # 4-agent stateless spot-check
 python scripts/run_llm_plant.py        # regulator-plant intervention
 python scripts/run_llm_chat.py         # multi-turn chat-mode spot-check
 python scripts/run_llm_rq32.py         # RQ 3.2: prompt-warning + hard-veto
+ollama pull qwen2.5:0.5b-instruct      # also needed for RQ 3.3's heterogeneous-model conditions
+python scripts/run_llm_rq33.py         # RQ 3.3: peer-identity info + real model heterogeneity
 ```
 
 ### A note on resource safety

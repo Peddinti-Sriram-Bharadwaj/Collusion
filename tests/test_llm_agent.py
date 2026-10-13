@@ -10,6 +10,7 @@ from src.llm_agent import (
     check_ollama_available,
     OllamaUnavailableError,
     ANTITRUST_WARNING,
+    PEER_INFO_TEXT,
 )
 
 
@@ -148,6 +149,63 @@ def test_warning_text_absent_from_chat_system_prompt_by_default():
     assert "antitrust regulator" not in agent.messages[0]["content"].lower()
 
 
+def test_peer_info_same_appears_in_stateless_prompt():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMPricingAgent(agent_id=0, env=env, peer_info="same", seed=0)
+    prompt = agent._build_prompt(history=[], round_num=0, n_rounds=30)
+    assert "same exact ai model" not in prompt.lower()  # not literal; check the real phrase instead
+    assert "same ai model" in prompt.lower() or "exact same ai model" in prompt.lower()
+
+
+def test_peer_info_different_appears_in_stateless_prompt():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMPricingAgent(agent_id=0, env=env, peer_info="different", seed=0)
+    prompt = agent._build_prompt(history=[], round_num=0, n_rounds=30)
+    assert "different ai model" in prompt.lower()
+
+
+def test_peer_info_none_by_default():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMPricingAgent(agent_id=0, env=env, seed=0)
+    prompt = agent._build_prompt(history=[], round_num=0, n_rounds=30)
+    assert "ai model" not in prompt.lower()
+
+
+def test_peer_info_appears_in_chat_system_prompt():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMChatPricingAgent(agent_id=0, env=env, peer_info="same", seed=0)
+    assert "same" in agent.messages[0]["content"].lower() and "ai model" in agent.messages[0]["content"].lower()
+
+
+def test_peer_info_text_table_has_three_entries():
+    assert set(PEER_INFO_TEXT.keys()) == {None, "same", "different"}
+    assert PEER_INFO_TEXT[None] == ""
+
+
+def test_run_llm_episode_per_agent_models(monkeypatch):
+    import src.llm_agent as llm_mod
+
+    captured_models = []
+
+    def fake_cls(agent_id, env, model, warning, peer_info, seed):
+        captured_models.append(model)
+        return _StubHighPriceAgentForModels(env.n_prices)
+
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", fake_cls)
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
+
+    run_llm_episode(n_agents=2, n_prices=10, n_rounds=2, models=["model-a", "model-b"], seed=0)
+    assert captured_models == ["model-a", "model-b"]
+
+
+class _StubHighPriceAgentForModels:
+    def __init__(self, n_prices):
+        self.n_prices = n_prices
+
+    def act(self, history, round_num, n_rounds):
+        return self.n_prices - 1, False
+
+
 class _StubHighPriceAgent:
     """Always proposes the highest grid index -- used to deterministically
     trigger the veto mechanism without any real LLM call."""
@@ -164,7 +222,7 @@ def test_veto_forces_overpriced_agent_down_to_nash(monkeypatch):
 
     # Patch both LLM agent classes so run_llm_episode's internal construction
     # produces our deterministic high-price stub instead of calling Ollama.
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
 
     env = LogitBertrandEnv(n_agents=2, n_prices=10)
     nash_grid_price = env.price_grid[int(np.argmin(np.abs(env.price_grid - env.p_nash)))]
@@ -178,7 +236,7 @@ def test_veto_forces_overpriced_agent_down_to_nash(monkeypatch):
 def test_veto_disabled_lets_high_prices_through(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=3, veto=False, seed=0)
     assert r["n_vetoes"] == 0
@@ -237,7 +295,7 @@ def test_run_llm_episode_skips_check_when_all_agents_fixed(monkeypatch):
 def test_veto_exempts_fixed_plant_agents(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=2, fixed_agent_ids=[1], veto=True, seed=0)
     # agent 1 is the fixed plant (pinned at Nash already); only agent 0's high
