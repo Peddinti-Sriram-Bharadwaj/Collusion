@@ -625,6 +625,99 @@ appear to be a lever on collusion in this setup.
 
 ---
 
+## RQ 3.4 — Does a firm's declared economic philosophy change collusion?
+
+<details>
+<summary><b>Why</b></summary>
+
+All prior conditions assumed implicitly profit-maximizing firms. A
+natural follow-up: does giving a firm an explicit organizational
+identity — capitalist, socialist, nonprofit, R&D-driven, consumer-first,
+scarcity/hoarding mentality — change whether it colludes, holding the
+market and the opponent fixed? And does pairing two *different*
+philosophies against each other destabilize an otherwise-collusive
+equilibrium?
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Added a `PERSONA_TEXT` dict and a `persona` parameter to both LLM agent
+classes, injected as a short mandate sentence into the prompt/system
+prompt (e.g. *"Your firm's guiding philosophy is unapologetic free-market
+capitalism..."* or *"Your firm is deeply empathetic to consumers,
+especially during times of economic distress... even when that means
+accepting a smaller profit margin."*). Two agents, stateless mode, 30
+rounds, 5 seeds per condition:
+
+- **7 homogeneous conditions**: both firms share one persona —
+  capitalist, socialist, for-profit, nonprofit, R&D-oriented,
+  consumer-empathetic, hoarder.
+- **2 contrasting mixed conditions**: capitalist vs. socialist, and
+  hoarder vs. consumer-empathetic.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Condition | Δ (mean, 95% CI) | n |
+|---|---|---|
+| Baseline (no persona) | 0.85 (0.82–0.89) | 15 |
+| Capitalist (both) | 0.765 (0.726–0.804) | 5 |
+| For-profit (both) | 0.824 (0.797–0.852) | 5 |
+| Hoarder (both) | 0.827 (0.802–0.851) | 5 |
+| R&D-oriented (both) | 0.834 (0.808–0.861) | 5 |
+| Socialist (both) | 0.838 (0.818–0.858) | 5 |
+| Nonprofit (both) | 0.759 (0.676–0.842) | 5 |
+| **Consumer-empathetic (both)** | **0.195 (-0.064–0.453)** | 5 |
+| Capitalist vs. socialist (mixed) | 0.759 (0.700–0.817) | 5 |
+| **Hoarder vs. consumer-empathetic (mixed)** | **-0.226 (-0.435 to -0.017)** | 5 |
+
+All 45 episodes had zero parse failures. The consumer-empathetic and
+mixed hoarder/empathetic conditions are also the only two with high
+variance (std ≈ 0.24–0.30 vs. ≈ 0.02–0.09 everywhere else), including
+individual seeds that cross into price-war territory (Δ < 0).
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+- **Most persona labels don't change the outcome.** Capitalist,
+  for-profit, hoarder, R&D-oriented, socialist, and nonprofit all cluster
+  tightly around Δ=0.76–0.84, overlapping or nearly overlapping the
+  no-persona baseline. Telling two firms a different *story* about why
+  they're pricing high doesn't stop them from converging to a
+  supra-competitive price — an extension of the RQ 3.2 "words alone
+  don't work" finding from regulatory warnings to self-declared
+  philosophy in general.
+- **Capitalist vs. socialist (mixed) still doesn't break collusion**
+  (0.759) — the labels alone, even opposed ones, don't translate into
+  materially different pricing behavior, because neither instruction
+  directly overrides the firm's profit-seeking objective.
+- **Consumer-empathetic is the one persona that actually matters**,
+  because unlike the others it isn't just flavor on the same objective —
+  it's an explicit directive to trade off margin for affordability,
+  i.e. it changes the objective itself, not just the story around it.
+  Collusion collapses (Δ≈0.19, one seed slightly negative) and variance
+  spikes.
+- **Hoarder vs. consumer-empathetic (mixed) is the strongest result in
+  this batch**: Δ=-0.226, confidently in price-war territory, not just
+  "non-collusive." Pairing a maximally extractive persona against a
+  maximally altruistic one appears to destabilize the implicit
+  coordination entirely, plausibly because the empathetic agent keeps
+  undercutting toward affordability and drags the hoarder into a
+  race-to-the-bottom response rather than a stable high-price
+  equilibrium.
+
+Net reading: persona *labels* mostly don't matter for collusion — what
+matters is whether an instruction actually conflicts with profit
+maximization. Only the consumer-empathetic persona did that on its own,
+and only the hoarder/consumer-empathetic *mismatch* was strong enough to
+flip the market into active price competition.
+</details>
+
+---
+
 ## Related work / benchmarks surveyed (for RQ 3.1–3.4)
 
 <details>
@@ -701,7 +794,8 @@ scripts/            One-off LLM experiment runners (long-running, saved incremen
   run_llm_chat.py         Multi-turn chat-mode spot-check
   run_llm_rq32.py         RQ 3.2: prompt-warning and hard-veto interventions
   run_llm_rq33.py         RQ 3.3: peer-identity info and real model heterogeneity
-tests/              114 tests covering every module above
+  run_llm_personas.py     RQ 3.4: economic/organizational persona manipulation
+tests/              119 tests covering every module above
 results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
@@ -714,7 +808,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 114 tests
+python -m pytest -q                # 119 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -734,6 +828,7 @@ python scripts/run_llm_chat.py         # multi-turn chat-mode spot-check
 python scripts/run_llm_rq32.py         # RQ 3.2: prompt-warning + hard-veto
 ollama pull qwen2.5:0.5b-instruct      # also needed for RQ 3.3's heterogeneous-model conditions
 python scripts/run_llm_rq33.py         # RQ 3.3: peer-identity info + real model heterogeneity
+python scripts/run_llm_personas.py     # RQ 3.4: economic/organizational persona manipulation
 ```
 
 ### A note on resource safety
