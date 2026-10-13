@@ -11,6 +11,7 @@ from src.llm_agent import (
     OllamaUnavailableError,
     ANTITRUST_WARNING,
     PEER_INFO_TEXT,
+    PERSONA_TEXT,
 )
 
 
@@ -182,12 +183,57 @@ def test_peer_info_text_table_has_three_entries():
     assert PEER_INFO_TEXT[None] == ""
 
 
+def test_persona_text_appears_in_stateless_prompt():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMPricingAgent(agent_id=0, env=env, persona="hoarder", seed=0)
+    prompt = agent._build_prompt(history=[], round_num=0, n_rounds=30)
+    assert "hoarder" in prompt.lower()
+
+
+def test_persona_text_absent_by_default():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMPricingAgent(agent_id=0, env=env, seed=0)
+    prompt = agent._build_prompt(history=[], round_num=0, n_rounds=30)
+    for text in PERSONA_TEXT.values():
+        if text:
+            assert text not in prompt
+
+
+def test_persona_text_appears_in_chat_system_prompt():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMChatPricingAgent(agent_id=0, env=env, persona="socialist", seed=0)
+    assert "socialist" in agent.messages[0]["content"].lower()
+
+
+def test_persona_text_table_has_expected_entries():
+    assert PERSONA_TEXT[None] == ""
+    for key in ["capitalist", "socialist", "for_profit", "nonprofit", "rnd_oriented", "consumer_empathetic", "hoarder"]:
+        assert key in PERSONA_TEXT
+        assert PERSONA_TEXT[key]
+
+
+def test_run_llm_episode_per_agent_personas(monkeypatch):
+    import src.llm_agent as llm_mod
+
+    captured_personas = []
+
+    def fake_cls(agent_id, env, model, warning, peer_info, persona, seed):
+        captured_personas.append(persona)
+        return _StubHighPriceAgentForModels(env.n_prices)
+
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", fake_cls)
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
+
+    run_llm_episode(n_agents=2, n_prices=10, n_rounds=2, personas=["capitalist", "socialist"], seed=0)
+    assert captured_personas == ["capitalist", "socialist"]
+
+
 def test_run_llm_episode_per_agent_models(monkeypatch):
     import src.llm_agent as llm_mod
 
     captured_models = []
 
-    def fake_cls(agent_id, env, model, warning, peer_info, seed):
+    def fake_cls(agent_id, env, model, warning, peer_info, persona, seed):
         captured_models.append(model)
         return _StubHighPriceAgentForModels(env.n_prices)
 
@@ -222,7 +268,7 @@ def test_veto_forces_overpriced_agent_down_to_nash(monkeypatch):
 
     # Patch both LLM agent classes so run_llm_episode's internal construction
     # produces our deterministic high-price stub instead of calling Ollama.
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
 
     env = LogitBertrandEnv(n_agents=2, n_prices=10)
     nash_grid_price = env.price_grid[int(np.argmin(np.abs(env.price_grid - env.p_nash)))]
@@ -236,7 +282,7 @@ def test_veto_forces_overpriced_agent_down_to_nash(monkeypatch):
 def test_veto_disabled_lets_high_prices_through(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=3, veto=False, seed=0)
     assert r["n_vetoes"] == 0
@@ -295,7 +341,7 @@ def test_run_llm_episode_skips_check_when_all_agents_fixed(monkeypatch):
 def test_veto_exempts_fixed_plant_agents(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=2, fixed_agent_ids=[1], veto=True, seed=0)
     # agent 1 is the fixed plant (pinned at Nash already); only agent 0's high
