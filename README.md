@@ -47,6 +47,18 @@ We built a toy market with robot pricing agents and asked five questions:
    did — even though nobody told them to cheat, and even after adding more
    competitors. The one fix that still worked well: planting a fair trucker
    in the mix.
+7. **Does it matter* how* the chatbot remembers the game?** — Yes, a lot.
+   If each round it just reads a short "here's what happened" summary, it
+   teams up almost every time. If instead it keeps one long, ongoing
+   conversation about the game, results become wildly inconsistent — some
+   runs team up hard, some end in a price war — because whatever it said
+   to itself early on tends to stick and snowball.
+8. **If you just *tell* the chatbot "the police are watching," does it
+   stop?** — Barely at all. But if you build a rule that actually blocks
+   any price that's too high, it works great on paper — except the chatbot
+   never actually stops *trying* to charge the high price; it just keeps
+   getting blocked. Looking "well-behaved" from the outside and *actually
+   not wanting to cheat* turned out to be two different things.
 
 ---
 
@@ -79,6 +91,15 @@ well-behaved-looking agents interacting badly" AGI safety concern.
 3. **1.3** — Can we improve on existing collusion detection methods?
 4. **1.4** — Can we use information-theoretic approaches to detect collusion in multi-agent games?
 5. **1.5** — Which single restriction removes the most collusion at the least cost?
+
+A second round of questions (control tests to isolate *why* and *how* LLM
+agents collude, motivated by recent steganographic-collusion and AI-control
+literature):
+
+6. **3.1** — Beyond colluding directly via text, can actions, tools, or side channels be the conduit for collusion?
+7. **3.2** — Can we disrupt collusion through introducing trusted agents? *(reproduced below)*
+8. **3.3** — Can agents identify their peers?
+9. **3.4** — What does a coalition do when it learns it is being watched?
 
 Full experimental design: [`experimental_plan.md`](experimental_plan.md).
 </details>
@@ -401,6 +422,186 @@ agents are the ones actually setting prices.
 
 ---
 
+## Memory mechanism matters: stateless vs. multi-turn chat
+
+<details>
+<summary><b>Why</b></summary>
+
+All the LLM results above use a **stateless** agent (`LLMPricingAgent`):
+each round, a fresh prompt is built from scratch, containing a factual
+summary of the last 10 rounds' prices/profits. The model's own *reasoning*
+from previous rounds is never shown back to it — only the resulting numbers.
+This raised an obvious question: does it matter that the model's past
+reasoning isn't preserved?
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Added `LLMChatPricingAgent` (`src/llm_agent.py`), which instead keeps one
+growing multi-turn conversation via Ollama's `/api/chat` — the model's own
+prior replies (including any stated reasoning) stay literally present in
+its context for every subsequent round, rather than being distilled into a
+plain history table. Same market, same model, same 30-round horizon, 5
+seeds, `n_agents=2`.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Mode | Δ (mean, 95% CI) | Range |
+|---|---|---|
+| **Stateless** (rebuilt prompt each round) | **0.85** (0.82–0.89) | 0.71–0.96 — tight, consistently collusive |
+| **Chat** (persistent conversation) | **-0.01** (-0.39–0.37) | **-0.47 to 0.66** — huge spread, no consistent direction |
+
+Five chat-mode seeds produced five qualitatively different outcomes — from
+a meaningful price war (Δ=-0.47) to strong collusion (Δ=0.66) — versus the
+stateless mode's remarkably tight, always-collusive convergence.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+**How you implement "memory" for an LLM pricing agent is not a neutral
+engineering choice — it qualitatively changes market dynamics.** With a
+persistent conversation, the model's own early reasoning compounds: lean
+slightly cooperative early on and it self-reinforces toward strong
+collusion; lean slightly aggressive and it spirals toward a price war
+neither Q-learning nor the stateless LLM ever produced. The stateless
+design (re-deriving a decision from a fixed, factual summary each round)
+produces a much stronger and more consistent pull toward collusion. n=5 is
+small given the high variance — more seeds are needed to firm up the
+chat-mode mean, though the *qualitative* bimodal-ish spread is already
+visible at this sample size.
+</details>
+
+---
+
+## RQ 3.2 — Trusted-agent interventions (reproduction + extension)
+
+<details>
+<summary><b>Why</b></summary>
+
+Track 1.5 found a fixed "regulator plant" agent to be the most
+cost-effective single restriction. This section asks a sharper question —
+*which kind* of trusted-agent intervention works, and does it actually
+change the agent's underlying intent or just its visible output? — directly
+reproducing the taxonomy used in two very recent papers: *Mitigating
+Emergent Collusion in LLM Pricing Agents* (prompt warning vs. payoff
+regulator vs. active entrant) and *Oversight is Not Compliance* (passive
+logging vs. revision vs. hard veto).
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Two LLM agents (stateless mode), 30 rounds, 10 seeds per new condition,
+added to `src/llm_agent.py`:
+
+- **Prompt-only warning**: both agents remain real LLMs; their prompt now
+  includes a plain-text antitrust-monitoring notice. No structural change.
+- **Hard veto**: both agents remain real LLMs; after they choose prices
+  each round, a rule-based regulator forcibly overrides any price more
+  than 30% of the way from Nash toward monopoly, snapping it back to the
+  Nash grid point. The agent sees the *overridden* price in its own history
+  next round.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Condition | Δ (mean, 95% CI) | Notes |
+|---|---|---|
+| Baseline (no intervention) | 0.85 (0.82–0.89) | |
+| **Prompt-only warning** | **0.91 (0.86–0.95)** | not lower than baseline |
+| Active entrant (1 agent fixed at Nash) | 0.27 (0.25–0.28) | |
+| **Hard veto (both agents)** | **0.1004, std = 0.0000** | identical every seed |
+
+The hard-veto result has a specific, important mechanical cause: the veto
+fired on **every single round, for both agents, in all 10 seeds** (60/60
+possible triggers each time) — the agents never stopped *proposing*
+near-monopoly prices, they just kept getting overridden back to Nash.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+Both papers' core claims replicate cleanly in our own environment:
+
+- **Words alone don't work.** The prompt-only warning had no detectable
+  braking effect — if anything, the point estimate was slightly *higher*
+  than baseline (*Mitigating Emergent Collusion*'s finding, confirmed).
+- **Structural interventions can force compliant *output* without
+  changing underlying *intent*.** The hard veto drove the observed price
+  series to the Nash floor, but the agents' revealed intent — what price
+  they kept trying to set — never changed across all 60 attempts per
+  episode. If you only look at final prices, collusion looks solved; if
+  you look at what was *proposed* before the override, it looks completely
+  unresolved. This is a direct, concrete illustration of *Oversight is Not
+  Compliance*'s central warning.
+
+An incidental finding during this run: a prior attempt at this experiment
+silently produced 100% invalid data because the local Ollama server had
+stopped between sessions — every one of 600 calls fell back to a random
+action with no visible error, and the resulting numbers still *looked*
+plausible. Caught only via an anomalously uniform `n_parse_failures` count.
+Fixed by adding `check_ollama_available()`, a pre-flight connectivity/model
+check that now fails loudly before any episode runs — a reminder that
+silent-fallback error handling can mask total data invalidity in exactly
+the cases where the failure is systematic rather than occasional.
+</details>
+
+---
+
+## Related work / benchmarks surveyed (for RQ 3.1–3.4)
+
+<details>
+<summary><b>Steganographic / covert-channel collusion</b></summary>
+
+- **CASE** (Motwani et al., *Secret Collusion among AI Agents*, [arXiv:2402.07510](https://arxiv.org/pdf/2402.07510)) — steganographic capability scales with model capability; paraphrasing defenses are insufficient.
+- **Perfect Collusion Benchmark** (Motwani et al., NeurIPS workshop 2023) — information-theoretically undetectable steganography as a stress test.
+- **ColludeBench-v0** (from *Audit the Whisper*, [arXiv:2510.04303](https://arxiv.org/html/2510.04303v2)) — pricing duopoly, auctions, and peer-review scenarios with configurable covert schemes (keyword, parity, adaptive-temperature, fairness-skew); most directly adaptable to our own pricing environment for RQ 3.1.
+- **NARCBench** ([arXiv:2604.01151](https://arxiv.org/abs/2604.01151)) — activation-probe collusion detection; strong in-distribution, weaker out-of-distribution transfer.
+- **Colosseum** ([arXiv:2602.15198](https://arxiv.org/html/2602.15198)) — cooperative multi-agent collusion auditing via the Terrarium framework.
+</details>
+
+<details>
+<summary><b>LLM pricing collusion specifically</b></summary>
+
+- **Fish, Gonczarowski & Shorrer** ([arXiv:2404.00806](https://arxiv.org/pdf/2404.00806v1)) — foundational GPT-4 pricing-collusion study.
+- **Mitigating Emergent Collusion in LLM Pricing Agents** ([arXiv:2609.13037](https://arxiv.org/pdf/2609.13037)) — reproduced above (RQ 3.2).
+- **Oversight is Not Compliance** (ICML 2026) — reproduced above (RQ 3.2).
+- **Faithful yet Collusive** ([arXiv:2609.18346](https://www.alphaxiv.org/abs/2609.18346.md)) — chain-of-thought monitoring alone is an unreliable collusion safeguard.
+</details>
+
+<details>
+<summary><b>AI Control (general untrusted-agent oversight vocabulary)</b></summary>
+
+- **Original AI Control setup** ([arXiv:2312.06942](https://arxiv.org/abs/2312.06942)) — trusted monitoring/editing on APPS coding tasks.
+- **Ctrl-Z** ([arXiv:2504.10374](https://arxiv.org/html/2504.10374v1)) — multi-step agent control via BashBench.
+- **Evaluating Control Protocols for Untrusted AI Agents** ([arXiv:2511.02997](https://arxiv.org/pdf/2511.02997.pdf)) — SHADE-Arena, deferral/resampling protocols under adaptive attacks.
+</details>
+
+<details>
+<summary><b>Evaluation awareness / sandbagging (relevant to RQ 3.4, not yet run)</b></summary>
+
+- Apollo Research: Claude Sonnet 3.7 verbalizes evaluation-awareness in up to ~33% of sandbagging-eval runs ([blog](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/)).
+- **In-Context Environments Induce Evaluation-Awareness** ([arXiv:2603.03824](https://www.alphaxiv.org/abs/2603.03824)) — sandbagging can occur with *no* verbalized awareness, a CoT-monitoring blind spot.
+- **Evaluation Awareness Has Limited Effect on Behaviour** ([arXiv:2605.05835](https://arxiv.org/pdf/2605.05835)) — counter-evidence worth weighing before assuming the effect is large.
+</details>
+
+<details>
+<summary><b>Peer identification (relevant to RQ 3.3, not yet run)</b></summary>
+
+- An "interlocutor awareness" paper (exact canonical source unconfirmed, found via mirror) reports LLMs reliably identify same-family peers from reasoning style and linguistic patterns, with downstream jailbreak/reward-hacking implications.
+</details>
+
+**Caveat**: the above is compiled from search-result abstracts/summaries,
+not full papers read end-to-end — treat exact figures as indicative, not
+verified, until the source papers are read directly.
+
+---
+
 ## Repository structure
 
 ```
@@ -419,11 +620,16 @@ src/
   info_theory.py    Transfer entropy, mutual information, interaction information
   track_1_4.py      Information-theoretic detection benchmark (RQ 1.4)
   track_1_5.py      Policy-restriction cost-effectiveness comparison (RQ 1.5)
-  llm_agent.py      LLM pricing agent (local Ollama), regulator-plant variant
+  llm_agent.py      LLM pricing agents: stateless + multi-turn chat, regulator-plant, warning, hard-veto; check_ollama_available() guard
 
 scripts/            One-off LLM experiment runners (long-running, saved incrementally)
-tests/              92 tests covering every module above
-results/            Raw CSV/JSONL output from every experiment reported here
+  run_llm_more_seeds.py   Additional 2-agent stateless seeds
+  run_llm_4agents.py      4-agent stateless spot-check
+  run_llm_plant.py        Regulator-plant intervention (stateless)
+  run_llm_chat.py         Multi-turn chat-mode spot-check
+  run_llm_rq32.py         RQ 3.2: prompt-warning and hard-veto interventions
+tests/              108 tests covering every module above
+results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
 
@@ -435,7 +641,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 92 tests
+python -m pytest -q                # 108 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -447,9 +653,12 @@ python -m src.track_1_5            # Track 1.5 restriction comparison
 # each script takes 10-30+ minutes since every round is a real model call)
 ollama serve &
 ollama pull qwen2.5:7b-instruct
-python scripts/run_llm_more_seeds.py
-python scripts/run_llm_4agents.py
-python scripts/run_llm_plant.py
+python -c "from src.llm_agent import check_ollama_available as c; c()"  # verify before a long run
+python scripts/run_llm_more_seeds.py   # 2-agent stateless, more seeds
+python scripts/run_llm_4agents.py      # 4-agent stateless spot-check
+python scripts/run_llm_plant.py        # regulator-plant intervention
+python scripts/run_llm_chat.py         # multi-turn chat-mode spot-check
+python scripts/run_llm_rq32.py         # RQ 3.2: prompt-warning + hard-veto
 ```
 
 ### A note on resource safety
@@ -465,6 +674,15 @@ load-bearing throughout `src/run_baseline.py` and `src/sweep.py`:
   of currently available RAM.
 - Bounded default parallelism (never claims every CPU core) and a
   best-effort per-worker OS memory limit.
+
+A second, different kind of silent-failure incident hit the LLM track: a
+local Ollama server that had stopped between sessions caused every model
+call in a ~20-minute run to fall back to a random action (the agent code's
+`except Exception` branch), producing plausible-*looking* but entirely
+invalid data with no visible error — caught only by an anomalously uniform
+`n_parse_failures` count. Fixed with `check_ollama_available()`
+(`src/llm_agent.py`), a pre-flight check called at the start of every
+episode that fails loudly instead of degrading silently.
 
 ---
 
@@ -482,4 +700,13 @@ load-bearing throughout `src/run_baseline.py` and `src/sweep.py`:
   being treated as settled (flagged explicitly in that track's results).
 - Consumer surplus is a representative-agent multinomial-logit proxy, used
   only for relative (not absolute) welfare comparisons.
+- The hard-veto result (RQ 3.2) is driven almost entirely by the veto rule
+  itself (it fired on 100% of attempts) rather than by any adaptation from
+  the LLM agents — it demonstrates a deterministic rule can fully override
+  LLM output, not that the agents' intent changed. The chat-mode memory
+  comparison has only 5 seeds given its high variance and should not be
+  treated as a settled mean yet, only as evidence the two memory
+  mechanisms produce qualitatively different dynamics.
+- RQ 3.1, 3.3, and 3.4 are designed (see Related Work section above) but
+  not yet implemented or run.
 </details>
