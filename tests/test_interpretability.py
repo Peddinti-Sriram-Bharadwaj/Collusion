@@ -17,6 +17,10 @@ from src.interpretability.representation_dataset import (
 from src.interpretability.neutral_pipeline import capture_neutral_decision_context
 from src.interpretability.hf_episode import run_hf_neutral_episode, save_hf_trajectory
 from src.interpretability.competitor_intervention import run_paired_competitor_price_intervention
+from src.interpretability.matched_prompt_counterfactual import (
+    derive_matched_prompt_conditions,
+    run_matched_prompt_counterfactuals,
+)
 from scripts import run_hf_competitor_intervention as intervention_cli
 from src.env import LogitBertrandEnv
 
@@ -274,3 +278,60 @@ def test_paired_cli_persists_runtime_memory_and_failure_status(monkeypatch):
         intervention_cli.run_and_persist_paired_experiment(StubExtractor(), output="interrupted.json", run_kwargs={})
     assert captured[-1][1]["execution"]["status"] == "interrupted"
     assert captured[-1][1]["execution"]["error_type"] == "KeyboardInterrupt"
+
+
+def test_matched_prompt_conditions_only_change_named_information_fields():
+    control_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.59
+Reply JSON"""
+    undercut_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.146); rival price(s): $1.33
+Reply JSON"""
+    conditions = derive_matched_prompt_conditions(control_prompt, undercut_prompt)
+    assert conditions["A_original_control"]["prompt"] == control_prompt
+    assert conditions["B_actual_market_undercut"]["prompt"] == undercut_prompt
+    assert conditions["negative_identical_control"]["prompt"] == control_prompt
+    assert conditions["C_synthetic_rival_price_only"]["prompt"].splitlines()[3] == "Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.33"
+    assert conditions["D_synthetic_own_profit_only"]["prompt"].splitlines()[3] == "Round 1: you priced $1.59 (profit 0.146); rival price(s): $1.59"
+    assert conditions["C_synthetic_rival_price_only"]["information_status"] == "synthetic_information_intervention"
+    assert conditions["D_synthetic_own_profit_only"]["modified_fields"] == ["own_profit"]
+
+
+def test_matched_prompt_counterfactual_records_alignment_metrics_and_negative_control():
+    control_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.59
+Reply JSON"""
+    undercut_prompt = control_prompt.replace("profit 0.269); rival price(s): $1.59", "profit 0.146); rival price(s): $1.33")
+    common = {
+        "n_prices": 10,
+        "market_seed": 3,
+        "n_rounds": 5,
+        "episode_id": "source",
+        "round_id": 2,
+        "generation_seed": 4,
+    }
+    control = {**common, "prompt": control_prompt, "full_prompt_hash": sha256(control_prompt.encode()).hexdigest()}
+    undercut = {**common, "prompt": undercut_prompt, "full_prompt_hash": sha256(undercut_prompt.encode()).hexdigest()}
+    result = run_matched_prompt_counterfactuals(
+        HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test"),
+        control_context=control,
+        undercut_context=undercut,
+        selected_layers=[4, 14, 27],
+    )
+    conditions = result["conditions"]
+    assert set(conditions) == {
+        "A_original_control", "B_actual_market_undercut", "C_synthetic_rival_price_only",
+        "D_synthetic_own_profit_only", "negative_identical_control",
+    }
+    assert all(record["eligible_for_analysis"] for record in conditions.values())
+    assert all(record["token_position"] == record["prompt_token_count"] - 1 for record in conditions.values())
+    assert conditions["negative_identical_control"]["full_prompt_hash"] == conditions["A_original_control"]["full_prompt_hash"]
+    assert conditions["C_synthetic_rival_price_only"]["full_prompt_hash"] != conditions["A_original_control"]["full_prompt_hash"]
+    assert result["comparisons_to_A_original_control"]["negative_identical_control"]["4"]["l2_distance"] == 0.0
+    assert result["comparisons_to_A_original_control"]["A_original_control"]["14"]["normalized_l2_distance"] == 0.0

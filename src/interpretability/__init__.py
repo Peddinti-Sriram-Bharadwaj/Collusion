@@ -18,6 +18,12 @@ from .competitor_intervention import (
     run_paired_competitor_price_intervention,
     save_paired_competitor_intervention,
 )
+from .matched_prompt_counterfactual import (
+    derive_matched_prompt_conditions,
+    load_agent1_round3_context,
+    run_matched_prompt_counterfactuals,
+    save_matched_prompt_counterfactuals,
+)
 
 __all__ = [
     "DecisionMetadata",
@@ -33,4 +39,8 @@ __all__ = [
     "save_hf_trajectory",
     "run_paired_competitor_price_intervention",
     "save_paired_competitor_intervention",
+    "derive_matched_prompt_conditions",
+    "load_agent1_round3_context",
+    "run_matched_prompt_counterfactuals",
+    "save_matched_prompt_counterfactuals",
 ]
