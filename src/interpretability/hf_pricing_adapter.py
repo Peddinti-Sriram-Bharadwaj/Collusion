@@ -53,7 +53,16 @@ class HFPricingAgent:
         self.env = env
         self.extractor = extractor
         self.selected_layers = tuple(selected_layers or representative_layers(extractor))
-        self.generation_parameters = generation_parameters or {"do_sample": False, "max_new_tokens": 32}
+        # Qwen's saved generation config includes sampling defaults.  Explicitly
+        # nulling them while ``do_sample=False`` avoids warning noise without
+        # changing greedy decoding behaviour.
+        self.generation_parameters = generation_parameters or {
+            "do_sample": False,
+            "max_new_tokens": 32,
+            "temperature": None,
+            "top_p": None,
+            "top_k": None,
+        }
         self.quantization = quantization
         self.rng = np.random.default_rng(seed)
         # Reuse source-of-truth prompt construction and response parsing.

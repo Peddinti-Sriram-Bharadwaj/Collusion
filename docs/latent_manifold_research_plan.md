@@ -113,8 +113,8 @@ the ignored `artifacts/interpretability/` directory.
 After resource approval, the guarded commands are:
 
 ```powershell
-python scripts/run_hf_neutral_pilot.py --mode alignment --allow-model-load --output artifacts/interpretability/alignment.json
-python scripts/run_hf_neutral_pilot.py --mode episode --allow-model-load --output artifacts/interpretability/neutral-five-round.json
+python -m scripts.run_hf_neutral_pilot --mode alignment --allow-model-load --output artifacts/interpretability/alignment.json
+python -m scripts.run_hf_neutral_pilot --mode episode --allow-model-load --output artifacts/interpretability/neutral-five-round.json
 ```
 
 The pilot remains an integration check, not a direct reproduction of the

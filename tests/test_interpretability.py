@@ -39,9 +39,12 @@ class _FakeModel:
         states = tuple(torch.full((1, 4, 6), float(index)) for index in range(29))
         return SimpleNamespace(hidden_states=states)
 
-    def generate(self, input_ids, attention_mask, do_sample, max_new_tokens):
-        assert do_sample is False
-        assert max_new_tokens == 32
+    def generate(self, input_ids, attention_mask, **kwargs):
+        assert kwargs["do_sample"] is False
+        assert kwargs["max_new_tokens"] == 32
+        assert kwargs["temperature"] is None
+        assert kwargs["top_p"] is None
+        assert kwargs["top_k"] is None
         return torch.cat([input_ids, torch.tensor([[99, 100]])], dim=1)
 
 
