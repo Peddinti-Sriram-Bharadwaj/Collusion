@@ -12,6 +12,8 @@ from .representation_dataset import (
     validate_activation_alignment,
 )
 from .neutral_pipeline import capture_neutral_decision_context
+from .hf_pricing_adapter import HFPricingAgent, PricingDecision
+from .hf_episode import run_hf_neutral_episode, save_hf_trajectory
 
 __all__ = [
     "DecisionMetadata",
@@ -21,4 +23,8 @@ __all__ = [
     "persona_prompt_hash",
     "validate_activation_alignment",
     "capture_neutral_decision_context",
+    "HFPricingAgent",
+    "PricingDecision",
+    "run_hf_neutral_episode",
+    "save_hf_trajectory",
 ]

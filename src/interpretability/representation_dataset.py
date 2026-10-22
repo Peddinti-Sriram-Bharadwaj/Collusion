@@ -28,11 +28,13 @@ class DecisionMetadata:
     persona_id: str | None
     persona_prompt_hash: str
     full_prompt_hash: str
+    input_token_ids_hash: str
     prompt_token_count: int
     n_agents: int
     n_prices: int
     n_rounds: int
     agent_mode: str
+    prompt_format: str
     model_id: str
     model_revision: str | None
     tokenizer_revision: str | None
@@ -71,6 +73,8 @@ def validate_activation_alignment(
         raise ValueError("persona_prompt_hash does not match the exact repository persona text")
     if metadata.prompt_token_count != capture.prompt_token_count:
         raise ValueError("Metadata and capture disagree on prompt token count")
+    if metadata.input_token_ids_hash != capture.input_token_ids_hash:
+        raise ValueError("Metadata and capture disagree on tokenized prompt identity")
     if capture.token_position != capture.prompt_token_count - 1:
         raise ValueError("Capture is not aligned to the final prompt token")
     if not capture.layer_vectors:

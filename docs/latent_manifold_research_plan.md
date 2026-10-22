@@ -86,3 +86,39 @@ Options requiring approval before download are:
    comparison.
 
 No option is selected and no weights are downloaded in this implementation.
+
+## Neutral Hugging Face pilot
+
+The proposed pilot is `Qwen/Qwen2.5-1.5B-Instruct` pinned to revision
+`f73cfd58be7c44c3caabea717217251688cd47b1`. The adapter uses the existing
+stateless prompt builder and its existing price-index parser, but is a separate
+backend: it does not change the Ollama code path. It tokenizes once, captures
+the final prompt token, and generates the price response from the same model
+object, input-token hash, and generation parameters.
+
+The pilot intentionally applies no Hugging Face chat template: it tokenizes
+the exact raw stateless string produced by the repository prompt builder. Its
+metadata records `prompt_format=raw_repository_stateless_v1`. This preserves
+the existing prompt-builder semantics but is not token-for-token equivalent to
+Ollama template behaviour; it is an explicit backend limitation, not a claim
+of comparability.
+
+`run_hf_neutral_episode` is neutral-only (`[None, None]`), reuses the existing
+price grid, history format, profit calculation, and collusion index, and emits
+the local `hf-neutral-trajectory-v1` schema. Its decision rows include price
+and profit, activation vectors, model metadata, episode/agent/round IDs, and
+an explicit failed-capture record when generation fails. Artifacts belong under
+the ignored `artifacts/interpretability/` directory.
+
+After resource approval, the guarded commands are:
+
+```powershell
+python scripts/run_hf_neutral_pilot.py --mode alignment --allow-model-load --output artifacts/interpretability/alignment.json
+python scripts/run_hf_neutral_pilot.py --mode episode --allow-model-load --output artifacts/interpretability/neutral-five-round.json
+```
+
+The pilot remains an integration check, not a direct reproduction of the
+Ollama 7B results: the model size, weights, tokenizer/template behaviour,
+quantization, and generation backend differ. Raw prompt tokenization is kept
+deliberately stable relative to the repository's stateless prompt builder; any
+future chat-template transformation must be separately versioned and studied.
