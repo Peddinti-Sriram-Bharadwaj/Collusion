@@ -89,6 +89,7 @@ class HFActivationExtractor:
             "allocated_bytes": int(torch.cuda.memory_allocated()),
             "reserved_bytes": int(torch.cuda.memory_reserved()),
             "max_allocated_bytes": int(torch.cuda.max_memory_allocated()),
+            "max_reserved_bytes": int(torch.cuda.max_memory_reserved()),
             "free_bytes": int(free_bytes),
             "total_bytes": int(total_bytes),
         }

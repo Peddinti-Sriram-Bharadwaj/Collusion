@@ -16,6 +16,8 @@ from src.interpretability.representation_dataset import (
 )
 from src.interpretability.neutral_pipeline import capture_neutral_decision_context
 from src.interpretability.hf_episode import run_hf_neutral_episode, save_hf_trajectory
+from src.interpretability.competitor_intervention import run_paired_competitor_price_intervention
+from scripts import run_hf_competitor_intervention as intervention_cli
 from src.env import LogitBertrandEnv
 
 
@@ -160,3 +162,115 @@ def test_trajectory_schema_is_json_serializable(monkeypatch):
     monkeypatch.setattr(Path, "write_text", lambda self, data, encoding: written.setdefault("text", data))
     save_hf_trajectory("ignored/trajectory.json", result)
     assert '"schema_version": "hf-neutral-trajectory-v1"' in written["text"]
+
+
+def test_paired_competitor_undercut_uses_executed_price_history_and_aligned_records():
+    class PromptSensitiveTokenizer(_FakeTokenizer):
+        def __call__(self, prompt, return_tensors):
+            marker = sum(prompt.encode("utf-8")) % 50 + 1
+            return {
+                "input_ids": torch.tensor([[11, 12, marker]]),
+                "attention_mask": torch.tensor([[1, 1, 1]]),
+            }
+
+    class PromptSensitiveModel(_FakeModel):
+        def __call__(self, input_ids, attention_mask, output_hidden_states, use_cache):
+            marker = float(input_ids[0, -1].item())
+            states = tuple(torch.full((1, 3, 6), float(index) + marker) for index in range(29))
+            return SimpleNamespace(hidden_states=states)
+
+    result = run_paired_competitor_price_intervention(
+        HFActivationExtractor(PromptSensitiveModel(), PromptSensitiveTokenizer(), "mock/qwen", "test"),
+        n_rounds=3,
+        seed=9,
+        intervention_round=0,
+        override_index=1,
+        selected_layers=[4, 14, 27],
+    )
+    control = result["trajectories"]["control"]
+    noop = result["trajectories"]["no_op"]
+    undercut = result["trajectories"]["undercut"]
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+
+    assert np.allclose(control["price_history"][0], env.price_grid[[3, 3]])
+    assert np.allclose(undercut["price_history"][0], env.price_grid[[1, 3]])
+    assert np.allclose(undercut["profit_history"][0], env._profits(env.price_grid[[1, 3]]))
+    intervention = undercut["interventions"][0]
+    assert intervention == {
+        "variant": "undercut", "round_id": 0, "target_agent_id": 0,
+        "requested_override_index": 1, "proposed_action_index": 3,
+        "executed_action_index": 1, "applied": True, "kind": "executed_price_override",
+    }
+    assert noop["interventions"][0]["kind"] == "no_op"
+    assert noop["interventions"][0]["applied"] is True
+    assert result["response_comparison"]["no_op_matches_control"] is True
+
+    control_response = next(d for d in control["decisions"] if d["agent_id"] == 1 and d["round_id"] == 1)
+    undercut_response = next(d for d in undercut["decisions"] if d["agent_id"] == 1 and d["round_id"] == 1)
+    assert f"rival price(s): ${env.price_grid[3]:.2f}" in control_response["prompt"]
+    assert f"rival price(s): ${env.price_grid[1]:.2f}" in undercut_response["prompt"]
+    assert control_response["full_prompt_hash"] != undercut_response["full_prompt_hash"]
+    assert result["response_comparison"]["undercut_minus_control_activation"]["4"]["l2_distance"] > 0
+    for trajectory in result["trajectories"].values():
+        assert all(d["eligible_for_analysis"] for d in trajectory["decisions"])
+        assert all(d["token_position"] == d["prompt_token_count"] - 1 for d in trajectory["decisions"])
+        assert all(set(d["layer_vectors"]) == {"4", "14", "27"} for d in trajectory["decisions"])
+
+
+def test_paired_competitor_intervention_replays_deterministically_and_rejects_non_undercut():
+    extractor = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test")
+    first = run_paired_competitor_price_intervention(
+        extractor, n_rounds=3, seed=2, intervention_round=0, override_index=1, selected_layers=[4, 14, 27],
+    )
+    second = run_paired_competitor_price_intervention(
+        extractor, n_rounds=3, seed=2, intervention_round=0, override_index=1, selected_layers=[4, 14, 27],
+    )
+    for variant in ("control", "no_op", "undercut"):
+        assert np.array_equal(first["trajectories"][variant]["price_history"], second["trajectories"][variant]["price_history"])
+        assert [d["full_prompt_hash"] for d in first["trajectories"][variant]["decisions"]] == [
+            d["full_prompt_hash"] for d in second["trajectories"][variant]["decisions"]
+        ]
+
+    with pytest.raises(ValueError, match="strictly below"):
+        run_paired_competitor_price_intervention(
+            extractor, n_rounds=3, seed=2, intervention_round=0, override_index=3, selected_layers=[4, 14, 27],
+        )
+
+
+def test_paired_cli_persists_runtime_memory_and_failure_status(monkeypatch):
+    class StubExtractor:
+        model_id = "mock/qwen"
+        revision = "test"
+        tokenizer_revision = "test"
+
+        def memory_snapshot(self):
+            return {
+                "cuda_available": True,
+                "allocated_bytes": 10,
+                "reserved_bytes": 20,
+                "max_allocated_bytes": 30,
+                "max_reserved_bytes": 40,
+            }
+
+    captured = []
+    monkeypatch.setattr(intervention_cli, "save_paired_competitor_intervention", lambda path, result: captured.append((path, result)))
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: {"schema_version": "test"})
+    result = intervention_cli.run_and_persist_paired_experiment(
+        StubExtractor(), output="ignored.json", run_kwargs={"seed": 1},
+    )
+    assert result["execution"]["status"] == "completed"
+    assert result["execution"]["wall_clock_seconds"] >= 0
+    assert result["execution"]["memory_before_release"]["max_reserved_bytes"] == 40
+    assert captured[-1][1]["execution"]["error_type"] is None
+
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: (_ for _ in ()).throw(RuntimeError("mock failure")))
+    with pytest.raises(RuntimeError, match="mock failure"):
+        intervention_cli.run_and_persist_paired_experiment(StubExtractor(), output="failed.json", run_kwargs={})
+    assert captured[-1][1]["execution"]["status"] == "failed"
+    assert captured[-1][1]["execution"]["error_type"] == "RuntimeError"
+
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: (_ for _ in ()).throw(KeyboardInterrupt()))
+    with pytest.raises(KeyboardInterrupt):
+        intervention_cli.run_and_persist_paired_experiment(StubExtractor(), output="interrupted.json", run_kwargs={})
+    assert captured[-1][1]["execution"]["status"] == "interrupted"
+    assert captured[-1][1]["execution"]["error_type"] == "KeyboardInterrupt"

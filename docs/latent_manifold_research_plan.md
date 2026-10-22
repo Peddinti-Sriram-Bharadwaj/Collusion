@@ -122,3 +122,35 @@ Ollama 7B results: the model size, weights, tokenizer/template behaviour,
 quantization, and generation backend differ. Raw prompt tokenization is kept
 deliberately stable relative to the repository's stateless prompt builder; any
 future chat-template transformation must be separately versioned and studied.
+
+## Paired competitor-price intervention pilot
+
+`run_paired_competitor_price_intervention` is a market-level counterfactual,
+not activation steering. It runs three deterministic, neutral-persona
+trajectories from the same empty history and seed: `control`, `no_op`, and
+`undercut`. At the pre-specified intervention round, `undercut` replaces only
+Agent 0's *executed* action with a strictly lower valid grid index. The
+subsequent shared history and profits are calculated from the executed actions,
+while every decision record retains both the proposed and executed indices.
+The no-op variant records the same intervention plumbing but leaves the action
+unchanged; it must reproduce control before an undercut contrast is used.
+
+The primary endpoint is Agent 1's next-round price response. Its exact prompt,
+prompt/token hashes, model revisions, parsed response, action, profit, and
+selected-layer vectors are retained. The output reports layer-wise L2 distance
+and cosine similarity between the next-response activations, but these are
+descriptive: the price intervention identifies an effect on a subsequent
+market-conditioned decision, not a causal internal coordination mechanism.
+High prices or Delta are not used as proof of collusion.
+
+After approval, an offline engineering run can be invoked as:
+
+```powershell
+$env:HF_HUB_OFFLINE = "1"
+$env:TRANSFORMERS_OFFLINE = "1"
+.venv-cuda\Scripts\python.exe -m scripts.run_hf_competitor_intervention --allow-model-load --local-files-only --rounds 5 --intervention-round 1 --override-index 0 --output artifacts/interpretability/paired-undercut.json
+```
+
+The runner refuses an invalid contrast: the override must be strictly below
+Agent 0's valid proposed price at the chosen round. No probes, persona sweeps,
+or activation steering are part of this pilot.

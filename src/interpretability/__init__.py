@@ -14,6 +14,10 @@ from .representation_dataset import (
 from .neutral_pipeline import capture_neutral_decision_context
 from .hf_pricing_adapter import HFPricingAgent, PricingDecision
 from .hf_episode import run_hf_neutral_episode, save_hf_trajectory
+from .competitor_intervention import (
+    run_paired_competitor_price_intervention,
+    save_paired_competitor_intervention,
+)
 
 __all__ = [
     "DecisionMetadata",
@@ -27,4 +31,6 @@ __all__ = [
     "PricingDecision",
     "run_hf_neutral_episode",
     "save_hf_trajectory",
+    "run_paired_competitor_price_intervention",
+    "save_paired_competitor_intervention",
 ]

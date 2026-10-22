@@ -101,6 +101,10 @@ class HFPricingAgent:
                 proposed_action_index=None if parse_failed else idx, executed_action_index=idx,
             )
             record = aligned_record(metadata, capture)
+            # Retain the exact model-facing context for post-hoc checks of
+            # history and interventions. The hash above remains the stable
+            # identifier for joins and duplicate detection.
+            record["prompt"] = prompt
             record["raw_response"] = text
             record["parse_failed"] = parse_failed
             record["eligible_for_analysis"] = not parse_failed
