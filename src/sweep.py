@@ -5,7 +5,13 @@ from __future__ import annotations
 
 import itertools
 import os
-import resource
+try:
+    # ``resource`` is a POSIX module.  The sweep's address-space limit is a
+    # best-effort guard; the independent Q-table and RAM-budget guards below
+    # remain active on Windows.
+    import resource
+except ImportError:  # pragma: no cover - exercised on Windows
+    resource = None
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 
@@ -28,6 +34,8 @@ DEFAULT_MAX_WORKERS = max(1, min(4, (os.cpu_count() or 4) - 1))
 
 def _limit_worker_memory():
     """Runs once in each worker process (ProcessPoolExecutor initializer)."""
+    if resource is None:
+        return
     try:
         resource.setrlimit(resource.RLIMIT_AS, (PER_WORKER_MEM_BYTES, PER_WORKER_MEM_BYTES))
     except (ValueError, OSError):
