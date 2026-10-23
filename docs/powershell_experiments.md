@@ -12,3 +12,19 @@ Get-Content artifacts\interpretability\behavioural-diagnostic.json -Raw | Conver
 ```
 
 The diagnostic compares raw repository prompts with Qwen chat-template prompts and records the protocol identity. It does not capture activations.
+
+## Behavioural-responsiveness benchmark
+
+This separate benchmark replays ten fixed, market-consistent histories through
+`LogitBertrandEnv`: histories contain one, two, four, or eight rounds and span
+low, high, rising, falling, alternating, and matched rival-price patterns. It
+records raw and Qwen-chat-template prompting as distinct configurations. It
+does not capture activations.
+
+```powershell
+# Run offline-only, with the cached model and deterministic decoding.
+$env:HF_HUB_OFFLINE='1'; $env:TRANSFORMERS_OFFLINE='1'; .\.venv-cuda\Scripts\python.exe -m scripts.run_hf_behavioural_responsiveness_benchmark --allow-model-load --local-files-only --seed 0 --protocol both
+
+# Inspect protocol-specific action diversity and matched raw/chat disagreement.
+Get-Content artifacts\interpretability\behavioural-responsiveness-benchmark.json -Raw | ConvertFrom-Json | Select-Object -ExpandProperty summary | ConvertTo-Json -Depth 6
+```
