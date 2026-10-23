@@ -9,6 +9,9 @@ from src.env import LogitBertrandEnv
 
 
 class _Tokenizer:
+    def __init__(self, response='{"price_index": 3}'):
+        self.response = response
+
     def __call__(self, prompt, return_tensors):
         assert return_tensors == "pt"
         return {"input_ids": torch.tensor([[11, 12, 13]]), "attention_mask": torch.tensor([[1, 1, 1]])}
@@ -19,7 +22,7 @@ class _Tokenizer:
 
     def decode(self, token_ids, skip_special_tokens):
         assert skip_special_tokens is True
-        return '{"price_index": 3}'
+        return self.response
 
 
 class _Model:
@@ -35,9 +38,9 @@ class _Extractor:
     revision = "test"
     tokenizer_revision = "test"
 
-    def __init__(self):
+    def __init__(self, response='{"price_index": 3}'):
         self.model = _Model()
-        self.tokenizer = _Tokenizer()
+        self.tokenizer = _Tokenizer(response)
         self.capture_final_prompt_token = lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("no activation extraction"))
 
     def _prepare_inputs(self, prompt):
@@ -76,12 +79,27 @@ def test_benchmark_records_protocol_configuration_hashes_and_is_deterministic(mo
 
 def test_summary_counts_only_valid_matched_protocol_pairs():
     rows = [
-        {"scenario_id": "a", "protocol": benchmark.RAW_PROTOCOL, "parse_valid": True, "selected_price_index": 1},
-        {"scenario_id": "a", "protocol": benchmark.CHAT_PROTOCOL, "parse_valid": True, "selected_price_index": 2},
-        {"scenario_id": "b", "protocol": benchmark.RAW_PROTOCOL, "parse_valid": True, "selected_price_index": 1},
-        {"scenario_id": "b", "protocol": benchmark.CHAT_PROTOCOL, "parse_valid": False, "selected_price_index": 9},
+        {"scenario_id": "a", "protocol": benchmark.RAW_PROTOCOL, "analysis_eligible": True, "selected_price_index": 1},
+        {"scenario_id": "a", "protocol": benchmark.CHAT_PROTOCOL, "analysis_eligible": True, "selected_price_index": 2},
+        {"scenario_id": "b", "protocol": benchmark.RAW_PROTOCOL, "analysis_eligible": True, "selected_price_index": 1},
+        {"scenario_id": "b", "protocol": benchmark.CHAT_PROTOCOL, "analysis_eligible": False, "selected_price_index": None},
     ]
     summary = benchmark.summarise_rows(rows)
     assert summary["matched_protocol_pairs"] == 1
     assert summary["matched_protocol_different_actions"] == 1
     assert summary["matched_protocol_different_action_fraction"] == 1.0
+
+
+def test_observed_instruction_echo_is_ineligible_without_a_fallback_action():
+    echo = '''The output should be formatted like so:
+
+{
+  "price_index": 3
+}
+This problem involves understanding and applying concepts related to supply and demand curves,'''
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = benchmark.LLMPricingAgent(1, env, persona=None, seed=0)
+    decision = benchmark._generate_decision(_Extractor(echo), agent, "mock prompt")
+    assert decision["selected_price_index"] is None
+    assert decision["analysis_eligible"] is False
+    assert decision["parse_status"] == "extra_text_or_embedded_json"

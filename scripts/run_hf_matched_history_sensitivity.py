@@ -86,12 +86,13 @@ def summarise_rows(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     by_protocol = {}
     for protocol in (RAW_PROTOCOL, CHAT_PROTOCOL):
         protocol_rows = [row for row in rows if row["protocol"] == protocol]
-        valid = [row for row in protocol_rows if row["parse_valid"]]
+        valid = [row for row in protocol_rows if row["analysis_eligible"]]
         actions = [row["selected_price_index"] for row in valid]
         counts = {str(action): actions.count(action) for action in sorted(set(actions))}
         by_protocol[protocol] = {
             "n_rows": len(protocol_rows),
             "n_valid": len(valid),
+            "n_invalid": len(protocol_rows) - len(valid),
             "parse_valid_fraction": len(valid) / len(protocol_rows) if protocol_rows else None,
             "action_counts_valid": counts,
             "action_diversity_valid": len(counts),

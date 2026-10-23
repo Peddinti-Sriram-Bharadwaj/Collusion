@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 from hashlib import sha256
-import re
 from typing import Any
 
 import torch
@@ -11,6 +10,7 @@ import torch
 from src.env import LogitBertrandEnv
 from src.interpretability.activation_extractor import HFActivationExtractor
 from src.interpretability.hf_episode import save_hf_trajectory
+from src.interpretability.strict_pricing_parser import parse_strict_price_response
 from src.llm_agent import LLMPricingAgent
 
 
@@ -88,8 +88,7 @@ def run_diagnostic(
             response = extractor.tokenizer.decode(
                 sequence[0, prompt_length:], skip_special_tokens=True
             )
-            match = re.search(r'"price_index"\s*:\s*(\d+)', response)
-            action_index = agent._parse_index(response)
+            parsed = parse_strict_price_response(response, env.n_prices)
             rows.append(
                 {
                     "condition": condition,
@@ -97,8 +96,8 @@ def run_diagnostic(
                     "prompt": prompt,
                     "prompt_hash": sha256(prompt.encode("utf-8")).hexdigest(),
                     "prompt_token_count": prompt_length,
-                    "selected_price_index": action_index,
-                    "parse_valid": bool(match and 0 <= int(match.group(1)) < env.n_prices),
+                    **parsed.to_dict(),
+                    "parse_valid": parsed.analysis_eligible,
                     "raw_response": response,
                 }
             )

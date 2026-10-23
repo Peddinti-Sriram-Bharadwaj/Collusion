@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict, dataclass
 from hashlib import sha256
-import re
 from typing import Any, Sequence
 
 import numpy as np
@@ -13,6 +12,7 @@ import torch
 from src.env import LogitBertrandEnv
 from src.interpretability.activation_extractor import HFActivationExtractor
 from src.interpretability.hf_episode import save_hf_trajectory
+from src.interpretability.strict_pricing_parser import parse_strict_price_response
 from src.llm_agent import LLMPricingAgent
 
 
@@ -104,10 +104,10 @@ def _generate_decision(extractor: HFActivationExtractor, agent: LLMPricingAgent,
     response = extractor.tokenizer.decode(
         sequence[0, prompt_length:], skip_special_tokens=True
     )
-    match = re.search(r'"price_index"\s*:\s*(\d+)', response)
+    parsed = parse_strict_price_response(response, agent.env.n_prices)
     return {
-        "selected_price_index": agent._parse_index(response),
-        "parse_valid": bool(match and 0 <= int(match.group(1)) < agent.env.n_prices),
+        **parsed.to_dict(),
+        "parse_valid": parsed.analysis_eligible,
         "raw_response": response,
         "prompt_token_count": prompt_length,
     }
@@ -118,12 +118,13 @@ def summarise_rows(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     by_protocol: dict[str, dict[str, Any]] = {}
     for protocol in (RAW_PROTOCOL, CHAT_PROTOCOL):
         protocol_rows = [row for row in rows if row["protocol"] == protocol]
-        valid = [row for row in protocol_rows if row["parse_valid"]]
+        valid = [row for row in protocol_rows if row["analysis_eligible"]]
         actions = [row["selected_price_index"] for row in valid]
         counts = {str(action): actions.count(action) for action in sorted(set(actions))}
         by_protocol[protocol] = {
             "n_rows": len(protocol_rows),
             "n_valid": len(valid),
+            "n_invalid": len(protocol_rows) - len(valid),
             "parse_valid_fraction": len(valid) / len(protocol_rows) if protocol_rows else None,
             "action_counts_valid": counts,
             "action_diversity_valid": len(counts),
@@ -135,7 +136,7 @@ def summarise_rows(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     pairs = [
         values for values in grouped.values()
         if RAW_PROTOCOL in values and CHAT_PROTOCOL in values
-        and values[RAW_PROTOCOL]["parse_valid"] and values[CHAT_PROTOCOL]["parse_valid"]
+        and values[RAW_PROTOCOL]["analysis_eligible"] and values[CHAT_PROTOCOL]["analysis_eligible"]
     ]
     different = sum(
         pair[RAW_PROTOCOL]["selected_price_index"] != pair[CHAT_PROTOCOL]["selected_price_index"]
