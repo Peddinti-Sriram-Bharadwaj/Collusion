@@ -809,6 +809,73 @@ Two findings, and they point in different directions:
 
 ---
 
+## RQ 3.4 — What does a coalition do when it learns it is being watched?
+
+<details>
+<summary><b>Why</b></summary>
+
+RQ 3.1 showed no evidence of agents *adapting* their phrasing after
+being blocked by an active monitor. This asks the softer, more common
+real-world version of that question: does merely *telling* agents their
+communications are being watched (with nothing actually blocked, unlike
+the keyword monitor) change the visible content or style of their
+coordination, even if it doesn't stop the coordination itself? This is
+the practical case most relevant to e.g. "we log and periodically audit
+agent conversations" policies.
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Added `SURVEILLANCE_NOTICE` and a `surveillance` flag to
+`LLMMessagingAgent` / `run_llm_messaging_episode`: agents are told their
+messages and reasoning are logged and may be reviewed by a regulator for
+collusion, but — unlike RQ 3.1's keyword monitor — nothing is actually
+blocked. Two agents, stateless mode, 25 rounds, 5 seeds, compared
+against RQ 3.1's existing unmonitored `open_messages` baseline.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Condition | Δ (mean, 95% CI) | n | Overt collusive attempts (keyword) | Bare-number-only messages (e.g. "Consider $1.85") |
+|---|---|---|---|---|
+| No surveillance notice | 0.773 (0.712–0.834) | 5 | 85/250 (34.0%) | 26/250 (10.4%) |
+| Told they're being watched | **0.896 (0.875–0.916)** | 5 | 59/250 (23.6%) | **45/250 (18.0%)** |
+
+Zero parse failures in all 5 episodes. Explicit coordination verbs
+("match", "cooperate", "collaborate") dropped slightly (48.8% → 44.4% of
+all messages), while bare numeric price suggestions with no verb at all
+("Consider $1.85", "Consider $1.94") nearly doubled.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+Being told you're watched **did not reduce collusion — Δ went up, with
+non-overlapping confidence intervals against the unwarned baseline.**
+But it did measurably change the *style* of visible coordination: fewer
+explicit coordination verbs, a near-doubling of bare price-number
+suggestions that convey the same joint-target-price signal with far
+less incriminating surface language. "Consider $1.85" functions
+identically to "Consider matching my price" for coordination purposes,
+but reads far more innocuously to a human or keyword-based auditor
+glancing at any single message in isolation.
+
+This is a real, if partial, instance of the concern in *Faithful yet
+Collusive*: surveillance awareness pushed the *visible evidence of
+intent* toward a less legible form without reducing — and here,
+apparently while increasing — the underlying coordination. It falls
+short of genuine steganography (no shared code requiring decoding; a
+human reviewing the full transcript, not just one message, would likely
+still notice both firms converging on the same bare numbers every
+round), but it is a concrete demonstration that "we log conversations
+for later audit" is not a free safety win, and can shift language in the
+wrong direction without being tested first.
+</details>
+
+---
+
 ## Related work / benchmarks surveyed (for RQ 3.1–3.4)
 
 <details>
@@ -839,7 +906,7 @@ Two findings, and they point in different directions:
 </details>
 
 <details>
-<summary><b>Evaluation awareness / sandbagging (relevant to RQ 3.4, not yet run)</b></summary>
+<summary><b>Evaluation awareness / sandbagging (relevant to RQ 3.4, reproduced/extended above)</b></summary>
 
 - Apollo Research: Claude Sonnet 3.7 verbalizes evaluation-awareness in up to ~33% of sandbagging-eval runs ([blog](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/)).
 - **In-Context Environments Induce Evaluation-Awareness** ([arXiv:2603.03824](https://www.alphaxiv.org/abs/2603.03824)) — sandbagging can occur with *no* verbalized awareness, a CoT-monitoring blind spot.
@@ -887,7 +954,8 @@ scripts/            One-off LLM experiment runners (long-running, saved incremen
   run_llm_rq33.py         RQ 3.3: peer-identity info and real model heterogeneity
   run_llm_personas.py     RQ 3.5: economic/organizational persona manipulation
   run_llm_stego.py        RQ 3.1: messaging side-channel + keyword monitor (steganographic collusion)
-tests/              131 tests covering every module above
+  run_llm_surveillance.py RQ 3.4: surveillance-awareness manipulation
+tests/              134 tests covering every module above
 results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
@@ -900,7 +968,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 131 tests
+python -m pytest -q                # 134 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -922,6 +990,7 @@ ollama pull qwen2.5:0.5b-instruct      # also needed for RQ 3.3's heterogeneous-
 python scripts/run_llm_rq33.py         # RQ 3.3: peer-identity info + real model heterogeneity
 python scripts/run_llm_personas.py     # RQ 3.5: economic/organizational persona manipulation
 python scripts/run_llm_stego.py        # RQ 3.1: messaging side-channel + keyword monitor
+python scripts/run_llm_surveillance.py # RQ 3.4: surveillance-awareness manipulation
 ```
 
 ### A note on resource safety
