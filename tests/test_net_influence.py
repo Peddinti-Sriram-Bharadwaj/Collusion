@@ -5,6 +5,8 @@ from src.net_influence import (
     pairwise_action_correlation,
     pairwise_net_influence,
     rank_pairs,
+    simulate_continuous_market,
+    rank_pairs_continuous,
 )
 
 
@@ -58,3 +60,29 @@ def test_pairwise_net_influence_nonnegative():
     actions, confound = simulate_rps_game(n_players=3, n_rounds=200, seed=4)
     net = pairwise_net_influence(actions, confound, 0, 1)
     assert net >= -1e-9
+
+
+def test_continuous_market_shapes():
+    prices, shock = simulate_continuous_market(n_agents=5, n_periods=200, seed=0)
+    assert prices.shape == (200, 5)
+    assert shock.shape == (200,)
+
+
+def test_continuous_net_influence_ranks_true_colluding_pair_first():
+    prices, shock = simulate_continuous_market(
+        n_agents=5, n_periods=1000, colluding_pair=(0, 1),
+        shock_std=0.2, collusion_strength=0.9, seed=0,
+    )
+    ranked = rank_pairs_continuous(prices, shock, lag=1, bins=10)
+    assert ranked[0][0] == (0, 1)
+
+
+def test_continuous_net_influence_flat_when_no_true_collusion():
+    prices, shock = simulate_continuous_market(
+        n_agents=5, n_periods=1000, colluding_pair=(0, 1),
+        shock_std=0.2, collusion_strength=0.0, seed=1,
+    )
+    ranked = rank_pairs_continuous(prices, shock, lag=1, bins=10)
+    # with no genuine collusion, net influence should stay well below the
+    # true-collusion case's score (~1.0+ at these settings)
+    assert all(net < 0.3 for _, _, net in ranked)

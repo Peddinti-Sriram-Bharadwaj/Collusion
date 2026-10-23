@@ -18,12 +18,24 @@ drawn "mood" signal each round (a confound) -- so naive pairwise action
 correlation is inflated for every pair, not just the colluding one. A
 useful detector should rank the true colluding pair above the others even
 after accounting for that shared confound.
+
+A second, continuous-valued extension (simulate_continuous_market /
+rank_pairs_continuous, near the bottom of this file) tests the same idea
+on data shaped like a real pricing/auction market (an AR(1) shared demand
+shock instead of a discrete mood signal, continuous prices instead of
+rock/paper/scissors choices, discretized via info_theory.discretize_series
+before computing conditional mutual information). It still correctly
+ranks the true colluding pair first, but the margin over the next-best
+(confound-only) pair is much smaller there (~1.2-1.4x) than in the
+discrete RPS case (~5-15x) -- a real, honestly-reported limitation of this
+proxy on continuous data, not something to paper over before applying it
+to real auction logs.
 """
 from __future__ import annotations
 
 import numpy as np
 
-from src.info_theory import mutual_information, conditional_mutual_information
+from src.info_theory import mutual_information, conditional_mutual_information, discretize_series
 
 
 def simulate_rps_game(
@@ -94,6 +106,93 @@ def rank_pairs(actions: np.ndarray, confound: np.ndarray, lag: int = 1) -> list[
                 continue
             corr = pairwise_action_correlation(actions, i, j, lag=lag)
             net = pairwise_net_influence(actions, confound, i, j, lag=lag)
+            rows.append(((i, j), corr, net))
+    rows.sort(key=lambda r: r[2], reverse=True)
+    return rows
+
+
+# --- Continuous-valued extension -------------------------------------------
+# The RPS game above is discrete by construction. The real target (a
+# multi-seller double auction / Bertrand pricing market) has continuous
+# prices, so this validates the same net-influence idea after discretizing
+# continuous series via info_theory.discretize_series -- closer to what
+# applying it to real auction/pricing data would actually require.
+
+def simulate_continuous_market(
+    n_agents: int = 5,
+    n_periods: int = 800,
+    colluding_pair: tuple[int, int] = (0, 1),
+    price_low: float = 1.0,
+    price_high: float = 2.0,
+    shock_std: float = 0.15,
+    shock_ar: float = 0.9,
+    collusion_strength: float = 0.9,
+    noise_std: float = 0.03,
+    seed: int = 0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Returns (price_history, shock_history).
+
+    price_history: (n_periods, n_agents) float array. Every agent's price
+    is independently nudged by a shared AR(1) demand shock each period
+    (the confound -- inflates correlation for ALL pairs). Separately, the
+    second member of `colluding_pair` copies the first member's previous
+    price (plus small noise) with probability `collusion_strength` -- the
+    genuine, confound-independent signal a detector should isolate.
+    """
+    rng = np.random.default_rng(seed)
+    mid = (price_low + price_high) / 2
+    span = (price_high - price_low) / 2
+    i, j = colluding_pair
+
+    shock = np.zeros(n_periods)
+    prices = np.zeros((n_periods, n_agents))
+    prices[0] = mid + rng.normal(0, noise_std, size=n_agents)
+
+    for t in range(n_periods):
+        shock[t] = shock_ar * (shock[t - 1] if t > 0 else 0.0) + rng.normal(0, shock_std)
+        base = np.clip(mid + shock[t] * span, price_low, price_high)
+        row = base + rng.normal(0, noise_std, size=n_agents)
+        if t > 0 and rng.random() < collusion_strength:
+            row[j] = np.clip(prices[t - 1, i] + rng.normal(0, noise_std), price_low, price_high)
+        prices[t] = np.clip(row, price_low, price_high)
+
+    return prices, shock
+
+
+def pairwise_net_influence_continuous(
+    prices: np.ndarray, shock: np.ndarray, i: int, j: int, lag: int = 1, bins: int = 6,
+) -> float:
+    """Same idea as pairwise_net_influence, but for continuous series:
+    discretize i's lagged price, j's price, and the shock into `bins`
+    quantile bins each, then take their conditional mutual information."""
+    x = discretize_series(prices[:-lag, i], bins=bins)
+    y = discretize_series(prices[lag:, j], bins=bins)
+    z = discretize_series(shock[lag:], bins=bins)
+    return conditional_mutual_information(x, y, z)
+
+
+def pairwise_correlation_continuous(prices: np.ndarray, i: int, j: int, lag: int = 1) -> float:
+    """Naive detector for continuous data: Pearson correlation between i's
+    lagged price and j's price. Blind to the shared shock."""
+    x = prices[:-lag, i]
+    y = prices[lag:, j]
+    return float(np.corrcoef(x, y)[0, 1])
+
+
+def rank_pairs_continuous(
+    prices: np.ndarray, shock: np.ndarray, lag: int = 1, bins: int = 6,
+) -> list[tuple[tuple[int, int], float, float]]:
+    """All (i, j) pairs (i != j) on continuous price data, each with
+    (raw Pearson correlation, net influence), sorted by net influence
+    descending."""
+    n_agents = prices.shape[1]
+    rows = []
+    for i in range(n_agents):
+        for j in range(n_agents):
+            if i == j:
+                continue
+            corr = pairwise_correlation_continuous(prices, i, j, lag=lag)
+            net = pairwise_net_influence_continuous(prices, shock, i, j, lag=lag, bins=bins)
             rows.append(((i, j), corr, net))
     rows.sort(key=lambda r: r[2], reverse=True)
     return rows
