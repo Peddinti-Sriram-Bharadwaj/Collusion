@@ -21,6 +21,7 @@ from src.interpretability.matched_prompt_counterfactual import (
     derive_matched_prompt_conditions,
     run_matched_prompt_counterfactuals,
 )
+from src.interpretability.balanced_counterfactual_dataset import generate_balanced_scenarios, collect_balanced_counterfactual_dataset, assert_no_split_leakage
 from scripts import run_hf_competitor_intervention as intervention_cli
 from src.env import LogitBertrandEnv
 
@@ -335,3 +336,24 @@ Reply JSON"""
     assert conditions["C_synthetic_rival_price_only"]["full_prompt_hash"] != conditions["A_original_control"]["full_prompt_hash"]
     assert result["comparisons_to_A_original_control"]["negative_identical_control"]["4"]["l2_distance"] == 0.0
     assert result["comparisons_to_A_original_control"]["A_original_control"]["14"]["normalized_l2_distance"] == 0.0
+
+
+def test_balanced_scenarios_are_valid_matched_and_pre_split():
+    scenarios = generate_balanced_scenarios(12, seed=4)
+    assert len(scenarios) == 12
+    assert all(s.intervention["executed_action_index"] < s.intervention["proposed_action_index"] for s in scenarios)
+    assert len({s.split for s in scenarios}) >= 2
+    for scenario in scenarios:
+        assert np.allclose(scenario.control_history[-1][0][1], scenario.undercut_history[-1][0][1])
+        assert scenario.control_history[-1][0][0] != scenario.undercut_history[-1][0][0]
+
+
+def test_balanced_collection_integrity_and_scenario_split_leakage_checks():
+    scenarios = generate_balanced_scenarios(10, seed=1)
+    data = collect_balanced_counterfactual_dataset(HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test"), scenarios, selected_layers=[4,14,27])
+    assert_no_split_leakage(data["rows"])
+    assert all(r["record"]["token_position"] == r["record"]["prompt_token_count"] - 1 for r in data["rows"])
+    assert all(set(r["record"]["layer_vectors"]) == {"4","14","27"} for r in data["rows"])
+    bad = [dict(data["rows"][0]), dict(data["rows"][0], split="test" if data["rows"][0]["split"] != "test" else "train")]
+    with pytest.raises(ValueError, match="multiple"):
+        assert_no_split_leakage(bad)

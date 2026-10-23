@@ -24,6 +24,7 @@ from .matched_prompt_counterfactual import (
     run_matched_prompt_counterfactuals,
     save_matched_prompt_counterfactuals,
 )
+from .balanced_counterfactual_dataset import generate_balanced_scenarios, collect_balanced_counterfactual_dataset, assert_no_split_leakage
 
 __all__ = [
     "DecisionMetadata",
@@ -43,4 +44,5 @@ __all__ = [
     "load_agent1_round3_context",
     "run_matched_prompt_counterfactuals",
     "save_matched_prompt_counterfactuals",
+    "generate_balanced_scenarios", "collect_balanced_counterfactual_dataset", "assert_no_split_leakage",
 ]
