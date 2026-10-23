@@ -45,3 +45,16 @@ def test_analyze_run_raises_without_metrics_file(tmp_path):
     import pytest
     with pytest.raises(FileNotFoundError):
         analyze_run(tmp_path)
+
+
+def test_analyze_run_flags_price_alignment_language_not_in_collusion_keywords(tmp_path):
+    run_dir = _write_fake_run(tmp_path, [
+        "Consider aligning asks around $80.35 to capture the highest bids.",
+        "Stay competitive.",
+    ])
+    result = analyze_run(run_dir)
+    # this phrasing should NOT trip the original pre-registered keyword list...
+    assert result["n_flagged"] == 0
+    # ...but SHOULD be caught by the separate, explicitly post-hoc alignment list
+    assert result["n_price_alignment"] == 1
+    assert "aligning asks around" in result["sample_price_alignment_messages"][0]
