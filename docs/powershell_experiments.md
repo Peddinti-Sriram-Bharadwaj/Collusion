@@ -28,3 +28,22 @@ $env:HF_HUB_OFFLINE='1'; $env:TRANSFORMERS_OFFLINE='1'; .\.venv-cuda\Scripts\pyt
 # Inspect protocol-specific action diversity and matched raw/chat disagreement.
 Get-Content artifacts\interpretability\behavioural-responsiveness-benchmark.json -Raw | ConvertFrom-Json | Select-Object -ExpandProperty summary | ConvertTo-Json -Depth 6
 ```
+
+## Matched-history sensitivity
+
+This separate four-scenario experiment holds the four-round own-price sequence
+fixed at indices `5, 5, 5, 5`. Only the rival path changes: consistently low,
+consistently high, falling, or rising. Every price/profit entry is replayed via
+`LogitBertrandEnv.step`; raw and Qwen-chat-template prompting remain separate
+experimental configurations.
+
+```powershell
+# Run the four matched histories once per selected protocol, offline only.
+$env:HF_HUB_OFFLINE='1'; $env:TRANSFORMERS_OFFLINE='1'; .\.venv-cuda\Scripts\python.exe -m scripts.run_hf_matched_history_sensitivity --allow-model-load --local-files-only --seed 0 --protocol both
+
+# Inspect protocol-specific valid-action variation.
+Get-Content artifacts\interpretability\matched-history-sensitivity.json -Raw | ConvertFrom-Json | Select-Object -ExpandProperty summary | ConvertTo-Json -Depth 6
+
+# Inspect each complete market history and decision.
+Get-Content artifacts\interpretability\matched-history-sensitivity.json -Raw | ConvertFrom-Json | Select-Object -ExpandProperty rows | Select-Object scenario_id,rival_pattern,protocol,selected_price_index,parse_valid,history_length,prompt_hash
+```
