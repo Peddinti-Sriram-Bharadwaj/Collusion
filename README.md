@@ -876,6 +876,64 @@ wrong direction without being tested first.
 
 ---
 
+## RQ 2.2 — Does combining what agents say with what they do beat either alone?
+
+<details>
+<summary><b>Why</b></summary>
+
+The hackathon's official formulation of this question asks whether a
+hybrid word/action detector beats looking at either channel alone. We
+already had paired message + price logs sitting from RQ 3.1 — this is
+the cheapest possible test: when an agent proposes a specific price in
+its message, does its own next action (or its rival's) actually match
+what it said?
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Reran the open-messages condition with `price_history` also persisted
+(`scripts/run_llm_consistency.py`, 5 seeds, 25 rounds, 2 agents). For
+every message containing a dollar figure (e.g. "Consider $1.85"),
+checked whether the *speaker's own* next-round price, and the *rival's*
+next-round price, landed within one price-grid step (~0.10, since free
+text doesn't always land exactly on a grid point) of the number stated.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Metric | Rate | n (price-bearing messages) |
+|---|---|---|
+| Self-consistency (speaker's own next price matches its stated number) | 84.2% | 38 |
+| Rival-compliance (rival's next price matches the stated number) | 89.5% | 38 |
+
+One of the 5 episodes (seed 2) had elevated parse failures (12, vs. 0
+elsewhere) caused by resource contention from another experiment
+running concurrently on the same local Ollama instance — included here
+for completeness but flagged as noisier than the rest.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+Say and do are tightly coupled in this environment: when an agent
+states a specific joint target price in its message, both it and its
+rival follow through on that exact number roughly 85-90% of the time by
+the very next round. This is a strong, simple instance of the "combine
+words and actions" detection strategy the hackathon brief points to
+(Shi et al. 2026 found >90% of deviations from public announcements
+were already present in private plans, in a different game) — here the
+public message essentially *is* the plan, and the market faithfully
+executes it. A detector that only watched prices would catch the same
+collusion (as every prior track shows, since Δ stays high with or
+without messaging), but a detector that can also read the message
+channel gets a much earlier and more interpretable signal of *intent*,
+not just outcome.
+</details>
+
+---
+
 ## Related work / benchmarks surveyed (for RQ 3.1–3.4)
 
 <details>
@@ -955,7 +1013,8 @@ scripts/            One-off LLM experiment runners (long-running, saved incremen
   run_llm_personas.py     RQ 3.5: economic/organizational persona manipulation
   run_llm_stego.py        RQ 3.1: messaging side-channel + keyword monitor (steganographic collusion)
   run_llm_surveillance.py RQ 3.4: surveillance-awareness manipulation
-tests/              134 tests covering every module above
+  run_llm_consistency.py  RQ 2.2: say-do (word/action) consistency check
+tests/              143 tests covering every module above
 results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
@@ -968,7 +1027,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 134 tests
+python -m pytest -q                # 143 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -991,6 +1050,7 @@ python scripts/run_llm_rq33.py         # RQ 3.3: peer-identity info + real model
 python scripts/run_llm_personas.py     # RQ 3.5: economic/organizational persona manipulation
 python scripts/run_llm_stego.py        # RQ 3.1: messaging side-channel + keyword monitor
 python scripts/run_llm_surveillance.py # RQ 3.4: surveillance-awareness manipulation
+python scripts/run_llm_consistency.py  # RQ 2.2: say-do consistency check
 ```
 
 ### A note on resource safety
