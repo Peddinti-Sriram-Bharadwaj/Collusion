@@ -15,6 +15,7 @@ from src.llm_agent import (
     PEER_INFO_TEXT,
     PERSONA_TEXT,
     _contains_collusive_language,
+    SURVEILLANCE_NOTICE,
 )
 
 
@@ -356,7 +357,7 @@ class _StubMessagingAgent:
 def test_messaging_episode_without_monitor_delivers_collusive_message(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMMessagingAgent", lambda agent_id, env, model, seed: _StubMessagingAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMMessagingAgent", lambda agent_id, env, model, surveillance, seed: _StubMessagingAgent(env.n_prices))
     monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
 
     r = run_llm_messaging_episode(n_agents=2, n_prices=10, n_rounds=3, monitor=False, seed=0)
@@ -369,7 +370,7 @@ def test_messaging_episode_without_monitor_delivers_collusive_message(monkeypatc
 def test_messaging_episode_with_monitor_blocks_collusive_message(monkeypatch):
     import src.llm_agent as llm_mod
 
-    monkeypatch.setattr(llm_mod, "LLMMessagingAgent", lambda agent_id, env, model, seed: _StubMessagingAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "LLMMessagingAgent", lambda agent_id, env, model, surveillance, seed: _StubMessagingAgent(env.n_prices))
     monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
 
     r = run_llm_messaging_episode(n_agents=2, n_prices=10, n_rounds=3, monitor=True, seed=0)
@@ -378,6 +379,36 @@ def test_messaging_episode_with_monitor_blocks_collusive_message(monkeypatch):
     assert all("BLOCKED" in m for round_msgs in r["delivered_message_log"] for m in round_msgs)
     # the original attempt is still visible in the raw log, unlike the delivered one
     assert all("let's both keep our prices high" in m for round_msgs in r["raw_message_log"] for m in round_msgs)
+
+
+def test_surveillance_notice_appears_in_messaging_prompt_when_enabled():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMMessagingAgent(agent_id=0, env=env, surveillance=True, seed=0)
+    prompt = agent._build_prompt(history=[], incoming_messages=[], round_num=0, n_rounds=25)
+    assert "logged" in prompt.lower() and "reviewed" in prompt.lower()
+
+
+def test_surveillance_notice_absent_from_messaging_prompt_by_default():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    agent = LLMMessagingAgent(agent_id=0, env=env, seed=0)
+    prompt = agent._build_prompt(history=[], incoming_messages=[], round_num=0, n_rounds=25)
+    assert SURVEILLANCE_NOTICE.strip() not in prompt
+
+
+def test_run_llm_messaging_episode_passes_surveillance_flag(monkeypatch):
+    import src.llm_agent as llm_mod
+
+    captured = []
+
+    def fake_cls(agent_id, env, model, surveillance, seed):
+        captured.append(surveillance)
+        return _StubMessagingAgent(env.n_prices)
+
+    monkeypatch.setattr(llm_mod, "LLMMessagingAgent", fake_cls)
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
+
+    run_llm_messaging_episode(n_agents=2, n_prices=10, n_rounds=2, surveillance=True, seed=0)
+    assert captured == [True, True]
 
 
 def test_check_ollama_available_raises_when_unreachable(monkeypatch):
