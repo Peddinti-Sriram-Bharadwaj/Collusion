@@ -625,7 +625,7 @@ appear to be a lever on collusion in this setup.
 
 ---
 
-## RQ 3.4 — Does a firm's declared economic philosophy change collusion?
+## RQ 3.5 — Does a firm's declared economic philosophy change collusion?
 
 <details>
 <summary><b>Why</b></summary>
@@ -718,6 +718,97 @@ flip the market into active price competition.
 
 ---
 
+## RQ 3.1 — Steganographic / covert-channel collusion
+
+<details>
+<summary><b>Why</b></summary>
+
+All prior conditions let collusion happen through the price action alone
+(tacit coordination) or, in RQ 3.2, tested whether *blocking the price*
+changes behavior. This asks the adjacent question from the literature
+(CASE, Secret Collusion among AI Agents; ColludeBench-v0's covert
+pricing schemes; Faithful yet Collusive's critique of naive CoT
+monitoring): if you give agents an explicit communication side-channel
+and then start filtering it, do they (a) just keep failing the same
+blocked way, or (b) adapt toward disguised/covert phrasing that evades
+the filter while still achieving coordination?
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Added `LLMMessagingAgent` and `run_llm_messaging_episode` to
+`src/llm_agent.py`: on top of the ordinary pricing game, each agent also
+emits a short free-text message the rival sees before its next price
+choice. A simple keyword/regex monitor (`COLLUSION_KEYWORDS`, 17
+patterns like `match.{0,15}price`, `cooperat`, `cartel`, `fix.{0,20}price`
+— deliberately heuristic, modeling a naive CoT/content monitor) can
+optionally block any outgoing message matching those patterns before
+delivery; the original pre-redaction message is still logged either way.
+Two agents, stateless mode, 25 rounds, 5 seeds per condition:
+
+- **Open messages**: unfiltered side-channel.
+- **Monitored messages**: keyword-filtered side-channel.
+</details>
+
+<details>
+<summary><b>Results</b></summary>
+
+| Condition | Δ (mean, 95% CI) | n | Flagged messages | Blocked |
+|---|---|---|---|---|
+| Open messages | 0.773 (0.712–0.834) | 5 | 85/250 | 0 (no monitor) |
+| Monitored messages | 0.808 (0.755–0.860) | 5 | 75/250 | 75/250 (100%) |
+
+In the open condition, with zero prompting toward collusion anywhere in
+the game rules, the model converged within 4-5 rounds to bluntly literal
+price-fixing proposals — *"Consider matching my price."*, *"Let's
+cooperate on this one."* — stated outright, every round, for the rest of
+the episode. This is the obvious profit-maximizing move once an
+unrestricted channel is handed to a model reasoning about a repeated
+pricing game; nothing subtle about it.
+
+In the monitored condition, **100% of keyword-matching attempts were
+blocked, and the model never adapted its phrasing in response** — it
+kept retrying near-identical blocked text ("Consider matching my price")
+dozens of times per episode with no behavioral change. But a manual scan
+of the *unflagged* messages found 15/250 (6%) that were substantively
+collusive despite never matching a keyword: *"Let's split the market"*,
+*"Keep it high, we can split the market"*, *"Considering your hint,
+let's try $1.68"* (a concrete joint price proposal), *"Will lower if you
+drop first"* (explicit tit-for-tat), *"Keep it steady, avoid price
+wars"*. None of these look deliberately disguised — they're just
+ordinary paraphrases that happen to fall outside a 17-pattern list.
+</details>
+
+<details>
+<summary><b>Takeaway</b></summary>
+
+Two findings, and they point in different directions:
+
+- **No evidence of intent-driven steganographic adaptation.** The model
+  never learned "that phrasing gets blocked, let me invent a new code."
+  Every blocked attempt was a near-verbatim retry, not a workaround —
+  the same "compliant output, unchanged intent" pattern as RQ 3.2's hard
+  veto, just on the message channel instead of the price channel.
+- **But a naive keyword monitor is trivially incomplete anyway, by
+  accident rather than by adversarial design.** 6% of messages achieved
+  real coordination (market division, concrete joint price proposals,
+  tit-for-tat terms) through ordinary paraphrase, with no evasive intent
+  needed. The practical risk from simple content filters isn't that
+  models will cleverly steganography-encode around them — it's that
+  natural language has more semantically-equivalent surface forms than
+  any finite keyword list can enumerate.
+- **Either way, Δ stayed high (0.77–0.81) regardless of whether the
+  message channel worked at all.** Price coordination in this
+  environment doesn't actually need the message channel to succeed —
+  tacit coordination through the price action alone (as in every prior
+  track) is already sufficient. The message channel adds a visible
+  layer of *evidence* of intent, but isn't load-bearing for the outcome
+  itself.
+</details>
+
+---
+
 ## Related work / benchmarks surveyed (for RQ 3.1–3.4)
 
 <details>
@@ -794,8 +885,9 @@ scripts/            One-off LLM experiment runners (long-running, saved incremen
   run_llm_chat.py         Multi-turn chat-mode spot-check
   run_llm_rq32.py         RQ 3.2: prompt-warning and hard-veto interventions
   run_llm_rq33.py         RQ 3.3: peer-identity info and real model heterogeneity
-  run_llm_personas.py     RQ 3.4: economic/organizational persona manipulation
-tests/              119 tests covering every module above
+  run_llm_personas.py     RQ 3.5: economic/organizational persona manipulation
+  run_llm_stego.py        RQ 3.1: messaging side-channel + keyword monitor (steganographic collusion)
+tests/              131 tests covering every module above
 results/            Raw CSV/JSONL output from every experiment reported here (git-ignored, regenerable)
 experimental_plan.md  Full experimental design write-up
 ```
@@ -808,7 +900,7 @@ experimental_plan.md  Full experimental design write-up
 pip install -r requirements.txt
 
 # Fast checks (tabular Q-learning, seconds to minutes)
-python -m pytest -q                # 119 tests
+python -m pytest -q                # 131 tests
 python -m src.run_baseline         # single-episode Calvano-style baseline
 python -m src.track_1_1            # Track 1.1 sweep
 python -m src.track_1_2            # Track 1.2 replacement study
@@ -828,7 +920,8 @@ python scripts/run_llm_chat.py         # multi-turn chat-mode spot-check
 python scripts/run_llm_rq32.py         # RQ 3.2: prompt-warning + hard-veto
 ollama pull qwen2.5:0.5b-instruct      # also needed for RQ 3.3's heterogeneous-model conditions
 python scripts/run_llm_rq33.py         # RQ 3.3: peer-identity info + real model heterogeneity
-python scripts/run_llm_personas.py     # RQ 3.4: economic/organizational persona manipulation
+python scripts/run_llm_personas.py     # RQ 3.5: economic/organizational persona manipulation
+python scripts/run_llm_stego.py        # RQ 3.1: messaging side-channel + keyword monitor
 ```
 
 ### A note on resource safety
