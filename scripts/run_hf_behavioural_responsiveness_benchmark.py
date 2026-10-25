@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict, dataclass
 from hashlib import sha256
+from time import perf_counter
 from typing import Any, Sequence
 
 import numpy as np
@@ -113,6 +114,44 @@ def _generate_decision(extractor: HFActivationExtractor, agent: LLMPricingAgent,
     }
 
 
+def model_placement_metadata(extractor: HFActivationExtractor) -> dict[str, Any]:
+    """Record one shared model's placement without allocating another copy."""
+    model = extractor.model
+    device_map = getattr(model, "hf_device_map", None)
+    return {
+        "model_device": str(getattr(model, "device", None)),
+        "hf_device_map": None if device_map is None else {
+            str(module): str(device) for module, device in device_map.items()
+        },
+        "shared_model_instances": 1,
+    }
+
+
+def _memory_snapshot(extractor: HFActivationExtractor) -> dict[str, Any]:
+    snapshot = getattr(extractor, "memory_snapshot", None)
+    return snapshot() if callable(snapshot) else {"cuda_available": False}
+
+
+def load_configured_extractor(
+    *, model_id: str, model_revision: str, local_files_only: bool
+) -> HFActivationExtractor:
+    """Load exactly the requested model/revision, never silently substituting one."""
+    try:
+        return HFActivationExtractor.from_pretrained(
+            model_id,
+            revision=model_revision,
+            device_map="auto",
+            torch_dtype=torch.float16,
+            local_files_only=local_files_only,
+        )
+    except OSError as exc:
+        locality = "local cache" if local_files_only else "configured Hugging Face source"
+        raise RuntimeError(
+            f"Requested model {model_id!r} at revision {model_revision!r} is unavailable from the {locality}. "
+            "No model or revision was substituted."
+        ) from exc
+
+
 def summarise_rows(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     """Summarise protocol-specific diversity and paired protocol disagreement."""
     by_protocol: dict[str, dict[str, Any]] = {}
@@ -155,11 +194,15 @@ def run_benchmark(
     *,
     seed: int = 0,
     protocol: str = "both",
+    smoke_only: bool = False,
 ) -> dict[str, Any]:
     """Evaluate each generated market history once for each selected protocol."""
+    started_at = perf_counter()
     env = LogitBertrandEnv(n_agents=2, n_prices=10)
     agent = LLMPricingAgent(1, env, persona=None, seed=seed)
     scenarios = generate_market_scenarios(seed)
+    if smoke_only:
+        scenarios = scenarios[:1]
     rows = []
     for scenario in scenarios:
         market_history = materialize_history(env, scenario)
@@ -184,11 +227,23 @@ def run_benchmark(
     return {
         "schema_version": "hf-behavioural-responsiveness-benchmark-v1",
         "seed": seed,
+        "smoke_only": smoke_only,
+        "model": {
+            "model_id": extractor.model_id,
+            "model_revision": extractor.revision,
+            "tokenizer_revision": extractor.tokenizer_revision,
+            "placement": model_placement_metadata(extractor),
+        },
         "deterministic_generation": True,
         "activation_extraction": False,
         "scenarios": [asdict(scenario) for scenario in scenarios],
         "rows": rows,
         "summary": summarise_rows(rows),
+        "execution": {
+            "status": "completed",
+            "wall_clock_seconds": perf_counter() - started_at,
+            "peak_cuda_memory": _memory_snapshot(extractor),
+        },
     }
 
 
@@ -196,8 +251,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--allow-model-load", action="store_true")
     parser.add_argument("--local-files-only", action="store_true")
+    parser.add_argument("--model-id", default=DEFAULT_MODEL_ID)
+    parser.add_argument("--model-revision", default=DEFAULT_MODEL_REVISION)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--protocol", choices=["raw", "chat", "both"], default="both")
+    parser.add_argument("--smoke-only", action="store_true", help="Evaluate exactly the first fixed scenario.")
     parser.add_argument(
         "--output",
         default="artifacts/interpretability/behavioural-responsiveness-benchmark.json",
@@ -206,17 +264,24 @@ def main() -> None:
     if not args.allow_model_load:
         parser.error("Refusing to load model weights without --allow-model-load.")
 
-    extractor = HFActivationExtractor.from_pretrained(
-        DEFAULT_MODEL_ID,
-        revision=DEFAULT_MODEL_REVISION,
-        device_map="auto",
-        torch_dtype=torch.float16,
+    load_started_at = perf_counter()
+    extractor = load_configured_extractor(
+        model_id=args.model_id,
+        model_revision=args.model_revision,
         local_files_only=args.local_files_only,
     )
+    model_load_seconds = perf_counter() - load_started_at
     try:
-        save_hf_trajectory(
-            args.output, run_benchmark(extractor, seed=args.seed, protocol=args.protocol)
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+        result = run_benchmark(
+            extractor,
+            seed=args.seed,
+            protocol=args.protocol,
+            smoke_only=args.smoke_only,
         )
+        result["execution"]["model_load_wall_clock_seconds"] = model_load_seconds
+        save_hf_trajectory(args.output, result)
     finally:
         extractor.close()
 

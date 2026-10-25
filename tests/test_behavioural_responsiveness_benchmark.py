@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 import torch
 
 from scripts import run_hf_behavioural_responsiveness_benchmark as benchmark
@@ -27,6 +28,7 @@ class _Tokenizer:
 
 class _Model:
     device = None
+    hf_device_map = {"": "cuda:0"}
 
     def generate(self, input_ids, attention_mask, **kwargs):
         assert kwargs == {"do_sample": False, "max_new_tokens": 32, "temperature": None, "top_p": None, "top_k": None}
@@ -45,6 +47,12 @@ class _Extractor:
 
     def _prepare_inputs(self, prompt):
         return self.tokenizer(prompt, return_tensors="pt")
+
+    def memory_snapshot(self):
+        return {"cuda_available": True, "max_allocated_bytes": 123, "max_reserved_bytes": 456}
+
+    def close(self):
+        self.closed = True
 
 
 def test_market_scenarios_are_reproducible_and_replay_through_environment():
@@ -65,7 +73,9 @@ def test_benchmark_records_protocol_configuration_hashes_and_is_deterministic(mo
     monkeypatch.setattr(benchmark.HFActivationExtractor, "from_pretrained", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("no model download")))
     first = benchmark.run_benchmark(_Extractor(), seed=2, protocol="both")
     second = benchmark.run_benchmark(_Extractor(), seed=2, protocol="both")
-    assert first == second
+    assert first["rows"] == second["rows"]
+    assert first["summary"] == second["summary"]
+    assert first["model"] == second["model"]
     assert first["activation_extraction"] is False
     assert len(first["rows"]) == 20
     assert {row["protocol"] for row in first["rows"]} == {benchmark.RAW_PROTOCOL, benchmark.CHAT_PROTOCOL}
@@ -75,6 +85,9 @@ def test_benchmark_records_protocol_configuration_hashes_and_is_deterministic(mo
     assert summary["matched_protocol_pairs"] == 10
     assert summary["matched_protocol_different_action_fraction"] == 0.0
     assert summary["by_protocol"][benchmark.RAW_PROTOCOL]["action_diversity_valid"] == 1
+    assert first["model"]["placement"]["shared_model_instances"] == 1
+    assert first["execution"]["wall_clock_seconds"] >= 0
+    assert first["execution"]["peak_cuda_memory"]["max_reserved_bytes"] == 456
 
 
 def test_summary_counts_only_valid_matched_protocol_pairs():
@@ -103,3 +116,61 @@ This problem involves understanding and applying concepts related to supply and 
     assert decision["selected_price_index"] is None
     assert decision["analysis_eligible"] is False
     assert decision["parse_status"] == "extra_text_or_embedded_json"
+
+
+def test_smoke_only_uses_exactly_one_fixed_scenario_per_protocol():
+    result = benchmark.run_benchmark(_Extractor(), seed=7, protocol="both", smoke_only=True)
+    assert result["smoke_only"] is True
+    assert len(result["scenarios"]) == 1
+    assert len(result["rows"]) == 2
+    assert {row["scenario_id"] for row in result["rows"]} == {"responsiveness-000"}
+
+
+def test_requested_model_revision_is_passed_once_and_unavailable_cache_fails(monkeypatch):
+    calls = []
+
+    def loader(model_id, **kwargs):
+        calls.append((model_id, kwargs))
+        return _Extractor()
+
+    monkeypatch.setattr(benchmark.HFActivationExtractor, "from_pretrained", staticmethod(loader))
+    extractor = benchmark.load_configured_extractor(
+        model_id="Qwen/Qwen2.5-1.5B-Instruct", model_revision="pinned", local_files_only=True
+    )
+    assert isinstance(extractor, _Extractor)
+    assert calls == [("Qwen/Qwen2.5-1.5B-Instruct", {
+        "revision": "pinned", "device_map": "auto", "torch_dtype": torch.float16, "local_files_only": True,
+    })]
+
+    monkeypatch.setattr(
+        benchmark.HFActivationExtractor,
+        "from_pretrained",
+        staticmethod(lambda *args, **kwargs: (_ for _ in ()).throw(OSError("not cached"))),
+    )
+    with pytest.raises(RuntimeError, match="No model or revision was substituted"):
+        benchmark.load_configured_extractor(model_id="missing/model", model_revision="missing", local_files_only=True)
+
+
+def test_cli_creates_one_shared_model_instance_for_a_smoke_run(monkeypatch):
+    loader_calls, saved = [], []
+
+    def loader(model_id, **kwargs):
+        loader_calls.append((model_id, kwargs))
+        return _Extractor()
+
+    monkeypatch.setattr(benchmark.HFActivationExtractor, "from_pretrained", staticmethod(loader))
+    monkeypatch.setattr(benchmark, "save_hf_trajectory", lambda path, result: saved.append((path, result)))
+    monkeypatch.setattr(benchmark.torch.cuda, "is_available", lambda: False)
+    monkeypatch.setattr("sys.argv", [
+        "run_hf_behavioural_responsiveness_benchmark.py",
+        "--allow-model-load", "--local-files-only", "--model-id", "mock/1.5b",
+        "--model-revision", "pinned", "--protocol", "chat", "--smoke-only", "--output", "ignored.json",
+    ])
+    benchmark.main()
+    assert len(loader_calls) == 1
+    assert loader_calls[0][0] == "mock/1.5b"
+    assert loader_calls[0][1]["revision"] == "pinned"
+    assert loader_calls[0][1]["local_files_only"] is True
+    assert saved[0][1]["model"]["placement"]["shared_model_instances"] == 1
+    assert saved[0][1]["execution"]["model_load_wall_clock_seconds"] >= 0
+    assert len(saved[0][1]["rows"]) == 1

@@ -47,6 +47,7 @@ class HFActivationExtractor:
         torch_dtype: Any | None = None,
         load_in_4bit: bool = False,
         local_files_only: bool = False,
+        cache_dir: str | None = None,
     ) -> "HFActivationExtractor":
         """Load a model only when a caller explicitly requests it.
 
@@ -68,8 +69,11 @@ class HFActivationExtractor:
             model_kwargs["torch_dtype"] = torch_dtype
         if load_in_4bit:
             model_kwargs["load_in_4bit"] = True
+        if cache_dir is not None:
+            model_kwargs["cache_dir"] = cache_dir
         tokenizer = AutoTokenizer.from_pretrained(
             model_id, revision=revision, local_files_only=local_files_only,
+            **({"cache_dir": cache_dir} if cache_dir is not None else {}),
         )
         model = AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs)
         model.eval()
