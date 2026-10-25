@@ -1,0 +1,242 @@
+{
+ "batch_id": "sd_v1_primary_7b_001",
+ "protocol": "strategic_deviation_v1",
+ "designation": "confirmatory",
+ "model": "7b",
+ "description": "Stage B primary: H1-H5 on Qwen2.5-7B, 16 histories, greedy, v1 template, base economics.",
+ "base": {
+  "design": {
+   "rounds": 16,
+   "deviation_round": 7,
+   "high": 7,
+   "low": 2,
+   "recovery_delay": 3,
+   "raise_to": 9
+  },
+  "audit_generation": "deviation_window"
+ },
+ "blocks": [
+  {
+   "name": "primary",
+   "grid": {
+    "condition": [
+     "A_stable",
+     "B_one_shot",
+     "C_persistent",
+     "D_gradual",
+     "E_nash",
+     "F_delayed",
+     "G_raise"
+    ],
+    "seeds.history_seed": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15
+    ],
+    "steering_preset": [
+     {
+      "steering": {
+       "kind": "none"
+      }
+     },
+     {
+      "steering": {
+       "kind": "sham",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "learned",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": -1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "learned",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "learned",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 2.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 1,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 2,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 2.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 2.0,
+       "random_seed": 1,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 2.0,
+       "random_seed": 2,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "generic_price",
+       "vector_id": "generic_price_answer_L20_b1",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "learned",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "post_deviation"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "name": "fixed_history",
+   "overrides": {
+    "experiment": "fixed_history"
+   },
+   "grid": {
+    "condition": [
+     "H_sudden",
+     "H_gradual",
+     "H_always_low",
+     "H_stable_high"
+    ],
+    "seeds.history_seed": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15
+    ],
+    "steering_preset": [
+     {
+      "steering": {
+       "kind": "none"
+      }
+     },
+     {
+      "steering": {
+       "kind": "learned",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     },
+     {
+      "steering": {
+       "kind": "random",
+       "vector_id": "learned_answer_L20_c3d",
+       "alpha": 1.0,
+       "random_seed": 0,
+       "timing": "all"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "name": "repeatability",
+   "grid": {
+    "condition": [
+     "A_stable",
+     "B_one_shot"
+    ],
+    "seeds.history_seed": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "replicate": [
+     1
+    ]
+   }
+  }
+ ]
+}
