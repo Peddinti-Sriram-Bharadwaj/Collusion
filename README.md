@@ -1211,7 +1211,7 @@ explicit team decision partway through the hackathon.
 | 2.1 Which tasks lead to collusion | `colosseum/` | Not attempted — judged too heavy to stand up in the sprint window (Terrarium + CoLLAB + tool-calling stack) |
 | 2.2 Say vs. do | `llm-trust-breaking/`, `trace-guard/` | Not attempted directly (adjacent weekend project below touches `llm-trust-breaking`) |
 | 2.3 What counts as evidence | `colosseum/`, `steganographic-collusion/` | Not attempted |
-| **3.1** Actions/side-channels as collusion conduit | `colosseum/`, `collusive-llm-agents/` | **In progress** — visibility ablation on the Cournot notebook (below); local pilot run underway |
+| **3.1** Actions/side-channels as collusion conduit | `colosseum/`, `collusive-llm-agents/` | **In progress** — visibility ablation on the Cournot notebook (below); 2 of 3 conditions (`hidden`, `visible`) complete at n=8 pairings, `canonical` running |
 | 3.2 Trusted-agent disruption | `llm-agent-collusion-2/` | Not attempted |
 | **3.3-adjacent** "Weekend project": mid-run model-identity swap | `llm-trust-breaking/` | **Pilot complete** (below) — real local data, n=5 pairings/condition, 2 of 4 planned conditions run |
 | **3.4** Watched coalitions | `llm-agent-collusion/` | **Attempted, stopped at a decision gate** (below) — positive control never cleared the paper's own cartel threshold on two open models, so the oversight sweep itself was not run |
@@ -1386,17 +1386,24 @@ channel, not just inferable noise.
 reliably produce valid JSON for this prompt (failed all 3 reprompts,
 consistent with the original notebook's own note that even `gpt-3.5-turbo`
 produces invalid prices regularly); switched to `qwen2.5:7b-instruct`, which
-ran all three conditions cleanly. 1-seed/2-round smoke tests (`hidden`
-CV=0.525/profit=1537.5, `visible` CV=0.225/profit=1343.8, `canonical`
-CV=0.325/profit=1393.8) are explicitly **not evidence** — pure noise at this
-n, and the direction was in fact opposite the hypothesis, which is expected
-at n=1. A real pilot run (`hidden`, 8 pairings × 15 rounds, local Ollama) is
-in progress as of this writing; `visible` and `canonical` are queued to run
-after it, one condition at a time.
+ran all three conditions cleanly. The 1-seed/2-round smoke tests from early
+validation are not reported below (pure noise at n=1, superseded by the real
+runs). Real pilot run, local Ollama, `qwen2.5:7b-instruct`, 8 pairings × 15
+rounds per condition (95% CI across all firm-pairing observations, n=16):
 
-**Inferences / conclusions.** Not yet available — this lane is mid-run.
-Per the evidence standard above, this section will only claim an
-action-carrier channel if `visible` shows higher specialization (CV) than
-both `hidden` and `canonical`, and will report plainly if it doesn't,
-consistent with this project's practice of treating a null result as
-informative rather than withholding it.
+| Condition | Mean CV (specialization) | Mean final cumulative profit |
+|---|---|---|
+| `hidden` (paper's original baseline) | 0.408 [CI 0.358–0.458] | 11072.0 [CI 9972–12172] |
+| `visible` (competitor's exact quantity shown) | 0.443 [CI 0.365–0.522] | 11837.8 [CI 10093–13583] |
+| `canonical` (competitor's quantity rounded) | *pending — run in progress* | *pending* |
+
+**Inferences / conclusions.** `visible`'s mean CV (0.443) is numerically
+higher than `hidden`'s (0.408), in the hypothesized direction, but the two
+95% CIs overlap heavily (0.358–0.458 vs. 0.365–0.522) — this is not yet a
+statistically distinguishable difference at n=8 pairings/condition. Per the
+pre-registered evidence standard, a real action-carrier claim also requires
+the effect to weaken under `canonical`, which hasn't run yet. **No claim of
+an action-carrier channel can be made yet** — the directional signal is
+consistent with the hypothesis but not strong enough on its own, and the
+third condition is required before any conclusion. Will update once
+`canonical` completes.
