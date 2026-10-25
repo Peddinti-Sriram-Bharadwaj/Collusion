@@ -1211,7 +1211,7 @@ explicit team decision partway through the hackathon.
 | 2.1 Which tasks lead to collusion | `colosseum/` | Not attempted — judged too heavy to stand up in the sprint window (Terrarium + CoLLAB + tool-calling stack) |
 | 2.2 Say vs. do | `llm-trust-breaking/`, `trace-guard/` | Not attempted directly (adjacent weekend project below touches `llm-trust-breaking`) |
 | 2.3 What counts as evidence | `colosseum/`, `steganographic-collusion/` | Not attempted |
-| **3.1** Actions/side-channels as collusion conduit | `colosseum/`, `collusive-llm-agents/` | **In progress** — visibility ablation on the Cournot notebook (below); 2 of 3 conditions (`hidden`, `visible`) complete at n=8 pairings, `canonical` running |
+| **3.1** Actions/side-channels as collusion conduit | `colosseum/`, `collusive-llm-agents/` | **Complete at n=8 (null result)** — visibility ablation on the Cournot notebook (below); all 3 conditions run, CVs overlap, no action-carrier channel supported. A Modal scale-up to n=20 was attempted but blocked by a recurring infra disconnect |
 | 3.2 Trusted-agent disruption | `llm-agent-collusion-2/` | Not attempted |
 | **3.3-adjacent** "Weekend project": mid-run model-identity swap | `llm-trust-breaking/` | **Pilot complete** (below) — real local data, n=5 pairings/condition, 2 of 4 planned conditions run |
 | **3.4** Watched coalitions | `llm-agent-collusion/` | **Attempted, stopped at a decision gate** (below) — positive control never cleared the paper's own cartel threshold on two open models, so the oversight sweep itself was not run |
@@ -1388,22 +1388,35 @@ consistent with the original notebook's own note that even `gpt-3.5-turbo`
 produces invalid prices regularly); switched to `qwen2.5:7b-instruct`, which
 ran all three conditions cleanly. The 1-seed/2-round smoke tests from early
 validation are not reported below (pure noise at n=1, superseded by the real
-runs). Real pilot run, local Ollama, `qwen2.5:7b-instruct`, 8 pairings × 15
-rounds per condition (95% CI across all firm-pairing observations, n=16):
+runs). Real run, local Ollama, `qwen2.5:7b-instruct`, 8 pairings × 15 rounds
+per condition (95% CI across all firm-pairing observations, n=16):
 
 | Condition | Mean CV (specialization) | Mean final cumulative profit |
 |---|---|---|
 | `hidden` (paper's original baseline) | 0.408 [CI 0.358–0.458] | 11072.0 [CI 9972–12172] |
 | `visible` (competitor's exact quantity shown) | 0.443 [CI 0.365–0.522] | 11837.8 [CI 10093–13583] |
-| `canonical` (competitor's quantity rounded) | *pending — run in progress* | *pending* |
+| `canonical` (competitor's quantity rounded) | 0.417 [CI 0.352–0.483] | 11930.5 [CI 10353–13508] |
 
-**Inferences / conclusions.** `visible`'s mean CV (0.443) is numerically
-higher than `hidden`'s (0.408), in the hypothesized direction, but the two
-95% CIs overlap heavily (0.358–0.458 vs. 0.365–0.522) — this is not yet a
-statistically distinguishable difference at n=8 pairings/condition. Per the
-pre-registered evidence standard, a real action-carrier claim also requires
-the effect to weaken under `canonical`, which hasn't run yet. **No claim of
-an action-carrier channel can be made yet** — the directional signal is
-consistent with the hypothesis but not strong enough on its own, and the
-third condition is required before any conclusion. Will update once
-`canonical` completes.
+An attempt to scale this up to n=20/condition on a Modal-hosted
+`Qwen2.5-7B-Instruct` (A10G) got one condition done (`hidden`, CV
+consistent with the local n=8 result) before the Modal ephemeral app
+disconnected mid-run (`modal.exception.ConflictError: App state is
+APP_STATE_STOPPED`) and failed the `visible` condition entirely. This
+happened on **two separate attempts** — the second wrapped in a persistent
+`caffeinate` to rule out the earlier suspected cause (a short-lived sleep
+assertion expiring mid-run) — so this looks like a genuine, recurring issue
+with long-lived ephemeral Modal apps over this network, not a one-off. Not
+re-attempted a third time without changing something about the approach
+(e.g. a non-ephemeral/deployed app, or shorter per-condition runs).
+
+**Inferences / conclusions.** At n=8 pairings/condition (the largest clean
+dataset obtained), all three conditions' CVs are close and their 95% CIs
+overlap heavily: `hidden` 0.408, `canonical` 0.417, `visible` 0.443.
+`visible` is numerically highest, in the hypothesized direction, but
+`canonical` sits almost on top of `hidden` rather than at an intermediate
+point, and none of the differences are statistically distinguishable at
+this n. **No action-carrier channel is supported by this data** — this
+reads as a genuine null result at the scale we were able to run, not
+merely "needs more data," though the Modal scale-up that could have settled
+that more conclusively was blocked by the infra issue above rather than
+completed.
