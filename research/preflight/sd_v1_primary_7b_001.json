@@ -1,0 +1,327 @@
+{
+ "batch_id": "sd_v1_primary_7b_001",
+ "n_units": 1656,
+ "checks": {
+  "history_prefixes_4r": {
+   "n_seeds": 16,
+   "n_distinct": 16,
+   "examples": [
+    [
+     0,
+     [
+      8,
+      7,
+      6,
+      5
+     ]
+    ],
+    [
+     1,
+     [
+      6,
+      6,
+      7,
+      8
+     ]
+    ],
+    [
+     2,
+     [
+      8,
+      5,
+      4,
+      5
+     ]
+    ],
+    [
+     3,
+     [
+      8,
+      4,
+      4,
+      5
+     ]
+    ]
+   ]
+  },
+  "fixed_history_own_index_counts": {
+   "4": 2,
+   "6": 4,
+   "7": 6,
+   "8": 4
+  },
+  "scripted_sequences": {
+   "A_stable@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": null,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "B_one_shot@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 8,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     2,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "C_persistent@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ]
+   },
+   "D_gradual@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 3,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     6,
+     5,
+     4,
+     3,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ]
+   },
+   "E_nash@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 0,
+    "returns_at": null,
+    "seq": [
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ]
+   },
+   "F_delayed@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 10,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     2,
+     2,
+     2,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "G_raise@{\"deviation_round\": 7, \"high\": 7, \"low\": 2, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 8,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     9,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   }
+  },
+  "information_discipline": "decision at live round t renders history[:P+t]; rival action t appended after the decision (src/research/deviation.py; tests/test_research.py::no leakage)",
+  "vector_history_overlap": {
+   "n_training_histories": 36,
+   "train_ids_recorded": true,
+   "n_eval_prefixes": 16,
+   "n_overlapping": 0,
+   "train_rival_patterns": [
+    [
+     1,
+     1,
+     1,
+     0
+    ],
+    [
+     1,
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     1,
+     1,
+     9
+    ],
+    [
+     1,
+     3,
+     5,
+     0
+    ],
+    [
+     1,
+     3,
+     5,
+     6
+    ],
+    [
+     1,
+     3,
+     5,
+     9
+    ]
+   ]
+  },
+  "vector": {
+   "id": "learned_answer_L20_c3d",
+   "norm": 14.375565528869629,
+   "dim": 3584,
+   "layer": 20,
+   "site": "answer",
+   "model": "7b"
+  },
+  "model": {
+   "key": "7b",
+   "id": "Qwen/Qwen2.5-7B-Instruct",
+   "revision": "a09a35458c702b33eeacc393d103063234e8bc28"
+  },
+  "templates": [
+   "v1"
+  ],
+  "sites_layers": [
+   [
+    "answer",
+    20
+   ]
+  ],
+  "benchmarks": {
+   "base": {
+    "nash_index": 2,
+    "monopoly_index": 7,
+    "br": [
+     1,
+     1,
+     2,
+     2,
+     3,
+     3,
+     4,
+     4,
+     4,
+     4
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.08000633228967902,
+    "n_prices": 10
+   }
+  },
+  "steering_arms": {
+   "('generic_price', 'generic_price_answer_L20_b1', 1.0, 'all')": 112,
+   "('learned', 'learned_answer_L20_c3d', -1.0, 'all')": 112,
+   "('learned', 'learned_answer_L20_c3d', 1.0, 'all')": 176,
+   "('learned', 'learned_answer_L20_c3d', 1.0, 'post_deviation')": 112,
+   "('learned', 'learned_answer_L20_c3d', 2.0, 'all')": 112,
+   "('none', None, 0.0, 'all')": 184,
+   "('random', 'learned_answer_L20_c3d', 1.0, 'all')": 400,
+   "('random', 'learned_answer_L20_c3d', 2.0, 'all')": 336,
+   "('sham', 'learned_answer_L20_c3d', 1.0, 'all')": 112
+  },
+  "steering_layer_site_consistent": true,
+  "coverage_independent_histories": {
+   "H1 B vs A (none)": 16,
+   "H2 B,C,F vs A (none)": 16,
+   "H3 sudden vs gradual (none)": 16,
+   "H4 learned+1 & random+1 & none": 16,
+   "H5 learned+1 on B and A": 16
+  },
+  "n_by_block": {
+   "primary": 1456,
+   "fixed_history": 192,
+   "repeatability": 8
+  },
+  "n_by_experiment": {
+   "deviation_game": 1464,
+   "fixed_history": 192
+  }
+ },
+ "issues": []
+}

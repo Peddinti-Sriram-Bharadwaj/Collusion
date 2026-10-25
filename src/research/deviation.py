@@ -88,17 +88,22 @@ def run_unit(model, tok, unit: dict, vector: np.ndarray | None) -> dict:
     if exp == "fixed_history":
         rng = np.random.default_rng(unit["seeds"]["history_seed"])
         lo, hi = unit["prefix_own_range"]
-        own = int(rng.integers(lo, hi + 1))
         n = unit["prefix_rounds"] + d.deviation_round + 1
+        if unit.get("fixed_history_own", "constant") == "prefix_random":
+            pre = [int(rng.integers(lo, hi + 1)) for _ in range(unit["prefix_rounds"])]
+            own_seq = (pre + [pre[-1]] * n)[:n]
+        else:  # smoke-batch behaviour
+            own_seq = [int(rng.integers(lo, hi + 1))] * n
+        own = own_seq[-1]
         gradual = scripted_sequence("D_gradual", d)
         seqs = {"H_sudden": [d.high] * (n - 1) + [d.low],
                 "H_gradual": ([d.high] * unit["prefix_rounds"] + gradual)[:n],
                 "H_always_low": [d.low] * n, "H_stable_high": [d.high] * n}
         seq = seqs[unit["condition"]]
-        history = [_step(env, r, own) for r in seq]
+        history = [_step(env, r, o) for r, o in zip(seq, own_seq)]
         rec = dec.decide(history, 1, n, n + (d.rounds - d.deviation_round - 1), steer=s["kind"] != "none",
                          audit=unit["audit_generation"] != "none")
-        rec.update({"t": 0, "rival_history": seq, "own_index": own,
+        rec.update({"t": 0, "rival_history": seq, "own_index": own, "own_history": own_seq,
                     "best_response_index": bench["best_response_by_rival_index"][seq[-1]]})
         rounds.append(rec)
         summary = {"decision_expected_index": rec["expected_index"], "decision_action": rec["action"],

@@ -93,3 +93,25 @@ layer 20 output; trained on Phase A.1 histories with even ids, which never appea
 game histories) at alpha in {-1, +1, +2}; three norm-matched random directions (seeds 0-2) at the
 same alphas; generic price direction `generic_price_answer_L20_b1` (norm-matched). Timing: all rounds
 (default) or post-deviation only.
+
+## Amendment A1 (2026-10-26, before any Stage B/C unit ran; hypotheses, metrics and decision rules unchanged)
+Found by the preflight audit (`scripts/preflight_sd.py`, outputs in `research/preflight/`):
+1. History seeds 7 and 15 produce the same 4-round pre-play prefix, so with greedy decoding they would be one unit
+   counted twice. History seed 13 produces the prefix (7,8)x4, which is a sub-history of a steering-vector training
+   history. Stage B uses the first 16 seeds whose prefixes are distinct and not training sub-histories:
+   0-12, 14, 16, 17. Stage C blocks with other prefix lengths or grids pick seeds by the same rule.
+2. Fixed-history arms previously showed one random own price in every round (smoke behaviour, kept as
+   `fixed_history_own = "constant"`), which yields only 5 distinct histories. From Stage B they use the same random
+   pre-play own prices as the games, followed by the last pre-play price (`"prefix_random"`), so the 16 histories are
+   distinct and each fixed history is the matched counterpart of a game prefix.
+3. The 8-price grid preset cannot hold design index 9 or own prices up to 8; Stage C runs it with the design scaled
+   to that grid (high = monopoly index 5, low = Nash index 1, raise_to 7, own prices 2-6), reported as a separate
+   economic setting rather than a matched one-factor change.
+4. Analysis: independent units are distinct pre-play histories. Replicate reruns (`replicate` > 0) are used only for
+   the repeatability check and are excluded from effect estimates.
+5. Explicit confirmatory estimators (src/research/hypotheses.py): H1 mean immediate(B) over histories; H2 (a)
+   recovery_gap(B) with equivalence margin 0.25 and (b) per-history difference C minus B in the 3 rounds after the
+   rival's return in B; H3 E(H_sudden) - E(H_gradual); H4 per-history learned level shift at alpha=+1 (timing all,
+   averaged over the 7 scripts) minus the mean of the three random directions at alpha=+1; H5 DiD of immediate(B)
+   under learned alpha=+1 (timing all). 95% cluster-bootstrap CIs over histories; two-sided bootstrap p-values,
+   Holm-adjusted across H1-H5.

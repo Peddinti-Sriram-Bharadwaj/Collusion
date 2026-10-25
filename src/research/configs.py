@@ -36,7 +36,11 @@ DEFAULT_UNIT: dict[str, Any] = {
                  "timing": "all", "random_seed": 0},
     "seeds": {"model_seed": 0, "history_seed": 0, "env_seed": 0, "rival_seed": 0},
     "audit_generation": "deviation_window",   # none | deviation_window | all
-    "fixed_own_index": 5,           # fixed_history: own price shown in every history round
+    "fixed_own_index": 5,           # unused (kept so earlier unit hashes stay stable)
+    # fixed_history own-price path: "prefix_random" = the same random pre-play own prices as the games
+    # (drawn with history_seed) followed by the last pre-play price; "constant" = one random own index for
+    # every round (smoke batch sd_v1_smoke_7b_001; gives only 5 distinct histories, see protocol amendment A1)
+    "fixed_history_own": "prefix_random",
     "replicate": 0,
 }
 
@@ -64,6 +68,15 @@ def set_path(d: dict, path: str, value: Any) -> dict:
 def validate_unit(u: dict, n_prices: int = 10) -> None:
     if u["experiment"] not in EXPERIMENTS:
         raise ValueError(f"unknown experiment {u['experiment']}")
+    n_prices = ECON_PRESETS[u["econ_id"]].n_prices if u.get("econ_id") in ECON_PRESETS else n_prices
+    dz = u["design"]
+    for k in ("high", "low", "raise_to"):
+        if not 0 <= dz[k] < n_prices:
+            raise ValueError(f"design.{k}={dz[k]} outside the {n_prices}-price grid ({u.get('econ_id')})")
+    if not (0 <= u["prefix_own_range"][0] <= u["prefix_own_range"][1] < n_prices):
+        raise ValueError(f"prefix_own_range {u['prefix_own_range']} outside the {n_prices}-price grid")
+    if u.get("fixed_history_own", "constant") not in ("constant", "prefix_random"):
+        raise ValueError("fixed_history_own must be constant | prefix_random")
     if u["experiment"] == "deviation_game" and u["condition"] not in SCRIPTED:
         raise ValueError(f"unknown scripted condition {u['condition']}")
     if u["experiment"] == "fixed_history" and u["condition"] not in FIXED_HISTORY_ARMS:

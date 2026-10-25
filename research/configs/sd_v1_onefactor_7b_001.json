@@ -3,7 +3,7 @@
  "protocol": "strategic_deviation_v1",
  "designation": "exploratory",
  "model": "7b",
- "description": "Stage C one-factor robustness (each factor varied alone from primary values).",
+ "description": "Stage C one-factor robustness: each factor varied alone from the primary settings.",
  "base": {
   "design": {
    "rounds": 16,
@@ -284,9 +284,9 @@
      2,
      3,
      4,
-     5,
-     6,
-     7
+     8,
+     9,
+     11
     ]
    }
   },
@@ -457,7 +457,16 @@
   {
    "name": "sweep:econ_id",
    "overrides": {
-    "econ_id": "grid8"
+    "econ_id": "grid8",
+    "prefix_own_range": [
+     2,
+     6
+    ],
+    "design": {
+     "high": 5,
+     "low": 1,
+     "raise_to": 7
+    }
    },
    "grid": {
     "condition": [

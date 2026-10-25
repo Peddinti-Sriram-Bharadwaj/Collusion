@@ -3,7 +3,25 @@
  "protocol": "strategic_deviation_v1",
  "designation": "confirmatory",
  "model": "7b",
- "description": "Stage B primary: H1-H5 on Qwen2.5-7B, 16 histories, greedy, v1 template, base economics.",
+ "description": "Stage B primary: H1-H5 on Qwen2.5-7B, 16 distinct histories, greedy, v1 template, base economics.",
+ "history_seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  14,
+  16,
+  17
+ ],
  "base": {
   "design": {
    "rounds": 16,
@@ -42,9 +60,9 @@
      10,
      11,
      12,
-     13,
      14,
-     15
+     16,
+     17
     ],
     "steering_preset": [
      {
@@ -189,9 +207,9 @@
      10,
      11,
      12,
-     13,
      14,
-     15
+     16,
+     17
     ],
     "steering_preset": [
      {

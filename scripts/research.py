@@ -40,7 +40,8 @@ def cmd_plan(a):
 def cmd_launch(a):
     spec = load_spec(a.spec)
     reg = Registry()
-    out = subprocess.run(["modal", "run", "--detach", "scripts/modal_research.py", "--spec", a.spec],
+    out = subprocess.run(["modal", "run", "--detach", "scripts/modal_research.py", "--spec", a.spec,
+                          "--shards", str(a.shards), "--max-seconds", str(a.max_seconds)],
                          capture_output=True, text=True, timeout=170)
     line = next((l for l in out.stdout.splitlines() if l.startswith("{") and "spawned" in l), None)
     reg.register_batch_event({"event": "launch", "batch_id": spec["batch_id"], "spec_path": a.spec,
@@ -50,17 +51,29 @@ def cmd_launch(a):
 
 
 def cmd_sync(a):
+    """Download a batch from the Modal volume and register it. Large batches: packed server-side into one tarball."""
+    import tarfile
     from src.research.runner import register_results
     reg = Registry()
     tmp = Path(tempfile.mkdtemp())
-    r = subprocess.run(["modal", "volume", "get", "--force", "collusion-latent-results", f"research/{a.batch}", str(tmp)],
-                       capture_output=True, text=True, timeout=170)
+    if a.bundle:
+        b = subprocess.run(["modal", "run", "scripts/modal_research.py::bundle", "--batch-id", a.batch],
+                           capture_output=True, text=True, timeout=170)
+        r = subprocess.run(["modal", "volume", "get", "--force", "collusion-latent-results", f"research/{a.batch}.tar.gz", str(tmp)],
+                           capture_output=True, text=True, timeout=170)
+        tb = next(tmp.rglob("*.tar.gz"))
+        with tarfile.open(tb) as tf:
+            tf.extractall(tmp, filter="data")
+        tb.unlink()
+    else:
+        r = subprocess.run(["modal", "volume", "get", "--force", "collusion-latent-results", f"research/{a.batch}", str(tmp)],
+                           capture_output=True, text=True, timeout=170)
     files = sorted(tmp.rglob("*.json"))
     items = []
-    done_info = None
+    done_info = {}
     for f in files:
-        if f.name == "_batch_done.json":
-            done_info = json.loads(f.read_text()); continue
+        if f.name.startswith("_") and f.name.endswith("_done.json"):
+            done_info[f.name] = json.loads(f.read_text()); continue
         d = json.loads(f.read_text()); items.append((d["record"], d["payload"]))
     res = register_results(reg, items)
     reg.register_batch_event({"event": "sync", "batch_id": a.batch, "files": len(files), **res, "batch_done": done_info})
@@ -116,9 +129,13 @@ def main():
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True)
     for name, fn in (("plan", cmd_plan), ("launch", cmd_launch), ("run-local", cmd_run_local)):
         p = sub.add_parser(name); p.add_argument("--spec", required=True); p.set_defaults(fn=fn)
+        if name == "launch":
+            p.add_argument("--shards", type=int, default=1)
+            p.add_argument("--max-seconds", type=float, default=0.0, help="per-shard budget guard (container seconds)")
         if name == "run-local":
             p.add_argument("--model-dir")
-    p = sub.add_parser("sync"); p.add_argument("--batch", required=True); p.set_defaults(fn=cmd_sync)
+    p = sub.add_parser("sync"); p.add_argument("--batch", required=True); p.add_argument("--bundle", action="store_true")
+    p.set_defaults(fn=cmd_sync)
     p = sub.add_parser("analyze"); p.add_argument("--formats", default="png,svg,pdf"); p.set_defaults(fn=cmd_analyze)
     sub.add_parser("legacy-import").set_defaults(fn=cmd_legacy)
     sub.add_parser("verify").set_defaults(fn=cmd_verify)
