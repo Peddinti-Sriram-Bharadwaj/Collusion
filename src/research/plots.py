@@ -20,7 +20,24 @@ COND_C = {"A_stable": "#555555", "B_one_shot": "#c44e52", "C_persistent": "#2a6f
           "E_nash": "#9aa0a6", "F_delayed": "#e07b39", "G_raise": "#7b4fbf"}
 STEER_C = {"none": "#555555", "sham": "#bbbbbb", "learned": "#7b4fbf", "random": "#9aa0a6", "generic_price": "#3a9d5d"}
 STATUS_C = {"supported": "#3a9d5d", "absent": "#c44e52", "opposite": "#7b2d2d", "inconclusive": "#e8c547",
-            "insufficient": "#dddddd", "not tested": "#ffffff"}
+            "insufficient": "#dddddd", "untested": "#ffffff"}
+
+
+def _main(d: pd.DataFrame | None, primary_block: bool = True) -> pd.DataFrame | None:
+    """Main-analysis subset: confirmatory batch if one exists (else everything), replicate reruns excluded."""
+    if d is None or d.empty:
+        return d
+    if "designation" in d and (d.designation == "confirmatory").any():
+        d = d[d.designation == "confirmatory"]
+    if "replicate" in d:
+        d = d[d.replicate == 0]
+    if primary_block and "block" in d and (d.block == "primary").any() and not (d.experiment == "fixed_history").all():
+        d = d[(d.block == "primary") | (d.experiment == "fixed_history")]
+    return d
+
+
+def _nh(d) -> int:
+    return int(d["history_cluster"].nunique()) if d is not None and "history_cluster" in d else 0
 
 
 class FigureWriter:
@@ -59,7 +76,7 @@ def _ci_band(ax, df, x, y, cluster, color, label, ls="-"):
 
 
 def fig_trajectories(W, T):
-    tr = T.get("trajectories")
+    tr = _main(T.get("trajectories"))
     if tr is None or tr.empty:
         return W.skip("01_trajectories", "no game runs")
     d = tr[(tr.steer_kind == "none") & (tr.experiment == "deviation_game") & (tr.block == "primary")]
@@ -69,26 +86,26 @@ def fig_trajectories(W, T):
     fig, axs = plt.subplots(2, (len(conds) + 1) // 2, figsize=(3.2 * ((len(conds) + 1) // 2), 5.4), sharey=True, squeeze=False)
     for ax, c in zip(axs.flat, conds):
         g = d[d.condition == c]
-        _ci_band(ax, g, "t", "E", "history_seed", "#2a6fdb", "agent (expected price)")
+        _ci_band(ax, g, "t", "E", "history_cluster", "#2a6fdb", "agent (expected price)")
         r = g.groupby("t")["rival"].mean(); ax.plot(r.index, r.values, color="#e07b39", ls="--", lw=1.2, label="rival")
         b = g.groupby("t")["br"].mean(); ax.plot(b.index, b.values, color="#3a9d5d", ls=":", lw=1, label="best response")
         ax.axvline(g.deviation_round.iloc[0], color="#ccc", lw=0.8)
-        ax.set_title(f"{c} (n={g.history_seed.nunique()} histories)", fontsize=8.5); ax.set_ylim(-0.3, 9.3); ax.set_xlabel("live round")
+        ax.set_title(f"{c} (n={_nh(g)} histories)", fontsize=8.5); ax.set_ylim(-0.3, 9.3); ax.set_xlabel("live round")
     for ax in axs.flat[len(conds):]:
         ax.axis("off")
     axs[0, 0].set_ylabel("price index"); axs[0, 0].legend(frameon=False, fontsize=7)
     fig.suptitle("Agent and rival price trajectories by rival condition (no steering; band = 95% CI over histories)", x=0.01, ha="left", fontweight="bold")
-    W.save(fig, "01_trajectories", fig_trajectories, ["trajectories"], d.run_id, "Mean expected price per live round; vertical line = deviation round.", f"{d.history_seed.nunique()} histories")
+    W.save(fig, "01_trajectories", fig_trajectories, ["trajectories"], d.run_id, "Mean expected price per live round; vertical line = deviation round.", f"{_nh(d)} histories")
 
 
 def fig_deviation_response(W, T):
-    pt = T.get("pair_traj")
+    pt = _main(T.get("pair_traj"))
     if pt is None or pt.empty:
         return W.skip("02_deviation_response", "no matched pairs")
     d = pt[pt.steer_kind == "none"]
     fig, ax = plt.subplots(figsize=(7, 3.8))
     for c in [c for c in COND_C if c in d.condition.unique()]:
-        _ci_band(ax, d[d.condition == c], "t", "delta", "history_seed", COND_C[c], c)
+        _ci_band(ax, d[d.condition == c], "t", "delta", "history_cluster", COND_C[c], c)
     ax.axhline(0, color="#999", lw=0.8); ax.axvline(d.deviation_round.iloc[0], color="#ccc", lw=0.8)
     ax.set_xlabel("live round"); ax.set_ylabel("Δ expected price vs stable control")
     ax.set_title("Deviation-response curves (matched to the stable-rival control)"); ax.legend(frameon=False, fontsize=7, ncol=2)
@@ -96,7 +113,7 @@ def fig_deviation_response(W, T):
 
 
 def fig_punish_recover(W, T):
-    pt = T.get("pair_traj")
+    pt = _main(T.get("pair_traj"))
     if pt is None or pt.empty:
         return W.skip("03_punishment_recovery", "no matched pairs")
     d = pt[(pt.steer_kind == "none") & pt.condition.isin(["B_one_shot", "F_delayed", "C_persistent"])]
@@ -108,7 +125,7 @@ def fig_punish_recover(W, T):
         if g.empty:
             ax.axis("off"); continue
         for rd, gg in g.groupby("recovery_delay"):
-            _ci_band(ax, gg, "t", "delta", "history_seed", COND_C[c], f"delay {rd}" if c == "F_delayed" else c,
+            _ci_band(ax, gg, "t", "delta", "history_cluster", COND_C[c], f"delay {rd}" if c == "F_delayed" else c,
                      ls="-" if rd == 3 else "--")
         td = g.deviation_round.iloc[0]
         ax.axvspan(td - 0.5, td + 0.5, color="#f2d0d0", alpha=0.6)
@@ -120,7 +137,7 @@ def fig_punish_recover(W, T):
 
 
 def fig_steer_traj(W, T):
-    tr = T.get("trajectories")
+    tr = _main(T.get("trajectories"))
     if tr is None or tr.empty:
         return W.skip("04_steering_trajectories", "no games")
     d = tr[(tr.experiment == "deviation_game") & tr.condition.isin(["A_stable", "B_one_shot"])]
@@ -132,14 +149,14 @@ def fig_steer_traj(W, T):
         for l in labels:
             for a, g in d[(d.condition == c) & (d.steering == l)].groupby("alpha"):
                 col = STEER_C["learned" if l.startswith("learned") else ("random" if l.startswith("random") else "none")]
-                _ci_band(ax, g, "t", "E", "history_seed", col, f"{l.split(':')[0]} α={a:+g}", ls="-" if a >= 0 else "--")
+                _ci_band(ax, g, "t", "E", "history_cluster", col, f"{l.split(':')[0]} α={a:+g}", ls="-" if a >= 0 else "--")
         ax.set_title(c); ax.set_xlabel("live round"); ax.axvline(d.deviation_round.iloc[0], color="#ccc", lw=0.8)
     axs[0].set_ylabel("expected price"); axs[0].legend(frameon=False, fontsize=6.5)
     fig.suptitle("Steered vs unsteered trajectories", x=0.01, ha="left", fontweight="bold")
     W.save(fig, "04_steering_trajectories", fig_steer_traj, ["trajectories"], d.run_id, "Learned direction vs random control and baseline.")
 
 
-def _effect_bars(ax, df, value, by, cluster="history_seed"):
+def _effect_bars(ax, df, value, by, cluster="history_cluster"):
     labs, ms, los, his, cols = [], [], [], [], []
     for key, g in df.groupby(by):
         s = S.summarize(g[value].tolist(), g[cluster].tolist(), n_boot=1500)
@@ -154,20 +171,23 @@ def _effect_bars(ax, df, value, by, cluster="history_seed"):
 
 
 def fig_steer_vs_random(W, T):
-    lv = T.get("steer_level")
+    lv = _main(T.get("steer_level"))
     if lv is None or lv.empty:
         return W.skip("05_steering_vs_random", "no steered runs")
-    d = lv.copy(); d["kind_alpha"] = list(zip(d.steer_kind, d.alpha))
-    fig, ax = plt.subplots(figsize=(8, 3.6))
-    _effect_bars(ax, d, "level_shift", ["steer_kind", "alpha"])
-    ax.set_ylabel("steered - unsteered expected price"); ax.set_title("Price-level effect: learned vs generic vs random vs sham")
+    d = lv.copy()
+    d["arm"] = d.apply(lambda r: f"{r.steer_kind}{'' if r.steer_timing == 'all' else ' (post-dev)'}", axis=1)
+    fig, ax = plt.subplots(figsize=(9, 3.8))
+    _effect_bars(ax, d, "level_shift", ["arm", "alpha"])
+    ax.set_ylabel("steered - unsteered expected price\n(price-index steps)")
+    ax.set_title(f"Price-level effect of each steering arm (mean over all rounds and rival scripts; n={_nh(d)} histories, 95% CI)")
     W.save(fig, "05_steering_vs_random", fig_steer_vs_random, ["steer_level"], d.run_id, "Mean per-round shift with 95% CI.")
 
 
 def fig_level_vs_interaction(W, T):
-    lv, did = T.get("steer_level"), T.get("did")
+    lv, did = _main(T.get("steer_level")), _main(T.get("did"))
     if lv is None or lv.empty or did is None or did.empty:
         return W.skip("06_level_vs_interaction", "need steered pairs")
+    lv, did = lv[lv.steer_timing == "all"], did[did.steer_timing == "all"]
     a = lv[lv.condition == "A_stable"].groupby(["steer_kind", "alpha"])["level_shift"].mean()
     b = did[did.condition == "B_one_shot"].groupby(["steer_kind", "alpha"])["did_immediate"].mean()
     j = pd.concat([a, b], axis=1).dropna()
@@ -183,7 +203,7 @@ def fig_level_vs_interaction(W, T):
 
 
 def fig_seed_dist(W, T):
-    p = T.get("pairs")
+    p = _main(T.get("pairs"))
     if p is None or p.empty:
         return W.skip("07_seed_distributions", "no pairs")
     d = p[p.steer_kind == "none"]
@@ -234,13 +254,13 @@ def fig_forest(W, grid):
 
 
 def fig_consistency_heatmap(W, grid):
-    g = grid[grid.view != "overall"]
+    g = grid[~grid.view.isin(["overall", "history_cluster", "batch_id", "steering", "condition"])]
     if g.empty:
         return W.skip("14_consistency_heatmap", "no factor views yet")
     g = g.assign(col=g.view + "=" + g.level)
     behs, cols = list(dict.fromkeys(grid.behaviour)), list(dict.fromkeys(g.col))
     status_code = {k: i for i, k in enumerate(STATUS_C)}
-    M = np.full((len(behs), len(cols)), status_code["not tested"])
+    M = np.full((len(behs), len(cols)), status_code["untested"])
     txt = [["" for _ in cols] for _ in behs]
     for _, r in g.iterrows():
         i, j = behs.index(r.behaviour), cols.index(r.col)
@@ -276,7 +296,7 @@ def fig_coverage(W, T):
 
 
 def fig_br(W, T):
-    tr = T.get("trajectories")
+    tr = _main(T.get("trajectories"))
     if tr is None or tr.empty:
         return W.skip("17_best_response", "no games")
     d = tr[tr.steer_kind == "none"].copy()
@@ -293,7 +313,7 @@ def fig_br(W, T):
 
 
 def fig_collusion(W, T):
-    u = T.get("units")
+    u = _main(T.get("units"))
     if u is None or u.empty or "sum_collusion_index_joint" not in u:
         return W.skip("18_collusion_index", "no games")
     d = u[u.experiment != "fixed_history"]
@@ -347,23 +367,99 @@ def fig_dose(W, T):
     lv, did = T.get("steer_level"), T.get("did")
     if lv is None or lv.empty:
         return W.skip("12_dose_response", "no steered runs")
+    keep = lambda d: d[(d.replicate == 0) & (d.steer_timing == "all") & (d.template_id == "v1") & (d.decoding_mode == "greedy")
+                       & (d.econ_id == "base") & (d.prefix_rounds == 4) & (d.window == 10) & (d.low == 2) & (d.rounds == 16)
+                       & (d.steer_kind.isin(["learned", "random"]))]
+    lv = keep(lv); did = keep(did) if did is not None and not did.empty else did
+    if lv.empty:
+        return W.skip("12_dose_response", "no matched steered runs")
     fig, axs = plt.subplots(1, 2, figsize=(10, 3.6))
     for k, g in lv[lv.condition == "A_stable"].groupby("steer_kind"):
-        _ci_band(axs[0], g, "alpha", "level_shift", "history_seed", STEER_C.get(k, "#555"), k)
+        _ci_band(axs[0], g, "alpha", "level_shift", "history_cluster", STEER_C.get(k, "#555"), k)
     axs[0].set_xlabel("α"); axs[0].set_ylabel("price-level shift"); axs[0].axhline(0, color="#999", lw=0.8); axs[0].legend(frameon=False, fontsize=7)
     axs[0].set_title("Dose-response: price level (stable rival)")
     if did is not None and not did.empty:
         for k, g in did[did.condition == "B_one_shot"].groupby("steer_kind"):
-            _ci_band(axs[1], g, "alpha", "did_immediate", "history_seed", STEER_C.get(k, "#555"), k)
+            _ci_band(axs[1], g, "alpha", "did_immediate", "history_cluster", STEER_C.get(k, "#555"), k)
     axs[1].set_xlabel("α"); axs[1].set_ylabel("DiD immediate response"); axs[1].axhline(0, color="#999", lw=0.8)
     axs[1].set_title("Dose-response: change in deviation response")
     W.save(fig, "12_dose_response", fig_dose, ["steer_level", "did"], lv.run_id, "Means with 95% CI across histories.")
 
 
+def fig_fixed_history(W, T):
+    fh = _main(T.get("fixed_history"))
+    if fh is None or fh.empty:
+        return W.skip("02b_fixed_history", "no fixed-history runs")
+    fh = fh[fh.fixed_history_own == "prefix_random"] if (fh.fixed_history_own == "prefix_random").any() else fh
+    cols = ["H_sudden-H_gradual", "H_sudden-H_always_low", "H_gradual-H_always_low", "H_always_low-H_stable_high"]
+    long = fh.melt(id_vars=["history_cluster", "steering", "run_id"], value_vars=[c for c in cols if c in fh], var_name="contrast", value_name="v").dropna()
+    fig, ax = plt.subplots(figsize=(8.5, 3.6))
+    labs, x0 = [], 0
+    for i, (c, g) in enumerate(long.groupby("contrast", sort=False)):
+        for j, (st, gg) in enumerate(g.groupby("steering")):
+            s_ = S.summarize(gg.v.tolist(), gg.history_cluster.tolist(), n_boot=1500)
+            col = STEER_C.get(st.split(":")[0].rstrip("0123456789"), "#555")
+            ax.errorbar(x0, s_["mean"], yerr=[[s_["mean"] - s_["ci_low"]], [s_["ci_high"] - s_["mean"]]], fmt="o", color=col, ms=5)
+            labs.append((x0, f"{c}\n{st.split(':')[0]}")); x0 += 1
+        x0 += 0.6
+    ax.set_xticks([l[0] for l in labs], [l[1] for l in labs], rotation=60, ha="right", fontsize=6.5); ax.axhline(0, color="#999", lw=0.8)
+    ax.set_ylabel("difference in expected price"); ax.set_title(f"Fixed-history contrasts (single decision, n={_nh(fh)} histories, 95% CI)")
+    W.save(fig, "02b_fixed_history", fig_fixed_history, ["fixed_history"], long.run_id,
+           "H3: sudden vs gradual at the same final rival price; absolute response: always-low vs always-high.")
+
+
+def fig_hypotheses(W, T):
+    h = T.get("hypotheses")
+    if h is None or h.empty or h["mean"].isna().all():
+        return W.skip("21_hypotheses", "no confirmatory estimates")
+    h = h[h["mean"].notna()]
+    fig, ax = plt.subplots(figsize=(8, 0.5 * len(h) + 1.2))
+    y = np.arange(len(h))[::-1]
+    for yy, (_, r) in zip(y, h.iterrows()):
+        ax.errorbar(r["mean"], yy, xerr=[[r["mean"] - r["ci_low"]], [r["ci_high"] - r["mean"]]], fmt="o", color=STATUS_C.get(r.status, "#000"), ms=6)
+        p = "" if pd.isna(r.get("p_holm")) else f", Holm p={r['p_holm']:.3g}"
+        ax.text(1.01, yy, f"{r.verdict} (n={int(r.n_clusters)}{p})", transform=ax.get_yaxis_transform(), fontsize=7)
+    ax.set_yticks(y, [f"{r.hypothesis} {r['name']}" for _, r in h.iterrows()], fontsize=7.5)
+    ax.axvline(0, color="#999", lw=0.8); ax.axvspan(-0.25, 0.25, color="#eee", zorder=0)
+    ax.set_xlabel("estimate (price-index steps; grey band = equivalence margin ±0.25)")
+    ax.set_title("Pre-registered hypotheses H1-H5 (confirmatory batch, 95% cluster-bootstrap CI)")
+    runs = ";".join(h["evidence_runs"].fillna("")).split(";")
+    W.save(fig, "21_hypotheses", fig_hypotheses, ["hypotheses"], [r for r in runs if r], "Colour = pre-declared status.")
+
+
+def fig_dimensions(W, T):
+    d = T.get("consistency_by_dimension")
+    if d is None or d.empty:
+        return W.skip("22_consistency_dimensions", "no dimension summary")
+    d = d[d.status != "untested"]
+    if d.empty:
+        return W.skip("22_consistency_dimensions", "no tested dimensions")
+    RC = {"robust": "#3a9d5d", "mixed": "#e8c547", "not replicated": "#c44e52", "inconclusive": "#f0e3a0",
+          "insufficient evidence": "#dddddd", "untested": "#ffffff"}
+    behs, dims = list(dict.fromkeys(d.behaviour)), list(dict.fromkeys(d.dimension))
+    code = {k: i for i, k in enumerate(RC)}
+    M = np.full((len(behs), len(dims)), code["untested"]); txt = [["" for _ in dims] for _ in behs]
+    for _, r in d.iterrows():
+        i, j = behs.index(r.behaviour), dims.index(r.dimension)
+        M[i, j] = code.get(r.status, code["untested"])
+        if pd.notna(r.get("level_mean_min")):
+            txt[i][j] = f"{r.level_mean_min:.2f}..{r.level_mean_max:.2f}"
+    from matplotlib.colors import ListedColormap
+    fig, ax = plt.subplots(figsize=(1.1 * len(dims) + 3, 0.42 * len(behs) + 1.6))
+    ax.imshow(M, cmap=ListedColormap(list(RC.values())), vmin=0, vmax=len(RC) - 1, aspect="auto")
+    for i in range(len(behs)):
+        for j in range(len(dims)):
+            ax.text(j, i, txt[i][j], ha="center", va="center", fontsize=5.5)
+    ax.set_yticks(range(len(behs)), behs, fontsize=7); ax.set_xticks(range(len(dims)), dims, rotation=45, ha="right", fontsize=7)
+    ax.legend([plt.Rectangle((0, 0), 1, 1, color=c) for c in RC.values()], RC.keys(), bbox_to_anchor=(1.01, 1), loc="upper left", fontsize=7, frameon=False)
+    ax.set_title("Consistency of each behaviour across each parameter dimension (cell text = range of level means)")
+    W.save(fig, "22_consistency_dimensions", fig_dimensions, ["consistency_by_dimension"], [], "Replication label across the levels of one dimension.")
+
+
 def make_all(T: dict, grid: pd.DataFrame, reg_records: list, out_dir: Path, registry_hash: str, formats=("png", "svg", "pdf")) -> list:
     W = FigureWriter(out_dir, registry_hash, formats)
-    for f in (fig_trajectories, fig_deviation_response, fig_punish_recover, fig_steer_traj, fig_steer_vs_random,
-              fig_level_vs_interaction, fig_seed_dist, fig_coverage, fig_br, fig_collusion, fig_dose):
+    for f in (fig_trajectories, fig_deviation_response, fig_fixed_history, fig_punish_recover, fig_steer_traj, fig_steer_vs_random,
+              fig_level_vs_interaction, fig_seed_dist, fig_coverage, fig_br, fig_collusion, fig_dose, fig_hypotheses, fig_dimensions):
         try:
             f(W, T)
         except Exception as exc:
@@ -371,7 +467,11 @@ def make_all(T: dict, grid: pd.DataFrame, reg_records: list, out_dir: Path, regi
     for view, name, title in (("template_id", "08_template_robustness", "Prompt-template robustness"),
                               ("temperature", "09_temperature", "Temperature sensitivity"),
                               ("prefix_rounds", "10_history_length", "History-length sensitivity"),
-                              ("deviation_magnitude", "11_deviation_magnitude", "Deviation-magnitude sensitivity")):
+                              ("deviation_magnitude", "11_deviation_magnitude", "Deviation-magnitude sensitivity"),
+                              ("econ_id", "11b_economics", "Economic-setting sensitivity"),
+                              ("recovery_delay", "11c_recovery_delay", "Recovery-delay sensitivity"),
+                              ("alpha", "11d_steering_strength", "Steering-strength sensitivity"),
+                              ("seed_model_seed", "11e_sampling_seed", "Sampling-seed variation (temperature > 0)")):
         try:
             fig_factor(W, grid, view, name, title)
         except Exception as exc:

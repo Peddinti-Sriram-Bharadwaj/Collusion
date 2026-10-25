@@ -207,3 +207,33 @@ def test_end_to_end_registry_analysis_plots_report(tiny, tmp_path, monkeypatch):
     rp = report.write_report(out, reg.records(), [], tables, grid, man, "h")
     txt = rp.read_text()
     assert "## 9. Limitations" in txt and "punishment_like_reduction" in txt
+
+
+def test_hypothesis_estimators_synthetic():
+    import pandas as pd
+    from src.research.hypotheses import estimates
+    rows, pt, lvl, did, fh = [], [], [], [], []
+    for h in range(6):
+        cl = f"base|p4|4-8|s{h}"
+        com = dict(history_cluster=cl, designation="confirmatory", replicate=0, block="primary", deviation_round=7,
+                   prefixed_audits=4, prefixed_valid=4)
+        rows.append(dict(run_id=f"b{h}", condition="B_one_shot", steer_kind="none", immediate=-1.0 - 0.1 * h, recovery_gap=0.05, **com))
+        rows.append(dict(run_id=f"rep{h}", condition="B_one_shot", steer_kind="none", immediate=99.0, recovery_gap=99.0,
+                         **{**com, "replicate": 1}))
+        for t in range(16):
+            pt.append(dict(run_id=f"b{h}", t=t, delta=0.0, condition="B_one_shot", steer_kind="none", **com))
+            pt.append(dict(run_id=f"c{h}", t=t, delta=-1.0 if t > 7 else 0.0, condition="C_persistent", steer_kind="none", **com))
+        lvl.append(dict(run_id=f"l{h}", steer_kind="learned", alpha=1.0, steer_timing="all", level_shift=-0.8, **com))
+        for r in range(3):
+            lvl.append(dict(run_id=f"r{h}{r}", steer_kind="random", alpha=1.0, steer_timing="all", level_shift=0.02 * r, **com))
+        did.append(dict(run_id=f"d{h}", steer_kind="learned", alpha=1.0, steer_timing="all", condition="B_one_shot", did_immediate=0.01 * h, **com))
+        fh.append(dict(run_id=f"f{h}", steer_kind="none", **{"H_sudden-H_gradual": -0.5}, **com))
+    T = {"pairs": pd.DataFrame(rows), "pair_traj": pd.DataFrame(pt), "steer_level": pd.DataFrame(lvl), "did": pd.DataFrame(did),
+         "fixed_history": pd.DataFrame(fh)}
+    h = estimates(T, "confirmatory").set_index("hypothesis")
+    assert h.loc["H1", "n_clusters"] == 6 and h.loc["H1", "mean"] < -1 and h.loc["H1", "status"] == "supported"  # replicate excluded
+    assert h.loc["H2a", "status"] == "supported"            # inside the equivalence margin
+    assert abs(h.loc["H2b", "mean"] + 1.0) < 1e-9          # C minus B after B's return
+    assert abs(h.loc["H4", "mean"] - (-0.82)) < 1e-9        # learned minus mean of randoms
+    assert h.loc["H3", "status"] == "supported"
+    assert h["p_holm"].notna().all()

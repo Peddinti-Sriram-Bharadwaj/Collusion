@@ -44,7 +44,7 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
         L += ["No protocol runs registered yet.", ""]
     else:
         sup = ov[ov.status == "supported"]; neg = ov[ov.status.isin(["absent", "opposite"])]
-        inc = ov[ov.status.isin(["inconclusive", "insufficient", "not tested"])]
+        inc = ov[ov.status.isin(["inconclusive", "insufficient", "untested"])]
         L += ["Evidence below is from the strategic-deviation protocol only (legacy results are listed separately).", ""]
         L += ["**Supported (overall 95% CI excludes zero in the predicted direction, or within the equivalence margin for null predictions):**", ""]
         L += [f"- {r.behaviour}: {_fmt(r['mean'])} [{_fmt(r.ci_low)}, {_fmt(r.ci_high)}], {_n(r.n_clusters)} independent histories; replication across tested settings: {r.replication_status}." for _, r in sup.iterrows()] or ["- none"]
@@ -53,6 +53,26 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
         L += ["", "**Unresolved (inconclusive, insufficient data, or not yet tested):**", ""]
         L += [f"- {r.behaviour}: {r.status}." for _, r in inc.iterrows()] or ["- none"]
         L += [""]
+    # 1b hypotheses
+    hyp = tables.get("hypotheses")
+    L += ["## 1b. Pre-registered hypotheses H1-H5 (confirmatory batch only)", ""]
+    if hyp is not None and not hyp.empty and hyp["n_clusters"].fillna(0).sum() > 0:
+        cols = ["hypothesis", "name", "predicted", "mean", "ci_low", "ci_high", "n_clusters", "p_two_sided", "p_holm",
+                "validity_rate", "status", "verdict"]
+        L += [md_table(hyp[[c for c in cols if c in hyp]], 3), "",
+              "Estimators: research/protocols/strategic_deviation_v1.md (amendment A1) and src/research/hypotheses.py. "
+              "n = independent pre-play histories. 'absent' requires the whole CI inside +-0.25 steps; a non-significant "
+              "estimate with a wider CI is 'inconclusive', never 'absent'.", ""]
+        if "learned_level" in hyp:
+            h4 = hyp[hyp.hypothesis == "H4"].iloc[0]
+            L += [f"H4 components: learned level shift {_fmt(h4.get('learned_level'))}, random {_fmt(h4.get('random_level'))}, "
+                  f"generic price direction {_fmt(h4.get('generic_level'))}, learned minus generic {_fmt(h4.get('learned_minus_generic'))}.", ""]
+    else:
+        L += ["No confirmatory batch registered yet.", ""]
+    hb = tables.get("hypotheses_by_batch")
+    if hb is not None and not hb.empty:
+        L += ["Same estimators per batch (exploratory and smoke batches are descriptive only):", "",
+              md_table(hb[["batch_id", "hypothesis", "mean", "ci_low", "ci_high", "n_clusters", "status"]], 3), ""]
     # 2 inventory
     L += ["## 2. Experiment inventory", ""]
     if runs.empty:
@@ -64,6 +84,24 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
               f"{int((runs.status == 'failed').sum())}; model decisions: {int(runs.n_dec.sum())}; summed unit runtime: "
               f"{runs.seconds.sum() / 3600:.2f} h. {budget_note}", ""]
     L += [f"Legacy (pre-registry) records: {len(legacy)} (see research/registry/legacy.jsonl).", ""]
+    # 2b validity / repeatability / compute
+    L += ["## 2b. Validity, repeatability and compute", ""]
+    u0 = tables.get("units")
+    if u0 is not None and not u0.empty:
+        v = u0.groupby("batch_id")[["free_audits", "free_valid", "free_agree", "prefixed_audits", "prefixed_valid", "prefixed_agree"]].sum(min_count=1)
+        v["free_valid_rate"] = v.free_valid / v.free_audits; v["prefixed_valid_rate"] = v.prefixed_valid / v.prefixed_audits
+        v["greedy_agreement"] = v.free_agree / v.free_audits
+        L += [md_table(v.reset_index()[["batch_id", "free_audits", "free_valid_rate", "greedy_agreement", "prefixed_audits", "prefixed_valid_rate"]], 3), "",
+              f"Minimum digit probability mass over all decisions: {u0.min_digit_mass.min():.4f}.", ""]
+    rep = tables.get("repeatability")
+    if rep is not None and not rep.empty:
+        L += [f"Repeatability: {len(rep)} identical reruns; max |dE| = {rep.max_abs_dE.max():.2e}; actions identical in "
+              f"{int(rep.actions_identical.sum())}/{len(rep)}.", ""]
+    comp = out_dir.parent / "registry" / "compute.jsonl"
+    if comp.exists():
+        cr = pd.DataFrame([json.loads(l) for l in comp.read_text().splitlines() if l.strip()])
+        L += ["Compute and cost (Modal billing report per app where available; otherwise GPU-seconds x list price):", "",
+              md_table(cr, 3), ""]
     # 3 coverage
     L += ["## 3. Parameter coverage", ""]
     u = tables.get("units")
@@ -78,6 +116,15 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
         cols = ["behaviour", "predicted", "mean", "ci_low", "ci_high", "n_clusters", "status", "replication_status", "validity_rate"]
         L += [md_table(ov[[c for c in cols if c in ov]]), "",
               "Full grid with every factor view: research/outputs/tables/behaviour_cells.csv.", ""]
+    dims = tables.get("consistency_by_dimension")
+    if dims is not None and not dims.empty:
+        d2 = dims[dims.status != "untested"]
+        if not d2.empty:
+            L += ["### Consistency by parameter dimension", "",
+                  md_table(d2[[c for c in ["behaviour", "dimension", "status", "n_levels", "n_supported", "n_opposite", "n_absent",
+                                           "n_inconclusive", "n_insufficient", "sign_agreement", "level_mean_min", "level_mean_max", "level_mean_sd"] if c in d2]], 2),
+                  "", "Labels: robust (>=80% of levels supported, none opposite), mixed, not replicated (>50% absent/opposite), "
+                  "inconclusive, insufficient evidence; cross_history uses sign agreement of per-history estimates (>=0.8 robust).", ""]
     # 5/6 deviation + steering
     for title, names in (("## 5. Strategic-deviation results", ["punishment_like_reduction", "persistent_deviation_response",
                                                                  "recovery_after_return", "raise_response", "unexpected_deviation_sensitivity",
@@ -98,10 +145,9 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
     # 7 robustness
     L += ["## 7. Robustness analysis", ""]
     if not grid.empty:
-        rv = grid[grid.view != "overall"]
+        rv = grid[~grid.view.isin(["overall", "history_cluster", "batch_id"])]
         for view, g in rv.groupby("view"):
-            L += [f"**{view}**: " + "; ".join(f"{b}: " + ", ".join(f"{lv}={st}" for lv, st in zip(gg.level, gg.status))
-                                             for b, gg in g.groupby("behaviour")), ""]
+            L += [f"**{view}**", "", md_table(g[["behaviour", "level", "mean", "ci_low", "ci_high", "n_clusters", "status"]]), ""]
     # 8 figures
     L += ["## 8. Figures", ""]
     for m in manifest:
@@ -113,6 +159,9 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
                   f"(hash `{m['source_runs_hash']}`).", ""]
     # 9 limitations
     L += ["## 9. Limitations and interpretation", "",
+          "Evidence ladder used throughout: observed behaviour -> statistical evidence (CI over independent histories) -> "
+          "causal interpretation (only for matched manipulations and steering contrasts against sham/random/generic "
+          "controls) -> collusion-related implications (none follow directly from scripted-rival experiments).", "",
           "- **High prices** and **supra-competitive outcomes** (collusion index > 0) describe outcomes, not mechanisms; a model "
           "with a fixed high-price default produces them against any rival.",
           "- **Strategic conditioning** requires a response that depends on the rival's behaviour beyond its current price level "
@@ -126,7 +175,7 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
           "- Greedy decoding is deterministic: replication units are distinct histories (history_seed), not model seeds.", ""]
     # 10 next
     L += ["## 10. Next experiments", ""]
-    gaps = ov[ov.status.isin(["insufficient", "inconclusive", "not tested"])].behaviour.tolist() if not ov.empty else []
+    gaps = ov[ov.status.isin(["insufficient", "inconclusive", "untested"])].behaviour.tolist() if not ov.empty else []
     L += [f"- Resolve: {', '.join(gaps)}." if gaps else "- Run stage C one-factor sweeps and stage E held-out confirmation.",
           "- See research/protocols/robustness_grid_v1.md for the staged plan and cost estimates.", ""]
     L += ["## Legacy evidence (pre-registry, separate protocols)", ""]

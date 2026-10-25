@@ -18,6 +18,7 @@ from src.research.configs import estimate, expand, load_spec  # noqa: E402
 from src.research.ids import git_state, sha256_file, short_hash  # noqa: E402
 from src.research.registry import Registry  # noqa: E402
 
+ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(__file__).resolve().parents[1] / "research" / "outputs"
 # Throughput measured on Modal A10 / Qwen2.5-7B fp16 (Phase A.1/C runs, 2026-10-25); re-measured by every batch.
 SEC_PER_PASS = {"0.5b": 0.03, "1.5b": 0.04, "3b": 0.06, "7b": 0.09, "14b": 0.12, "32b": 0.25}
@@ -107,13 +108,58 @@ def cmd_analyze(a):
     tables = A.build_tables(reg, OUT)
     grid = A.behaviour_grid(tables) if not tables["units"].empty else __import__("pandas").DataFrame(
         columns=["behaviour", "view", "level", "status", "mean", "ci_low", "ci_high", "n_clusters", "replication_status", "description", "evidence_runs"])
+    from src.research import hypotheses as H
+    import pandas as pd
+    hyp = H.estimates(tables, "confirmatory")
+    hyp_b = []
+    if not tables["units"].empty:
+        for b in sorted(tables["units"]["batch_id"].unique()):
+            sub = {k: (v[v.batch_id == b] if isinstance(v, pd.DataFrame) and "batch_id" in v else v) for k, v in tables.items()}
+            hb = H.estimates(sub, None); hb.insert(0, "batch_id", b); hyp_b.append(hb)
+    tables["hypotheses"] = hyp
+    tables["hypotheses_by_batch"] = pd.concat(hyp_b) if hyp_b else pd.DataFrame()
+    dims = A.dimension_summary(grid) if not grid.empty and "mean" in grid else pd.DataFrame()
+    tables["consistency_by_dimension"] = dims
     paths = A.write_tables(tables, grid, OUT)
     (OUT / "tables" / "behaviour_grid.json").write_text(grid.to_json(orient="records", indent=1))
+    # master consistency table: one row per behaviour x view x level with every provenance column
+    grid.to_csv(OUT / "tables" / "master_consistency.csv", index=False)
     manifest = plots.make_all(tables, grid, [r for r in recs if r.get("protocol_version") == A.PROTOCOL], OUT, rhash,
                               formats=tuple(a.formats.split(",")))
     rp = report.write_report(OUT, [r for r in recs if r.get("protocol_version") == A.PROTOCOL], leg, tables, grid, manifest, rhash)
     print(json.dumps({"registry_hash": rhash, "tables": list(paths), "figures": sum(1 for m in manifest if not m.get("skipped")),
                       "skipped": [m["figure"] for m in manifest if m.get("skipped")], "report": str(rp)}, indent=1))
+
+
+def cmd_cost(a):
+    """Record compute for a batch: Modal billing (app 'collusion-research', hourly buckets in [since, until)) plus
+    GPU-seconds summed from the batch's per-shard completion files in the registry's sync events."""
+    reg = Registry()
+    ev = [e for e in reg.records("batches") if e.get("batch_id") == a.batch and e.get("event") == "sync"]
+    done = (ev[-1].get("batch_done") or {}) if ev else {}
+    if done and "stats" in done:   # single-shard format
+        done = {"_batch_done.json": done}
+    secs = sum(float(v.get("seconds", 0)) for v in done.values())
+    gpu = ",".join(sorted({v.get("gpu", "?") for v in done.values()})) or "A10"
+    rate = USD_PER_HOUR.get(gpu.split(",")[0], 1.10)
+    cmd = ["modal", "billing", "report", "--start", a.since, "--resolution", "h", "--json"]
+    if a.until:
+        cmd += ["--end", a.until]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    billed = None
+    try:
+        rows = json.loads(r.stdout)
+        billed = round(sum(float(x["cost"]) for x in rows if x.get("description") == "collusion-research"), 4)
+    except Exception:
+        pass
+    rec = {"batch_id": a.batch, "shards": len(done), "gpu": gpu, "container_seconds": round(secs, 1),
+           "est_cost_list_price_usd": round(secs / 3600 * rate, 3), "modal_billed_usd_app_window": billed,
+           "billing_window": f"[{a.since}, {a.until or 'now'}) hourly buckets, app collusion-research",
+           "recorded_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"}
+    p = ROOT / "research" / "registry" / "compute.jsonl"
+    with open(p, "a") as f:
+        f.write(json.dumps(rec) + "\n")
+    print(json.dumps(rec, indent=1))
 
 
 def cmd_legacy(a):
@@ -134,6 +180,8 @@ def main():
             p.add_argument("--max-seconds", type=float, default=0.0, help="per-shard budget guard (container seconds)")
         if name == "run-local":
             p.add_argument("--model-dir")
+    p = sub.add_parser("cost"); p.add_argument("--batch", required=True); p.add_argument("--since", required=True)
+    p.add_argument("--until"); p.set_defaults(fn=cmd_cost)
     p = sub.add_parser("sync"); p.add_argument("--batch", required=True); p.add_argument("--bundle", action="store_true")
     p.set_defaults(fn=cmd_sync)
     p = sub.add_parser("analyze"); p.add_argument("--formats", default="png,svg,pdf"); p.set_defaults(fn=cmd_analyze)

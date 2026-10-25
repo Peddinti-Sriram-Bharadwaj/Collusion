@@ -44,6 +44,11 @@ def _flatten(rec: dict) -> dict:
            "deviation_magnitude": dz["high"] - dz["low"], "recovery_delay": dz["recovery_delay"], "raise_to": dz["raise_to"],
            "replicate": c.get("replicate", 0), **{f"seed_{k}": val for k, val in c["seeds"].items()},
            "history_seed": c["seeds"]["history_seed"], "raw_path": rec.get("raw_path"),
+           # independent unit = distinct pre-play history (seed + prefix length + own-price range + economics)
+           "history_cluster": f"{c['econ_id']}|p{c['prefix_rounds']}|{c['prefix_own_range'][0]}-{c['prefix_own_range'][1]}|s{c['seeds']['history_seed']}",
+           "fixed_history_own": c.get("fixed_history_own", "constant"),
+           "model_revision": (rec.get("model") or {}).get("revision"),
+           "git_commit": (rec.get("git") or {}).get("commit"),
            "n_decisions": v.get("n_decisions"), "free_audits": v.get("free_audits"), "free_valid": v.get("free_valid"),
            "free_agree": v.get("free_agree"), "prefixed_audits": v.get("prefixed_audits"),
            "prefixed_valid": v.get("prefixed_valid"), "prefixed_agree": v.get("prefixed_agree"),
@@ -73,6 +78,10 @@ def build_tables(reg: Registry, out_dir: Path, protocol: str = PROTOCOL) -> dict
     if units.empty:
         return tables
     units["steering"] = units.apply(steering_label, axis=1)
+    from src.research.economics import ECON_PRESETS, benchmarks
+    nash = {e: benchmarks(ECON_PRESETS[e])["nash_index"] for e in units["econ_id"].unique() if e in ECON_PRESETS}
+    if "sum_mean_action" in units:
+        units["price_above_nash"] = units["sum_mean_action"] - units["econ_id"].map(nash)
     by_id = {r["run_id"]: r for r in done}
     raw_cache: dict[str, list] = {}
 
@@ -164,6 +173,45 @@ def build_tables(reg: Registry, out_dir: Path, protocol: str = PROTOCOL) -> dict
         lvl = lvl.merge(units, on="run_id", how="left")
     tables["steer_level"] = lvl
 
+    # ---- steering specificity: learned minus mean of random directions, same config / alpha / history ----------
+    spec_rows = []
+    if not lvl.empty:
+        key = lambda r: (r["batch_id"], r["condition"], r["history_cluster"], r["alpha"], r["steer_timing"], r["template_id"],
+                         r["temperature"], r["econ_id"], r["seed_model_seed"], r["rounds"], r["low"], r["prefix_rounds"])
+        rnd = {}
+        for _, r in lvl[lvl.steer_kind == "random"].iterrows():
+            rnd.setdefault(key(r), []).append(r["level_shift"])
+        gen = {key(r): r["level_shift"] for _, r in lvl[lvl.steer_kind == "generic_price"].iterrows()}
+        for _, r in lvl[lvl.steer_kind == "learned"].iterrows():
+            k = key(r)
+            if k in rnd:
+                spec_rows.append({"run_id": r["run_id"], "learned_level": r["level_shift"], "random_level_mean": float(np.mean(rnd[k])),
+                                  "n_random": len(rnd[k]), "specificity": float(r["level_shift"] - np.mean(rnd[k])),
+                                  "learned_minus_generic": float(r["level_shift"] - gen[k]) if k in gen else None})
+    spec = pd.DataFrame(spec_rows)
+    if not spec.empty:
+        spec = spec.merge(units, on="run_id", how="left")
+    tables["specificity"] = spec
+
+    # ---- repeatability: replicate reruns vs their originals ------------------------------------------------
+    rep_rows = []
+    for r in done:
+        if r["config"].get("replicate", 0) == 0:
+            continue
+        c0 = {**r["config"], "replicate": 0}
+        orig = next((x for x in done if x["batch_id"] == r["batch_id"] and match_key(x["config"], drop=("unit_id", "block")) ==
+                     match_key(c0, drop=("unit_id", "block"))), None)
+        if orig is None:
+            continue
+        a, b = M.traj(rounds_of(r["run_id"])), M.traj(rounds_of(orig["run_id"]))
+        acts_eq = bool((M.traj(rounds_of(r["run_id"]), "action") == M.traj(rounds_of(orig["run_id"]), "action")).all())
+        rep_rows.append({"run_id": r["run_id"], "original_run_id": orig["run_id"], "max_abs_dE": float(np.abs(a - b).max()),
+                         "actions_identical": acts_eq})
+    rep = pd.DataFrame(rep_rows)
+    if not rep.empty:
+        rep = rep.merge(units, on="run_id", how="left")
+    tables["repeatability"] = rep
+
     # ---- fixed-history matched absolute-price contrasts ----------------------------------------
     fh = [r for r in done if r["config"]["experiment"] == "fixed_history"]
     grp: dict[str, dict] = {}
@@ -188,83 +236,148 @@ def build_tables(reg: Registry, out_dir: Path, protocol: str = PROTOCOL) -> dict
 # ---------------------------------------------------------------------------------------------
 # Behavioural consistency grid
 # ---------------------------------------------------------------------------------------------
+def _rep0(d):
+    return d[d.replicate == 0] if "replicate" in d else d
+
+
 BEHAVIOURS = [
-    # name, table, filter(df)->df, value column, predicted, unit description
+    # name, table, filter(df)->df, value column, predicted, description, figure
     ("rival_price_responsiveness", "pairs", lambda d: d[(d.condition == "E_nash") & (d.steer_kind == "none")], "post_mean",
-     "negative", "E(rival at Nash) - E(rival stable high), live rounds after t_d"),
-    ("unexpected_deviation_sensitivity", "fixed_history", lambda d: d[d.steer_kind == "none"], "H_sudden-H_gradual",
-     "negative", "same final rival price, sudden vs gradual history"),
+     "negative", "E(rival at Nash price throughout) - E(stable high rival), live rounds after t_d", "18_best_response"),
     ("absolute_price_response", "fixed_history", lambda d: d[d.steer_kind == "none"], "H_always_low-H_stable_high",
-     "negative", "decision under always-low vs always-high rival"),
+     "negative", "single decision: always-low vs always-high rival history", "02b_fixed_history"),
+    ("unexpected_deviation_sensitivity", "fixed_history", lambda d: d[d.steer_kind == "none"], "H_sudden-H_gradual",
+     "negative", "same final rival price: sudden drop vs gradual decline (H3)", "02b_fixed_history"),
     ("punishment_like_reduction", "pairs", lambda d: d[(d.condition == "B_one_shot") & (d.steer_kind == "none")], "immediate",
-     "negative", "one-shot undercut vs stable, first round after observing it"),
+     "negative", "one-shot undercut vs stable, first round after observing it (H1)", "03_deviation_response"),
+    ("delayed_deviation_response", "pairs", lambda d: d[(d.condition == "B_one_shot") & (d.steer_kind == "none")], "peak",
+     "negative", "one-shot undercut: most negative gap in the 4 rounds after observing it", "03_deviation_response"),
     ("persistent_deviation_response", "pairs", lambda d: d[(d.condition == "C_persistent") & (d.steer_kind == "none")], "post_mean",
-     "negative", "persistent undercut vs stable, all post rounds"),
+     "negative", "persistent undercut vs stable, all post-deviation rounds", "03_deviation_response"),
+    ("gradual_decline_response", "pairs", lambda d: d[(d.condition == "D_gradual") & (d.steer_kind == "none")], "post_mean",
+     "negative", "gradual decline vs stable, all post-deviation rounds", "03_deviation_response"),
     ("recovery_after_return", "pairs", lambda d: d[(d.condition.isin(["B_one_shot", "F_delayed"])) & (d.steer_kind == "none")],
-     "recovery_gap", "near_zero", "price gap 1-3 rounds after the rival returns to the high price"),
+     "recovery_gap", "near_zero", "gap 1-3 rounds after the rival's return is observed (H2a, forgiveness-like if ~0)", "04_recovery"),
     ("raise_response", "pairs", lambda d: d[(d.condition == "G_raise") & (d.steer_kind == "none")], "immediate",
-     "nonzero", "unexpected rival price increase vs stable"),
-    ("supra_competitive_default", "units", lambda d: d[(d.condition == "A_stable") & (d.steer_kind == "none") &
+     "nonzero", "unexpected rival price increase vs stable", "03_deviation_response"),
+    ("high_price_default", "units", lambda d: d[(d.condition == "A_stable") & (d.steer_kind == "none") &
+                                                (d.experiment == "deviation_game")], "price_above_nash",
+     "positive", "stable high rival: mean chosen price index minus the Nash index", "01_trajectories"),
+    ("supra_competitive_pricing", "units", lambda d: d[(d.condition == "A_stable") & (d.steer_kind == "none") &
                                                        (d.experiment == "deviation_game")], "sum_collusion_index_joint",
-     "positive", "collusion index under a stable high-price rival (0 = Nash profits)"),
-    ("above_best_response", "units", lambda d: d[(d.steer_kind == "none") & (d.experiment == "deviation_game")],
-     "sum_br_gap_mean", "positive", "chosen price minus one-shot best response"),
-    ("steering_price_level", "steer_level", lambda d: d[(d.steer_kind == "learned") & (d.alpha > 0)], "level_shift",
-     "negative", "steered minus unsteered expected price (same rival script)"),
+     "positive", "collusion index under a stable high-price rival (0 = Nash profits, 1 = monopoly)", "19_collusion_index"),
+    ("best_response_alignment", "units", lambda d: d[(d.steer_kind == "none") & (d.experiment == "deviation_game")],
+     "sum_br_gap_mean", "near_zero", "chosen price minus one-shot best response to the rival's last price", "18_best_response"),
+    ("self_play_stability", "units", lambda d: d[(d.experiment == "reactive_game") & (d.condition == "self_play")],
+     "sum_stability_last5_sd", "near_zero", "SD of the last 5 self-play prices", ""),
+    ("steering_price_level", "steer_level", lambda d: d[(d.steer_kind == "learned") & (d.alpha > 0) & (d.steer_timing == "all")], "level_shift",
+     "negative", "learned vector: steered minus unsteered expected price (same rival script)", "06_steering_controls"),
+    ("steering_specificity", "specificity", lambda d: d[(d.alpha > 0) & (d.steer_timing == "all")], "specificity",
+     "negative", "learned level shift minus mean of norm-matched random directions (H4)", "06_steering_controls"),
     ("steering_random_level", "steer_level", lambda d: d[(d.steer_kind == "random") & (d.alpha > 0)], "level_shift",
-     "near_zero", "norm-matched random direction, same strengths"),
+     "near_zero", "norm-matched random directions, same strengths", "06_steering_controls"),
     ("steering_generic_level", "steer_level", lambda d: d[(d.steer_kind == "generic_price") & (d.alpha > 0)], "level_shift",
-     "negative", "generic price direction (positive control)"),
-    ("steering_sham", "steer_level", lambda d: d[d.steer_kind == "sham"], "level_shift", "near_zero", "zero-vector hook"),
-    ("steering_x_deviation", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition == "B_one_shot")], "did_immediate",
-     "nonzero", "change in one-shot deviation response caused by steering (DiD)"),
-    ("steering_x_persistent", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition == "C_persistent")], "did_post_mean",
-     "nonzero", "change in persistent-deviation response caused by steering (DiD)"),
-    ("steering_x_recovery", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition.isin(["B_one_shot", "F_delayed"]))],
-     "did_recovery_gap", "nonzero", "change in post-return gap caused by steering (DiD)"),
+     "negative", "generic price direction (positive control)", "06_steering_controls"),
+    ("steering_sham", "steer_level", lambda d: d[d.steer_kind == "sham"], "level_shift", "near_zero", "zero-vector hook", "06_steering_controls"),
+    ("steering_x_deviation", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition == "B_one_shot") & (d.steer_timing == "all")],
+     "did_immediate", "nonzero", "change in the one-shot deviation response caused by steering (H5, DiD)", "08_level_vs_interaction"),
+    ("steering_x_persistent", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition == "C_persistent") & (d.steer_timing == "all")],
+     "did_post_mean", "nonzero", "change in the persistent-deviation response caused by steering (DiD)", "08_level_vs_interaction"),
+    ("steering_x_recovery", "did", lambda d: d[(d.steer_kind == "learned") & (d.condition.isin(["B_one_shot", "F_delayed"])) & (d.steer_timing == "all")],
+     "did_recovery_gap", "nonzero", "change in the post-return gap caused by steering (DiD)", "08_level_vs_interaction"),
     ("random_x_deviation", "did", lambda d: d[(d.steer_kind == "random") & (d.condition == "B_one_shot")], "did_immediate",
-     "near_zero", "random-direction control for the DiD"),
+     "near_zero", "random-direction control for the DiD", "08_level_vs_interaction"),
 ]
-VIEWS = ["overall", "model", "history_seed", "template_id", "temperature", "deviation_magnitude", "prefix_rounds",
-         "recovery_delay", "alpha", "steer_layer", "econ_id", "steering", "block"]
+VIEWS = ["overall", "batch_id", "history_cluster", "template_id", "temperature", "seed_model_seed", "deviation_magnitude",
+         "prefix_rounds", "recovery_delay", "window", "alpha", "steer_timing", "econ_id", "condition", "rounds", "steering", "model"]
+# consistency dimensions reported in the per-behaviour summary (user-facing names)
+DIMENSIONS = {"cross_history": "history_cluster", "cross_sampling_seed": "seed_model_seed", "cross_template": "template_id",
+              "cross_temperature": "temperature", "cross_economics": "econ_id", "cross_deviation_size": "deviation_magnitude",
+              "cross_history_length": "prefix_rounds", "cross_recovery_delay": "recovery_delay", "cross_window": "window",
+              "cross_rival_policy": "condition", "cross_steering_strength": "alpha", "cross_batch": "batch_id"}
+
+
+def _join(g, col):
+    return ",".join(sorted(map(str, g[col].dropna().unique()))) if col in g else ""
 
 
 def behaviour_grid(tables: dict[str, pd.DataFrame], seed: int = 0) -> pd.DataFrame:
     rows = []
-    for name, tname, filt, col, pred, desc in BEHAVIOURS:
+    for name, tname, filt, col, pred, desc, fig in BEHAVIOURS:
         df = tables.get(tname)
         if df is None or df.empty or col not in df.columns:
-            rows.append({"behaviour": name, "view": "overall", "level": "all", "status": "not tested", "description": desc})
+            rows.append({"behaviour": name, "view": "overall", "level": "all", "status": "untested", "description": desc, "figure": fig})
             continue
-        d = filt(df)
+        d = _rep0(filt(df))
         d = d[pd.to_numeric(d[col], errors="coerce").notna()]
         if d.empty:
-            rows.append({"behaviour": name, "view": "overall", "level": "all", "status": "not tested", "description": desc})
+            rows.append({"behaviour": name, "view": "overall", "level": "all", "status": "untested", "description": desc, "figure": fig})
             continue
         for view in VIEWS:
             if view != "overall" and (view not in d.columns or d[view].nunique() < 2):
                 continue
             groups = [("all", d)] if view == "overall" else list(d.groupby(view))
             for level, g in groups:
-                s = S.summarize(g[col].astype(float).tolist(), g["history_seed"].tolist(), seed=seed)
-                valid = g[["prefixed_valid", "prefixed_audits"]].sum(numeric_only=True)
+                vals = g[col].astype(float)
+                s = S.summarize(vals.tolist(), g["history_cluster"].tolist(), seed=seed)
+                cm = vals.groupby(g["history_cluster"].values).mean()
+                valid = g[["prefixed_valid", "prefixed_audits"]].apply(pd.to_numeric, errors="coerce").sum()
                 rows.append({"behaviour": name, "view": view, "level": str(level), "predicted": pred, "metric": col,
-                             "description": desc, **s, "status": S.cell_status(s, pred),
+                             "description": desc, "figure": fig, **s,
+                             "between_history_sd": float(cm.std(ddof=1)) if len(cm) > 1 else None,
+                             "directional_consistency": float(max((cm < 0).mean(), (cm > 0).mean())) if len(cm) else None,
+                             "status": S.cell_status(s, pred),
                              "validity_rate": float(valid["prefixed_valid"] / valid["prefixed_audits"]) if valid["prefixed_audits"] else None,
-                             "models": ",".join(sorted(map(str, g["model"].unique()))),
-                             "templates": ",".join(sorted(map(str, g["template_id"].unique()))),
-                             "steering": ",".join(sorted(map(str, g["steering"].unique()))) if "steering" in g else "",
-                             "designations": ",".join(sorted(map(str, g["designation"].unique()))),
-                             "evidence_runs": ";".join(g["run_id"].astype(str).tolist()[:50])})
+                             "experiment_ids": _join(g, "batch_id"), "designations": _join(g, "designation"),
+                             "models": _join(g, "model"), "model_revisions": _join(g, "model_revision"),
+                             "history_seeds": _join(g, "history_seed"), "game_seeds": _join(g, "seed_env_seed"),
+                             "sampling_seeds": _join(g, "seed_model_seed"), "templates": _join(g, "template_id"),
+                             "temperatures": _join(g, "temperature"), "rival_policies": _join(g, "condition"),
+                             "econ_ids": _join(g, "econ_id"), "horizons": _join(g, "rounds"),
+                             "steering": _join(g, "steering"), "alphas": _join(g, "alpha"),
+                             "evidence_runs": ";".join(g["run_id"].astype(str).tolist()[:60])})
     grid = pd.DataFrame(rows)
     rep = []
     for name, g in grid.groupby("behaviour", sort=False):
         overall = g[g.view == "overall"]
-        views = g[g.view != "overall"]
-        rep.append({"behaviour": name, "overall_status": overall["status"].iloc[0] if len(overall) else "not tested",
-                    "replication_status": S.replication_status(views["status"].tolist()) if len(views) else
-                    ("insufficient evidence" if overall["status"].iloc[0] in ("insufficient", "not tested") else "single setting only")})
+        views = g[(g.view != "overall") & (g.view != "history_cluster")]
+        st0 = overall["status"].iloc[0] if len(overall) else "untested"
+        if st0 == "untested":
+            r = "untested"
+        elif len(views):
+            r = S.replication_status(views["status"].tolist())
+        else:
+            r = "insufficient evidence" if st0 == "insufficient" else "single setting only"
+        rep.append({"behaviour": name, "overall_status": st0, "replication_status": r})
     return grid.merge(pd.DataFrame(rep), on="behaviour", how="left")
+
+
+def dimension_summary(grid: pd.DataFrame) -> pd.DataFrame:
+    """Behaviour x consistency dimension: replication label across the levels of one parameter, with spread."""
+    rows = []
+    for b, g in grid.groupby("behaviour", sort=False):
+        for dim, view in DIMENSIONS.items():
+            v = g[g.view == view]
+            if v.empty:
+                rows.append({"behaviour": b, "dimension": dim, "status": "untested"}); continue
+            m = pd.to_numeric(v["mean"], errors="coerce")
+            sts = v["status"].tolist()
+            if view == "history_cluster":  # per-history cells have 1 cluster each -> use sign agreement across histories
+                sgn = np.sign(m.dropna())
+                agree = float(max((sgn < 0).mean(), (sgn > 0).mean())) if len(sgn) else np.nan
+                lab = ("robust" if agree >= 0.8 else "mixed" if agree >= 0.6 else "not replicated") if len(sgn) >= 4 else "insufficient evidence"
+                rows.append({"behaviour": b, "dimension": dim, "status": lab, "n_levels": len(v), "sign_agreement": agree,
+                             "level_mean_min": float(m.min()), "level_mean_max": float(m.max()), "level_mean_sd": float(m.std(ddof=1)) if len(m) > 1 else None})
+                continue
+            lab = S.replication_status(sts)
+            rows.append({"behaviour": b, "dimension": dim, "status": lab, "n_levels": len(v),
+                         "n_supported": int(sum(x == "supported" for x in sts)), "n_opposite": int(sum(x == "opposite" for x in sts)),
+                         "n_absent": int(sum(x == "absent" for x in sts)), "n_inconclusive": int(sum(x == "inconclusive" for x in sts)),
+                         "n_insufficient": int(sum(x == "insufficient" for x in sts)),
+                         "level_mean_min": float(m.min()), "level_mean_max": float(m.max()),
+                         "level_mean_sd": float(m.std(ddof=1)) if len(m) > 1 else None,
+                         "levels": ";".join(f"{l}={x:.2f}" for l, x in zip(v["level"], m))})
+    return pd.DataFrame(rows)
 
 
 def write_tables(tables: dict[str, pd.DataFrame], grid: pd.DataFrame, out_dir: Path) -> dict[str, str]:
