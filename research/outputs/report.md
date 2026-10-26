@@ -1,6 +1,6 @@
 # Strategic pricing research: consolidated report
 
-_Auto-generated 2026-10-26T01:02:29+00:00 from the registry (hash `785c0fc481ca3603`). Do not edit by hand; run `python scripts/research.py analyze`._
+_Auto-generated 2026-10-26T03:22:05+00:00 from the registry (hash `785c0fc481ca3603`). Do not edit by hand; run `python scripts/research.py analyze`._
 
 ## 1. Executive summary
 
@@ -718,7 +718,7 @@ Mean expected price conditional on the rival's previous price. Source: `src/rese
 
 ![18_collusion_index](figures/18_collusion_index.png)
 
-Per-game joint collusion index. Source: `src/research/plots.py:fig_collusion`, tables units, 1456 runs (hash `5ed245b3f1828389`).
+Per-history joint collusion index; scripted rival prices drive most of the variation between scripts. Source: `src/research/plots.py:fig_collusion`, tables units, 672 runs (hash `6d4d127b31ada493`).
 
 ### 12_dose_response
 
@@ -737,6 +737,12 @@ Colour = pre-declared status. Source: `src/research/plots.py:fig_hypotheses`, ta
 ![22_consistency_dimensions](figures/22_consistency_dimensions.png)
 
 Replication label across the levels of one dimension. Source: `src/research/plots.py:fig_dimensions`, tables consistency_by_dimension, 0 runs (hash `4f53cda18c2baa0c`).
+
+### 23_direction_specificity
+
+![23_direction_specificity](figures/23_direction_specificity.png)
+
+Undercut and raise produce the same delayed fall; a gradual decline produces a rise. Source: `src/research/plots.py:fig_direction`, tables pair_traj, pairs, 96 runs (hash `7e0dbf2f6ead25e2`).
 
 ### 08_template_robustness
 

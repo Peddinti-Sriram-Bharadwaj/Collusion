@@ -315,11 +315,10 @@ def fig_br(W, T):
     d = d.dropna(subset=["rival_prev"])
     fig, ax = plt.subplots(figsize=(5.5, 4))
     for m, g in d.groupby("model"):
-        s = g.groupby("rival_prev").agg(E=("E", "mean"), br=("br", "mean"))
-        ax.plot(s.index, s.E, marker="o", label=f"{m} observed")
+        _ci_band(ax, g, "rival_prev", "E", "history_cluster", "#2a6fdb", f"Qwen2.5-{m.upper()} (expected price, 95% CI)")
     s = d.groupby("rival_prev")["br"].mean(); ax.plot(s.index, s.values, color="black", ls="--", label="one-shot best response")
     ax.set_xlabel("rival price last round (index)"); ax.set_ylabel("agent price (index)"); ax.legend(frameon=False, fontsize=7)
-    ax.set_title("Observed response vs economic best response")
+    ax.set_title(f"Observed price vs one-round best response (no steering, n={_nh(d)} histories)")
     W.save(fig, "17_best_response", fig_br, ["trajectories"], d.run_id, "Mean expected price conditional on the rival's previous price.")
 
 
@@ -327,15 +326,64 @@ def fig_collusion(W, T):
     u = _main(T.get("units"))
     if u is None or u.empty or "sum_collusion_index_joint" not in u:
         return W.skip("18_collusion_index", "no games")
-    d = u[u.experiment != "fixed_history"]
-    groups = [(k, g["sum_collusion_index_joint"].dropna().values) for k, g in d.groupby(["condition", "steering"])]
-    groups = [(k, v) for k, v in groups if len(v)]
-    fig, ax = plt.subplots(figsize=(max(6, 0.45 * len(groups)), 3.6))
-    ax.boxplot([v for _, v in groups], tick_labels=[f"{c}\n{s}" for (c, s), _ in groups], showfliers=True)
+    d = u[(u.experiment == "deviation_game") & (u.steer_timing == "all") &
+          (u.steering.isin(["none", "sham"]) | u.steer_kind.isin(["learned", "random"]))]
+    d = d[(d.steer_kind == "none") | (d.alpha == 1.0)]
+    arms = [("none", "#555555", "no steering"), ("learned", "#7b4fbf", "learned α=+1"), ("random", "#9aa0a6", "random α=+1 (3 seeds)")]
+    conds = [c for c in COND_C if c in d.condition.unique()]
+    fig, ax = plt.subplots(figsize=(9, 3.8))
+    for k, (kind, col, lab) in enumerate(arms):
+        for i, c in enumerate(conds):
+            g = d[(d.condition == c) & (d.steer_kind == kind)]
+            if g.empty:
+                continue
+            v = g.groupby("history_cluster")["sum_collusion_index_joint"].mean()
+            x = i + (k - 1) * 0.25
+            ax.scatter(np.full(len(v), x) + np.random.default_rng(i + 10 * k).uniform(-0.06, 0.06, len(v)), v, s=8, color=col, alpha=0.5)
+            s_ = S.summarize(v.tolist(), list(v.index), n_boot=1500)
+            ax.errorbar(x, s_["mean"], yerr=[[s_["mean"] - s_["ci_low"]], [s_["ci_high"] - s_["mean"]]], fmt="o", color=col, ms=6,
+                        mec="black", mew=0.5, label=lab if i == 0 else None, zorder=3)
     ax.axhline(0, color="#999", lw=0.8, ls=":"); ax.axhline(1, color="#999", lw=0.8, ls=":")
-    ax.tick_params(axis="x", labelsize=6, rotation=60); ax.set_ylabel("collusion index (joint)")
-    ax.set_title("Collusion-index distribution by condition and steering (0 = Nash, 1 = monopoly profits)")
-    W.save(fig, "18_collusion_index", fig_collusion, ["units"], d.run_id, "Per-game joint collusion index.")
+    ax.text(len(conds) - 0.5, 0.02, "Nash", fontsize=7, color="#777", ha="right"); ax.text(len(conds) - 0.5, 1.01, "monopoly", fontsize=7, color="#777", ha="right")
+    ax.set_xticks(range(len(conds)), [c.replace("_", " ") for c in conds], fontsize=8)
+    ax.set_ylabel("joint collusion index"); ax.set_ylim(-0.05, 1.08); ax.legend(frameon=False, fontsize=7, loc="lower left")
+    ax.set_title(f"Joint profits relative to Nash (0) and monopoly (1) by rival script (dots = histories, n={_nh(d)}; 95% CI)")
+    W.save(fig, "18_collusion_index", fig_collusion, ["units"], d.run_id, "Per-history joint collusion index; scripted rival prices drive most of the variation between scripts.")
+
+
+def fig_direction(W, T):
+    pt, pr = _main(T.get("pair_traj")), _main(T.get("pairs"))
+    if pt is None or pt.empty or pr is None or pr.empty:
+        return W.skip("23_direction_specificity", "no matched pairs")
+    pt, pr = pt[pt.steer_kind == "none"], pr[pr.steer_kind == "none"]
+    if not {"B_one_shot", "G_raise"} <= set(pr.condition):
+        return W.skip("23_direction_specificity", "needs B_one_shot and G_raise")
+    fig, axs = plt.subplots(1, 2, figsize=(10.5, 3.8), gridspec_kw={"width_ratios": [1.4, 1]})
+    lab = {"B_one_shot": "one-off undercut (7→2→7)", "G_raise": "one-off raise (7→9→7)", "C_persistent": "persistent undercut (7→2)",
+           "D_gradual": "gradual decline (7→2)"}
+    for c in ["B_one_shot", "G_raise", "C_persistent", "D_gradual"]:
+        g = pt[pt.condition == c]
+        if not g.empty:
+            _ci_band(axs[0], g, "t", "delta", "history_cluster", COND_C[c], lab[c], ls="-" if c in ("B_one_shot", "G_raise") else ":")
+    td = int(pt.deviation_round.iloc[0])
+    axs[0].axvspan(td - 0.5, td + 0.5, color="#f2d0d0", alpha=0.6); axs[0].axhline(0, color="#999", lw=0.8)
+    axs[0].set_xlabel("live round (shaded = rival's deviation round)"); axs[0].set_ylabel("Δ expected price vs stable rival (steps)")
+    axs[0].legend(frameon=False, fontsize=7); axs[0].set_title("Matched price response by rival script")
+    conds = [c for c in COND_C if c in pr.condition.unique()]
+    ms, lo, hi = [], [], []
+    for c in conds:
+        g = pr[pr.condition == c]
+        s_ = S.summarize(g["post_mean"].tolist(), g["history_cluster"].tolist(), n_boot=2000)
+        ms.append(s_["mean"]); lo.append(s_["ci_low"]); hi.append(s_["ci_high"])
+    y = np.arange(len(conds))[::-1]
+    axs[1].errorbar(ms, y, xerr=[np.array(ms) - lo, np.array(hi) - ms], fmt="none", ecolor="#666")
+    axs[1].scatter(ms, y, c=[COND_C[c] for c in conds], s=40, zorder=3, edgecolor="black", lw=0.4)
+    axs[1].set_yticks(y, [c.replace("_", " ") for c in conds], fontsize=8); axs[1].axvline(0, color="#999", lw=0.8)
+    axs[1].set_xlabel("mean Δ after the deviation (steps, 95% CI)"); axs[1].set_title(f"Post-deviation shift (n={_nh(pr)} histories)")
+    fig.suptitle("The delayed price fall follows any change in the rival's pattern, including a price increase", x=0.01, ha="left", fontweight="bold")
+    fig.tight_layout()
+    W.save(fig, "23_direction_specificity", fig_direction, ["pair_traj", "pairs"], pr.run_id,
+           "Undercut and raise produce the same delayed fall; a gradual decline produces a rise.")
 
 
 def fig_negative(W, grid):
@@ -470,7 +518,7 @@ def fig_dimensions(W, T):
 def make_all(T: dict, grid: pd.DataFrame, reg_records: list, out_dir: Path, registry_hash: str, formats=("png", "svg", "pdf")) -> list:
     W = FigureWriter(out_dir, registry_hash, formats)
     for f in (fig_trajectories, fig_deviation_response, fig_fixed_history, fig_punish_recover, fig_steer_traj, fig_steer_vs_random,
-              fig_level_vs_interaction, fig_seed_dist, fig_coverage, fig_br, fig_collusion, fig_dose, fig_hypotheses, fig_dimensions):
+              fig_level_vs_interaction, fig_seed_dist, fig_coverage, fig_br, fig_collusion, fig_dose, fig_hypotheses, fig_dimensions, fig_direction):
         try:
             f(W, T)
         except Exception as exc:
