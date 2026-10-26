@@ -1,0 +1,19 @@
+{
+ "kind": "generic_price",
+ "model_key": "7b",
+ "model_id": "Qwen/Qwen2.5-7B-Instruct",
+ "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+ "layer": 20,
+ "site": "answer",
+ "template_id": "v1",
+ "construction": "-(mean answer-token residual of B1 prompts with model expected price in top third - bottom third), template v1, 60 vs 60 prompts; sign chosen so +alpha lowers price; rescaled to the norm of learned_answer_L20_c3d",
+ "training_histories": "B1 dataset (360 prompts; v1 subset 180), disjoint from Phase A.1 histories",
+ "source_run": "artifacts/interpretability/phase_b/qwen7b_b1.npz",
+ "source_sha256": "4b52507a36ce94907b802f9cf3d1aff559813a2ecbf717872e7ea0be97521169",
+ "cosine_with_learned_answer_L20_c3d": 0.7746,
+ "alpha_units": "norm-matched to learned_answer_L20_c3d",
+ "vector_id": "generic_price_answer_L20_b1",
+ "dim": 3584,
+ "norm": 14.375565528869629,
+ "sha256": "4aeff4d383d413e70fddb5685d985ddaf3dda098387411eec62cc284737bde0e"
+}

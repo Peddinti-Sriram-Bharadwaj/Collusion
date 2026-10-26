@@ -1,0 +1,49 @@
+{
+ "kind": "learned",
+ "model_key": "7b",
+ "model_id": "Qwen/Qwen2.5-7B-Instruct",
+ "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+ "layer": 18,
+ "site": "reply_start",
+ "template_id": "v1",
+ "construction": "mean over training pairs of (edited - control) residual output of decoder layer at site; edits = Phase A.1 realistic rival-final undercut (idx 0) and raise (idx 9)",
+ "training_histories": [
+  "phase-a-000",
+  "phase-a-002",
+  "phase-a-004",
+  "phase-a-006",
+  "phase-a-008",
+  "phase-a-010",
+  "phase-a-012",
+  "phase-a-014",
+  "phase-a-016",
+  "phase-a-018",
+  "phase-a-020",
+  "phase-a-022"
+ ],
+ "heldout_histories": [
+  "phase-a-001",
+  "phase-a-003",
+  "phase-a-005",
+  "phase-a-007",
+  "phase-a-009",
+  "phase-a-011",
+  "phase-a-013",
+  "phase-a-015",
+  "phase-a-017",
+  "phase-a-019",
+  "phase-a-021",
+  "phase-a-023"
+ ],
+ "source_run": "artifacts/interpretability/runs/c3d_7b.json (Modal, 2026-10-25)",
+ "source_sha256": "5e3ad017bcdc9fb8d79e1af2410a11b433d8933f6b03bcd25758ba1c1c8067fd",
+ "validation": {
+  "heldout_effect_at_alpha1": null,
+  "pair_consistency": 0.6713166236877441
+ },
+ "alpha_units": "alpha=1 adds the average real-edit activation change",
+ "vector_id": "learned_reply_start_L18_c3d",
+ "dim": 3584,
+ "norm": 14.046128273010254,
+ "sha256": "0caadd7ff4bd7679621e5c575e6c211196a6a1651870632795171d9fc32925b3"
+}

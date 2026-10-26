@@ -1,0 +1,359 @@
+from hashlib import sha256
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+
+torch = pytest.importorskip("torch")
+
+from src.interpretability.activation_extractor import HFActivationExtractor
+from src.interpretability.experiment_config import NeutralSmokeConfig, balanced_persona_design
+from src.interpretability.representation_dataset import (
+    DecisionMetadata,
+    aligned_record,
+    persona_prompt_hash,
+    validate_activation_alignment,
+)
+from src.interpretability.neutral_pipeline import capture_neutral_decision_context
+from src.interpretability.hf_episode import run_hf_neutral_episode, save_hf_trajectory
+from src.interpretability.competitor_intervention import run_paired_competitor_price_intervention
+from src.interpretability.matched_prompt_counterfactual import (
+    derive_matched_prompt_conditions,
+    run_matched_prompt_counterfactuals,
+)
+from src.interpretability.balanced_counterfactual_dataset import generate_balanced_scenarios, collect_balanced_counterfactual_dataset, assert_no_split_leakage
+from scripts import run_hf_competitor_intervention as intervention_cli
+from src.env import LogitBertrandEnv
+
+
+class _FakeTokenizer:
+    def __call__(self, prompt, return_tensors):
+        assert return_tensors == "pt"
+        return {"input_ids": torch.tensor([[11, 12, 13, 14]]), "attention_mask": torch.tensor([[1, 1, 1, 1]])}
+
+    def decode(self, token_ids, skip_special_tokens):
+        return '{"price_index": 3}'
+
+
+class _FakeModel:
+    device = None
+    config = SimpleNamespace(num_hidden_layers=28)
+
+    def __call__(self, input_ids, attention_mask, output_hidden_states, use_cache):
+        assert output_hidden_states is True
+        assert use_cache is False
+        # Embedding output + 28 transformer-layer outputs, hidden width 6.
+        states = tuple(torch.full((1, 4, 6), float(index)) for index in range(29))
+        return SimpleNamespace(hidden_states=states)
+
+    def generate(self, input_ids, attention_mask, **kwargs):
+        assert kwargs["do_sample"] is False
+        assert kwargs["max_new_tokens"] == 32
+        assert kwargs["temperature"] is None
+        assert kwargs["top_p"] is None
+        assert kwargs["top_k"] is None
+        return torch.cat([input_ids, torch.tensor([[99, 100]])], dim=1)
+
+
+def _metadata(token_count=4, persona=None):
+    return DecisionMetadata(
+        episode_id="neutral-smoke-000", market_seed=7, generation_seed=7,
+        agent_id=0, round_id=0, persona_id=persona,
+        persona_prompt_hash=persona_prompt_hash(persona),
+        full_prompt_hash=sha256(b"example").hexdigest(), input_token_ids_hash=sha256(torch.tensor([[11, 12, 13, 14]]).numpy().tobytes()).hexdigest(), prompt_token_count=token_count,
+        n_agents=2, n_prices=10, n_rounds=3, agent_mode="stateless", prompt_format="raw_repository_stateless_v1",
+        model_id="mock/qwen", model_revision="test", tokenizer_revision="test",
+        backend="huggingface", quantization=None, generation_parameters={"temperature": 0.0},
+        warning=False, peer_info=None, fixed_agent_ids=(), veto=False, veto_margin_fraction=0.3,
+    )
+
+
+def test_capture_uses_final_prompt_token_and_requested_layers():
+    capture = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test").capture_final_prompt_token("prompt", [4, 14, 27])
+    assert capture.prompt_token_count == 4
+    assert capture.token_position == 3
+    assert len(capture.input_token_ids_hash) == 64
+    assert set(capture.layer_vectors) == {4, 14, 27}
+    assert np.all(capture.layer_vectors[4] == 5.0)  # hidden-state index is layer + 1
+    assert capture.layer_vectors[27].shape == (6,)
+
+
+def test_capture_uses_last_non_padding_token_for_left_padded_input():
+    class LeftPaddedTokenizer(_FakeTokenizer):
+        def __call__(self, prompt, return_tensors):
+            return {"input_ids": torch.tensor([[0, 0, 11, 12]]), "attention_mask": torch.tensor([[0, 0, 1, 1]])}
+
+    capture = HFActivationExtractor(_FakeModel(), LeftPaddedTokenizer(), "mock/qwen").capture_final_prompt_token("prompt", [4])
+    assert capture.prompt_token_count == 2
+    assert capture.token_position == 3
+
+
+def test_alignment_accepts_exact_neutral_persona_metadata():
+    capture = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen").capture_final_prompt_token("prompt", [4, 14, 27])
+    record = aligned_record(_metadata(), capture)
+    assert record["persona_id"] is None
+    assert record["token_position"] == 3
+
+
+def test_alignment_rejects_persona_hash_or_token_count_mismatch():
+    capture = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen").capture_final_prompt_token("prompt", [4, 14, 27])
+    with pytest.raises(ValueError, match="token count"):
+        validate_activation_alignment(_metadata(token_count=3), capture)
+    bad = _metadata()
+    object.__setattr__(bad, "persona_prompt_hash", "not-the-real-hash")
+    with pytest.raises(ValueError, match="persona_prompt_hash"):
+        validate_activation_alignment(bad, capture)
+
+
+def test_existing_persona_design_is_complete_and_smoke_is_neutral_only():
+    design = balanced_persona_design()
+    assert NeutralSmokeConfig().personas == (None, None)
+    assert set(design) == {
+        "neutral_default", "homog_capitalist", "homog_socialist", "homog_for_profit",
+        "homog_nonprofit", "homog_rnd_oriented", "homog_consumer_empathetic", "homog_hoarder",
+        "mixed_capitalist_vs_socialist", "mixed_hoarder_vs_consumer_empathetic",
+    }
+
+
+def test_neutral_pipeline_reuses_existing_prompt_builder_and_marks_neutral():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    extractor = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test")
+    record = capture_neutral_decision_context(
+        extractor=extractor, env=env, history=[], episode_id="smoke-0",
+        market_seed=12, agent_id=0, round_id=0, n_rounds=3,
+    )
+    assert record["persona_id"] is None
+    assert record["persona_prompt_hash"] == persona_prompt_hash(None)
+    assert record["prompt_token_count"] == 4
+    assert record["proposed_action_index"] is None
+
+
+def test_mocked_hf_episode_aligns_generated_decision_with_market_transition():
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+    extractor = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test")
+    result = run_hf_neutral_episode(extractor, n_rounds=2, seed=4, selected_layers=[4, 14, 27])
+    assert result["persona_configuration"] == [None, None]
+    assert result["n_parse_failures"] == 0
+    assert len(result["decisions"]) == 4
+    assert all(entry["activation_status"] == "captured" for entry in result["decisions"])
+    assert all(entry["eligible_for_analysis"] is True for entry in result["decisions"])
+    assert all(entry["proposed_action_index"] == entry["executed_action_index"] == 3 for entry in result["decisions"])
+    assert np.allclose(result["price_history"], env.price_grid[3])
+    assert np.isfinite(result["delta"])
+
+
+def test_mocked_hf_episode_records_fallback_when_generation_fails():
+    class BrokenModel(_FakeModel):
+        def generate(self, **kwargs):
+            raise RuntimeError("generation failed")
+
+    extractor = HFActivationExtractor(BrokenModel(), _FakeTokenizer(), "mock/qwen", "test")
+    result = run_hf_neutral_episode(extractor, n_rounds=1, seed=4, selected_layers=[4, 14, 27])
+    assert result["n_parse_failures"] == 2
+    assert all(entry["activation_status"] == "failed" for entry in result["decisions"])
+    assert all(entry["error"] == "generation failed" for entry in result["decisions"])
+    assert all(entry["eligible_for_analysis"] is False for entry in result["decisions"])
+
+
+def test_trajectory_schema_is_json_serializable(monkeypatch):
+    result = run_hf_neutral_episode(
+        HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test"),
+        n_rounds=1, selected_layers=[4, 14, 27],
+    )
+    written = {}
+    from pathlib import Path
+
+    monkeypatch.setattr(Path, "mkdir", lambda *args, **kwargs: None)
+    monkeypatch.setattr(Path, "write_text", lambda self, data, encoding: written.setdefault("text", data))
+    save_hf_trajectory("ignored/trajectory.json", result)
+    assert '"schema_version": "hf-neutral-trajectory-v1"' in written["text"]
+
+
+def test_paired_competitor_undercut_uses_executed_price_history_and_aligned_records():
+    class PromptSensitiveTokenizer(_FakeTokenizer):
+        def __call__(self, prompt, return_tensors):
+            marker = sum(prompt.encode("utf-8")) % 50 + 1
+            return {
+                "input_ids": torch.tensor([[11, 12, marker]]),
+                "attention_mask": torch.tensor([[1, 1, 1]]),
+            }
+
+    class PromptSensitiveModel(_FakeModel):
+        def __call__(self, input_ids, attention_mask, output_hidden_states, use_cache):
+            marker = float(input_ids[0, -1].item())
+            states = tuple(torch.full((1, 3, 6), float(index) + marker) for index in range(29))
+            return SimpleNamespace(hidden_states=states)
+
+    result = run_paired_competitor_price_intervention(
+        HFActivationExtractor(PromptSensitiveModel(), PromptSensitiveTokenizer(), "mock/qwen", "test"),
+        n_rounds=3,
+        seed=9,
+        intervention_round=0,
+        override_index=1,
+        selected_layers=[4, 14, 27],
+    )
+    control = result["trajectories"]["control"]
+    noop = result["trajectories"]["no_op"]
+    undercut = result["trajectories"]["undercut"]
+    env = LogitBertrandEnv(n_agents=2, n_prices=10)
+
+    assert np.allclose(control["price_history"][0], env.price_grid[[3, 3]])
+    assert np.allclose(undercut["price_history"][0], env.price_grid[[1, 3]])
+    assert np.allclose(undercut["profit_history"][0], env._profits(env.price_grid[[1, 3]]))
+    intervention = undercut["interventions"][0]
+    assert intervention == {
+        "variant": "undercut", "round_id": 0, "target_agent_id": 0,
+        "requested_override_index": 1, "proposed_action_index": 3,
+        "executed_action_index": 1, "applied": True, "kind": "executed_price_override",
+    }
+    assert noop["interventions"][0]["kind"] == "no_op"
+    assert noop["interventions"][0]["applied"] is True
+    assert result["response_comparison"]["no_op_matches_control"] is True
+
+    control_response = next(d for d in control["decisions"] if d["agent_id"] == 1 and d["round_id"] == 1)
+    undercut_response = next(d for d in undercut["decisions"] if d["agent_id"] == 1 and d["round_id"] == 1)
+    assert f"rival price(s): ${env.price_grid[3]:.2f}" in control_response["prompt"]
+    assert f"rival price(s): ${env.price_grid[1]:.2f}" in undercut_response["prompt"]
+    assert control_response["full_prompt_hash"] != undercut_response["full_prompt_hash"]
+    assert result["response_comparison"]["undercut_minus_control_activation"]["4"]["l2_distance"] > 0
+    for trajectory in result["trajectories"].values():
+        assert all(d["eligible_for_analysis"] for d in trajectory["decisions"])
+        assert all(d["token_position"] == d["prompt_token_count"] - 1 for d in trajectory["decisions"])
+        assert all(set(d["layer_vectors"]) == {"4", "14", "27"} for d in trajectory["decisions"])
+
+
+def test_paired_competitor_intervention_replays_deterministically_and_rejects_non_undercut():
+    extractor = HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test")
+    first = run_paired_competitor_price_intervention(
+        extractor, n_rounds=3, seed=2, intervention_round=0, override_index=1, selected_layers=[4, 14, 27],
+    )
+    second = run_paired_competitor_price_intervention(
+        extractor, n_rounds=3, seed=2, intervention_round=0, override_index=1, selected_layers=[4, 14, 27],
+    )
+    for variant in ("control", "no_op", "undercut"):
+        assert np.array_equal(first["trajectories"][variant]["price_history"], second["trajectories"][variant]["price_history"])
+        assert [d["full_prompt_hash"] for d in first["trajectories"][variant]["decisions"]] == [
+            d["full_prompt_hash"] for d in second["trajectories"][variant]["decisions"]
+        ]
+
+    with pytest.raises(ValueError, match="strictly below"):
+        run_paired_competitor_price_intervention(
+            extractor, n_rounds=3, seed=2, intervention_round=0, override_index=3, selected_layers=[4, 14, 27],
+        )
+
+
+def test_paired_cli_persists_runtime_memory_and_failure_status(monkeypatch):
+    class StubExtractor:
+        model_id = "mock/qwen"
+        revision = "test"
+        tokenizer_revision = "test"
+
+        def memory_snapshot(self):
+            return {
+                "cuda_available": True,
+                "allocated_bytes": 10,
+                "reserved_bytes": 20,
+                "max_allocated_bytes": 30,
+                "max_reserved_bytes": 40,
+            }
+
+    captured = []
+    monkeypatch.setattr(intervention_cli, "save_paired_competitor_intervention", lambda path, result: captured.append((path, result)))
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: {"schema_version": "test"})
+    result = intervention_cli.run_and_persist_paired_experiment(
+        StubExtractor(), output="ignored.json", run_kwargs={"seed": 1},
+    )
+    assert result["execution"]["status"] == "completed"
+    assert result["execution"]["wall_clock_seconds"] >= 0
+    assert result["execution"]["memory_before_release"]["max_reserved_bytes"] == 40
+    assert captured[-1][1]["execution"]["error_type"] is None
+
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: (_ for _ in ()).throw(RuntimeError("mock failure")))
+    with pytest.raises(RuntimeError, match="mock failure"):
+        intervention_cli.run_and_persist_paired_experiment(StubExtractor(), output="failed.json", run_kwargs={})
+    assert captured[-1][1]["execution"]["status"] == "failed"
+    assert captured[-1][1]["execution"]["error_type"] == "RuntimeError"
+
+    monkeypatch.setattr(intervention_cli, "run_paired_competitor_price_intervention", lambda extractor, **kwargs: (_ for _ in ()).throw(KeyboardInterrupt()))
+    with pytest.raises(KeyboardInterrupt):
+        intervention_cli.run_and_persist_paired_experiment(StubExtractor(), output="interrupted.json", run_kwargs={})
+    assert captured[-1][1]["execution"]["status"] == "interrupted"
+    assert captured[-1][1]["execution"]["error_type"] == "KeyboardInterrupt"
+
+
+def test_matched_prompt_conditions_only_change_named_information_fields():
+    control_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.59
+Reply JSON"""
+    undercut_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.146); rival price(s): $1.33
+Reply JSON"""
+    conditions = derive_matched_prompt_conditions(control_prompt, undercut_prompt)
+    assert conditions["A_original_control"]["prompt"] == control_prompt
+    assert conditions["B_actual_market_undercut"]["prompt"] == undercut_prompt
+    assert conditions["negative_identical_control"]["prompt"] == control_prompt
+    assert conditions["C_synthetic_rival_price_only"]["prompt"].splitlines()[3] == "Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.33"
+    assert conditions["D_synthetic_own_profit_only"]["prompt"].splitlines()[3] == "Round 1: you priced $1.59 (profit 0.146); rival price(s): $1.59"
+    assert conditions["C_synthetic_rival_price_only"]["information_status"] == "synthetic_information_intervention"
+    assert conditions["D_synthetic_own_profit_only"]["modified_fields"] == ["own_profit"]
+
+
+def test_matched_prompt_counterfactual_records_alignment_metrics_and_negative_control():
+    control_prompt = """Header
+Recent history:
+Round 0: you priced $1.33 (profit 0.160); rival price(s): $1.33
+Round 1: you priced $1.59 (profit 0.269); rival price(s): $1.59
+Reply JSON"""
+    undercut_prompt = control_prompt.replace("profit 0.269); rival price(s): $1.59", "profit 0.146); rival price(s): $1.33")
+    common = {
+        "n_prices": 10,
+        "market_seed": 3,
+        "n_rounds": 5,
+        "episode_id": "source",
+        "round_id": 2,
+        "generation_seed": 4,
+    }
+    control = {**common, "prompt": control_prompt, "full_prompt_hash": sha256(control_prompt.encode()).hexdigest()}
+    undercut = {**common, "prompt": undercut_prompt, "full_prompt_hash": sha256(undercut_prompt.encode()).hexdigest()}
+    result = run_matched_prompt_counterfactuals(
+        HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test"),
+        control_context=control,
+        undercut_context=undercut,
+        selected_layers=[4, 14, 27],
+    )
+    conditions = result["conditions"]
+    assert set(conditions) == {
+        "A_original_control", "B_actual_market_undercut", "C_synthetic_rival_price_only",
+        "D_synthetic_own_profit_only", "negative_identical_control",
+    }
+    assert all(record["eligible_for_analysis"] for record in conditions.values())
+    assert all(record["token_position"] == record["prompt_token_count"] - 1 for record in conditions.values())
+    assert conditions["negative_identical_control"]["full_prompt_hash"] == conditions["A_original_control"]["full_prompt_hash"]
+    assert conditions["C_synthetic_rival_price_only"]["full_prompt_hash"] != conditions["A_original_control"]["full_prompt_hash"]
+    assert result["comparisons_to_A_original_control"]["negative_identical_control"]["4"]["l2_distance"] == 0.0
+    assert result["comparisons_to_A_original_control"]["A_original_control"]["14"]["normalized_l2_distance"] == 0.0
+
+
+def test_balanced_scenarios_are_valid_matched_and_pre_split():
+    scenarios = generate_balanced_scenarios(12, seed=4)
+    assert len(scenarios) == 12
+    assert all(s.intervention["executed_action_index"] < s.intervention["proposed_action_index"] for s in scenarios)
+    assert len({s.split for s in scenarios}) >= 2
+    for scenario in scenarios:
+        assert np.allclose(scenario.control_history[-1][0][1], scenario.undercut_history[-1][0][1])
+        assert scenario.control_history[-1][0][0] != scenario.undercut_history[-1][0][0]
+
+
+def test_balanced_collection_integrity_and_scenario_split_leakage_checks():
+    scenarios = generate_balanced_scenarios(10, seed=1)
+    data = collect_balanced_counterfactual_dataset(HFActivationExtractor(_FakeModel(), _FakeTokenizer(), "mock/qwen", "test"), scenarios, selected_layers=[4,14,27])
+    assert_no_split_leakage(data["rows"])
+    assert all(r["record"]["token_position"] == r["record"]["prompt_token_count"] - 1 for r in data["rows"])
+    assert all(set(r["record"]["layer_vectors"]) == {"4","14","27"} for r in data["rows"])
+    bad = [dict(data["rows"][0]), dict(data["rows"][0], split="test" if data["rows"][0]["split"] != "test" else "train")]
+    with pytest.raises(ValueError, match="multiple"):
+        assert_no_split_leakage(bad)

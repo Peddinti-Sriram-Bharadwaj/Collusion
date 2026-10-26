@@ -274,6 +274,7 @@ def test_veto_forces_overpriced_agent_down_to_nash(monkeypatch):
     # Patch both LLM agent classes so run_llm_episode's internal construction
     # produces our deterministic high-price stub instead of calling Ollama.
     monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
 
     env = LogitBertrandEnv(n_agents=2, n_prices=10)
     nash_grid_price = env.price_grid[int(np.argmin(np.abs(env.price_grid - env.p_nash)))]
@@ -288,6 +289,7 @@ def test_veto_disabled_lets_high_prices_through(monkeypatch):
     import src.llm_agent as llm_mod
 
     monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=3, veto=False, seed=0)
     assert r["n_vetoes"] == 0
@@ -465,6 +467,7 @@ def test_veto_exempts_fixed_plant_agents(monkeypatch):
     import src.llm_agent as llm_mod
 
     monkeypatch.setattr(llm_mod, "LLMPricingAgent", lambda agent_id, env, model, warning, peer_info, persona, seed: _StubHighPriceAgent(env.n_prices))
+    monkeypatch.setattr(llm_mod, "check_ollama_available", lambda *a, **k: None)
 
     r = run_llm_episode(n_agents=2, n_prices=10, n_rounds=2, fixed_agent_ids=[1], veto=True, seed=0)
     # agent 1 is the fixed plant (pinned at Nash already); only agent 0's high

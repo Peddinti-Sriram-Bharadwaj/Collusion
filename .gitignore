@@ -11,3 +11,7 @@ submission/*.out
 # Liar's Bar scripted-offer: raw game records (~567 MB) are kept out of git
 liars_bar_scripted_offer/experiments/game_records/
 liars_bar_scripted_offer/**/.venv/
+
+# Mechanistic lane: large local activation dumps (summaries live in research/)
+artifacts/interpretability/
+.venv-cuda/

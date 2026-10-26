@@ -1,0 +1,496 @@
+{
+ "batch_id": "sd_v1_onefactor_7b_001",
+ "n_units": 656,
+ "checks": {
+  "history_prefixes_4r": {
+   "n_seeds": 8,
+   "n_distinct": 8,
+   "examples": [
+    [
+     0,
+     [
+      6,
+      5,
+      4,
+      3
+     ]
+    ],
+    [
+     1,
+     [
+      4,
+      4,
+      5,
+      6
+     ]
+    ],
+    [
+     2,
+     [
+      6,
+      3,
+      2,
+      3
+     ]
+    ],
+    [
+     3,
+     [
+      6,
+      2,
+      2,
+      3
+     ]
+    ]
+   ]
+  },
+  "history_prefixes_2r": {
+   "n_seeds": 8,
+   "n_distinct": 8,
+   "examples": [
+    [
+     0,
+     [
+      8,
+      7
+     ]
+    ],
+    [
+     1,
+     [
+      6,
+      6
+     ]
+    ],
+    [
+     2,
+     [
+      8,
+      5
+     ]
+    ],
+    [
+     3,
+     [
+      8,
+      4
+     ]
+    ]
+   ]
+  },
+  "history_prefixes_8r": {
+   "n_seeds": 8,
+   "n_distinct": 8,
+   "examples": [
+    [
+     0,
+     [
+      8,
+      7,
+      6,
+      5,
+      5,
+      4,
+      4,
+      4
+     ]
+    ],
+    [
+     1,
+     [
+      6,
+      6,
+      7,
+      8,
+      4,
+      4,
+      8,
+      8
+     ]
+    ],
+    [
+     2,
+     [
+      8,
+      5,
+      4,
+      5,
+      6,
+      8,
+      6,
+      4
+     ]
+    ],
+    [
+     3,
+     [
+      8,
+      4,
+      4,
+      5,
+      4,
+      8,
+      8,
+      6
+     ]
+    ]
+   ]
+  },
+  "fixed_history_own_index_counts": {},
+  "scripted_sequences": {
+   "A_stable@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": null,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "B_one_shot@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 8,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     3,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "C_persistent@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ]
+   },
+   "D_gradual@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 4,
+    "returns_at": null,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     6,
+     5,
+     4,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ]
+   },
+   "E_nash@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 0,
+    "returns_at": null,
+    "seq": [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ]
+   },
+   "F_delayed@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 10,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     3,
+     3,
+     3,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "G_raise@{\"deviation_round\": 7, \"high\": 7, \"low\": 3, \"raise_to\": 9, \"recovery_delay\": 3, \"rounds\": 16}": {
+    "first_diff_round": 7,
+    "returns_at": 8,
+    "seq": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     9,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   }
+  },
+  "information_discipline": "decision at live round t renders history[:P+t]; rival action t appended after the decision (src/research/deviation.py; tests/test_research.py::no leakage)",
+  "vector_history_overlap": {
+   "n_training_histories": 36,
+   "train_ids_recorded": true,
+   "n_eval_prefixes": 32,
+   "n_overlapping": 0,
+   "train_rival_patterns": [
+    [
+     1,
+     1,
+     1,
+     0
+    ],
+    [
+     1,
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     1,
+     1,
+     9
+    ],
+    [
+     1,
+     3,
+     5,
+     0
+    ],
+    [
+     1,
+     3,
+     5,
+     6
+    ],
+    [
+     1,
+     3,
+     5,
+     9
+    ]
+   ]
+  },
+  "vector": {
+   "id": "learned_answer_L20_c3d",
+   "norm": 14.375565528869629,
+   "dim": 3584,
+   "layer": 20,
+   "site": "answer",
+   "model": "7b"
+  },
+  "model": {
+   "key": "7b",
+   "id": "Qwen/Qwen2.5-7B-Instruct",
+   "revision": "a09a35458c702b33eeacc393d103063234e8bc28"
+  },
+  "templates": [
+   "v1",
+   "v1_implicit_horizon",
+   "v2_log",
+   "v3_system",
+   "v4_history_first"
+  ],
+  "sites_layers": [
+   [
+    "answer",
+    20
+   ]
+  ],
+  "benchmarks": {
+   "base": {
+    "nash_index": 2,
+    "monopoly_index": 7,
+    "br": [
+     1,
+     1,
+     2,
+     2,
+     3,
+     3,
+     4,
+     4,
+     4,
+     4
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.08000633228967902,
+    "n_prices": 10
+   },
+   "grid8": {
+    "nash_index": 1,
+    "monopoly_index": 5,
+    "br": [
+     1,
+     1,
+     2,
+     2,
+     2,
+     3,
+     3,
+     3
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.06235686987569833,
+    "n_prices": 8
+   },
+   "high_cost": {
+    "nash_index": 2,
+    "monopoly_index": 7,
+    "br": [
+     1,
+     1,
+     2,
+     2,
+     3,
+     3,
+     4,
+     4,
+     4,
+     5
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.08433583030959763,
+    "n_prices": 10
+   },
+   "high_mu": {
+    "nash_index": 2,
+    "monopoly_index": 7,
+    "br": [
+     1,
+     2,
+     2,
+     2,
+     3,
+     3,
+     3,
+     3,
+     3,
+     4
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.051617237577283814,
+    "n_prices": 10
+   },
+   "low_mu": {
+    "nash_index": 1,
+    "monopoly_index": 7,
+    "br": [
+     1,
+     1,
+     2,
+     2,
+     3,
+     3,
+     4,
+     5,
+     5,
+     6
+    ],
+    "br_recomputed_match": true,
+    "deviation_gain_vs_monopoly": 0.12206624413215877,
+    "n_prices": 10
+   }
+  },
+  "steering_arms": {
+   "('learned', 'learned_answer_L20_c3d', -0.5, 'all')": 16,
+   "('learned', 'learned_answer_L20_c3d', -2.0, 'all')": 16,
+   "('learned', 'learned_answer_L20_c3d', 0.5, 'all')": 16,
+   "('learned', 'learned_answer_L20_c3d', 1.5, 'all')": 16,
+   "('none', None, 0.0, 'all')": 528,
+   "('random', 'learned_answer_L20_c3d', -0.5, 'all')": 16,
+   "('random', 'learned_answer_L20_c3d', -2.0, 'all')": 16,
+   "('random', 'learned_answer_L20_c3d', 0.5, 'all')": 16,
+   "('random', 'learned_answer_L20_c3d', 1.5, 'all')": 16
+  },
+  "steering_layer_site_consistent": true,
+  "coverage_independent_histories": {
+   "H1 B vs A (none)": 11,
+   "H2 B,C,F vs A (none)": 11,
+   "H3 sudden vs gradual (none)": 0,
+   "H4 learned+1 & random+1 & none": 0,
+   "H5 learned+1 on B and A": 0
+  },
+  "n_by_block": {
+   "sweep:template_id": 96,
+   "sweep:temperature": 144,
+   "sweep:deviation_magnitude": 72,
+   "sweep:prefix_rounds": 48,
+   "sweep:recovery_delay": 48,
+   "sweep:econ_id": 96,
+   "sweep:window": 24,
+   "sweep:alpha": 128
+  },
+  "n_by_experiment": {
+   "deviation_game": 656
+  }
+ },
+ "issues": []
+}

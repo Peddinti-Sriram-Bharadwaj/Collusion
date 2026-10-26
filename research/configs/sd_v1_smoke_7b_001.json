@@ -1,0 +1,27 @@
+{
+ "batch_id": "sd_v1_smoke_7b_001",
+ "protocol": "strategic_deviation_v1",
+ "designation": "smoke",
+ "model": "7b",
+ "description": "Stage A infrastructure smoke test: execution, prompts, strict-parse audits, payoffs, steering alignment, registry, resume, plots.",
+ "base": {"design": {"rounds": 12, "deviation_round": 5, "high": 7, "low": 2, "recovery_delay": 3}, "audit_generation": "deviation_window"},
+ "blocks": [
+  {"name": "primary", "grid": {
+    "condition": ["A_stable", "B_one_shot", "C_persistent", "F_delayed"],
+    "seeds.history_seed": [0, 1],
+    "steering_preset": [
+      {"steering": {"kind": "none"}},
+      {"steering": {"kind": "sham", "vector_id": "learned_answer_L20_c3d", "alpha": 1.0}},
+      {"steering": {"kind": "learned", "vector_id": "learned_answer_L20_c3d", "alpha": 1.0}},
+      {"steering": {"kind": "random", "vector_id": "learned_answer_L20_c3d", "alpha": 1.0, "random_seed": 0}}]}},
+  {"name": "fixed_history", "overrides": {"experiment": "fixed_history"}, "grid": {
+    "condition": ["H_sudden", "H_gradual", "H_always_low", "H_stable_high"],
+    "seeds.history_seed": [0, 1],
+    "steering_preset": [{"steering": {"kind": "none"}},
+                        {"steering": {"kind": "learned", "vector_id": "learned_answer_L20_c3d", "alpha": 1.0}}]}},
+  {"name": "sweep:decoding", "overrides": {"decoding": {"mode": "sample", "temperature": 0.7}}, "grid": {
+    "condition": ["A_stable", "B_one_shot"], "seeds.model_seed": [0, 1]}},
+  {"name": "repeatability", "grid": {"condition": ["B_one_shot"], "replicate": [1]}},
+  {"name": "sweep:template_id", "overrides": {"template_id": "v3_system"}, "grid": {"condition": ["A_stable", "B_one_shot"]}}
+ ]
+}

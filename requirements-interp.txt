@@ -1,0 +1,9 @@
+# Study 2 (mechanistic probe and strategic-deviation study), on top of requirements.txt
+torch>=2.3
+transformers==4.48.3
+accelerate>=1.0
+safetensors>=0.4
+huggingface_hub>=0.25
+matplotlib>=3.8
+scipy>=1.11
+modal>=1.0
