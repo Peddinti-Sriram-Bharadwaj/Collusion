@@ -12,6 +12,107 @@ empirically-studied case of algorithmic pricing collusion.
 
 ---
 
+## This branch — latent steering of LLM pricing decisions (sprint lane)
+
+Everything below the line after this section is the shared project this
+branch forked from (`master`), written before the Apart Research AI
+Collusion Research Sprint (October 23-25, 2026) as the environment and
+baseline this branch's work builds on. **This section describes what is
+new on this branch, written during the sprint.**
+
+**Question.** The rest of this project asks whether pricing agents collude
+and how to detect or disrupt it from the outside. This branch asks a
+different, narrower question: when an LLM's price does respond to a
+rival's price, is that response visible and causally locatable inside the
+model's activations, or only observable as an external behavioral
+pattern? A second, explicitly pre-registered question follows from the
+first: does the model's pricing specifically punish a rival for
+undercutting it, the way a tit-for-tat strategy would?
+
+**What was built.** A two-firm repeated Bertrand environment with a
+ten-point price grid (Nash ≈ index 2, monopoly ≈ index 7), run against
+`Qwen2.5-7B-Instruct` (and a 0.5B-32B scaling comparison) on Modal, with a
+Hugging Face pipeline recording hidden states at the answer token. A
+strict JSON-only output parser was necessary: an earlier, raw-prompt
+version of the pipeline was found, on re-audit, to accept text the model
+had copied back from the prompt's own example as if it were a real
+decision, and all output from that version was discarded rather than
+corrected after the fact. On top of this environment, three methods were
+built: matched prompt pairs that edit only the rival's displayed last
+price (plus an irrelevant-number negative control), linear probes that
+try to decode the rival's price from hidden states at each layer and
+token position, and activation patching between matched pairs to localize
+where a price edit's effect is carried, which was then used to build a
+single steering vector and test whether it transfers to prompts it was
+not built from.
+
+**Mechanistic findings.** The model's price moved in response to a
+rival-price edit in 96% of cases, more than the largest shift seen under
+the irrelevant-number control, but not in the economically rational
+direction: both a rival price increase and a rival price cut lowered the
+model's own price on average (Spearman ρ ≈ 0 with the one-round best
+response). The rival's price was linearly decodable from hidden
+activations (held-out R² up to 0.86), and patching across 48 matched
+prompt pairs localized the effect to the rival-price tokens through
+roughly layer 10, handing off to the reply-start token at layer 18 and
+landing on the answer token by layer 20. A steering vector built from
+that site reproduced the real edit's effect on held-out histories (0.65
+steps against 0.73 for the real edit) and on 96 separately pre-registered
+fresh histories, and lowered price in repeated games more than
+norm-matched random directions at every tested strength.
+
+**The pre-registered strategic-deviation study.** A confirmatory batch of
+1,656 runs (16 independent pre-play histories, zero failed runs, every
+output strictly parsed) tested five hypotheses with Holm-corrected,
+cluster-bootstrap confidence intervals. Only one was supported: that the
+steering vector's effect is specific relative to random directions
+(H4, -0.43 steps, 95% CI [-0.56, -0.32], Holm p=0.002). The model's
+immediate response to a one-off rival undercut was not distinguishable
+from zero (H1, -0.08 steps, Holm p=0.81); a delayed price fall did follow
+an undercut two to four rounds later, but a rival price *increase*
+produced a fall of comparable or larger size, so this reads as a reaction
+to any break in the rival's pattern rather than a punishment response
+specific to undercutting. A follow-up, one-factor-at-a-time robustness
+batch (656 runs) found the model's high-price default itself (collusion
+index 0.73-0.95) stable across prompt templates, temperature, and most
+economic settings, while the punishment-like and recovery effects varied
+by prompt template and did not replicate consistently.
+
+**What this does and does not show.** The steering result demonstrates a
+real, located causal path from the rival's displayed price to the model's
+output. It does not show that this path is specific to rival-price
+information: the vector's cosine similarity with the model's general
+high-versus-low price direction is 0.77-0.81, meaning a substantial part
+of its effect may be a shared route for price-level control generally,
+not a feature reserved for processing the rival's price. It also does not
+support treating the model's pricing as a recognizable strategy against a
+rival (no punishment, no reciprocation to a price increase) -- the
+dominant, robust pattern across every batch is a fixed, largely
+rival-independent high-price default. No part of this branch tests two
+LLM agents responding to each other, so no claim about coordination
+between two learning agents follows from it.
+
+**Limitations.** One model family (chiefly Qwen2.5-7B, with the 14B/32B
+comparison less thoroughly tested); scripted, non-learning rivals only;
+16 independent histories in the confirmatory batch and 8 in the
+robustness batch, with confidence intervals reported throughout rather
+than point estimates alone; prices are read from the model's digit output
+after a forced answer prefix, validated by strict-parse audits rather
+than by an independent scoring method.
+
+**Where things are.** Code: `src/research/` and `scripts/research.py`.
+Protocol and amendment: `research/protocols/strategic_deviation_v1.md`;
+preflight audit: `research/preflight/`. Run registry:
+`research/registry/runs.jsonl`, raw results in `research/raw/`, compute
+log `research/registry/compute.jsonl`. Tables, figures (PNG/SVG/PDF with a
+provenance manifest), and the auto-generated, always-current summary:
+`research/outputs/` (`python scripts/research.py analyze` regenerates
+`research/outputs/report.md`). A condensed version of this lane is also
+summarized in `master`'s README (Part 3) and in the sprint submission
+report at `submission/submission.pdf` on `master`.
+
+---
+
 ## TL;DR (explain it like I'm ten)
 
 Imagine two ice cream trucks parked next to each other. If they both charge
