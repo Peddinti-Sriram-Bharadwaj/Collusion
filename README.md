@@ -12,6 +12,33 @@ empirically-studied case of algorithmic pricing collusion.
 
 ---
 
+## Sprint submission and what is pre-existing vs. new
+
+This repository was used for the Apart Research AI Collusion Research Sprint
+(October 23-25, 2026). Per the sprint's own rules, pre-existing code must be
+marked as such, separately from work done during the sprint:
+
+- **Part 1 below ("our custom-built experiments") was written before the
+  sprint.** It is included here as the environment and baseline the sprint
+  work builds on, not as sprint output.
+- **Part 2 below ("hackathon starter-repo lanes") was written during the
+  sprint**, on top of the separate Apart Research starter repo, by Sriram
+  Bharadwaj.
+- Two further sprint-only lines of work, by the other two team members, are
+  not reproduced in full in this README: a Liar's Bar trust-offer exposure
+  experiment by Chewon Cho (`llm-agent-collusion-2` fork,
+  [chewonc/collusion\_hackathon](https://github.com/chewonc/collusion_hackathon/tree/scripted-offer)),
+  and a mechanistic-interpretability probe of LLM pricing decisions by
+  Gagana (`gagana/latent-manifold-steering` branch of this repository).
+
+The condensed sprint submission report, covering the two most substantive
+lines of sprint work in full (Bertrand-market disruption and the latent-
+steering mechanistic probe) and summarizing the rest as verified
+observations, is at **[`submission/submission.pdf`](submission/submission.pdf)**
+(source: `submission/submission.tex`).
+
+---
+
 ## TL;DR (explain it like I'm ten)
 
 Imagine two ice cream trucks parked next to each other. If they both charge
