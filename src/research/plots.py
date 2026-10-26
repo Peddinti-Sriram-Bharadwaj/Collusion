@@ -220,18 +220,29 @@ def fig_seed_dist(W, T):
 
 def fig_factor(W, grid, view, name, title):
     g = grid[(grid.view == view) & grid["mean"].notna()]
-    if g.empty:
+    if g.empty or g["level"].nunique() < 2:
         return W.skip(name, f"no variation in {view}")
     behs = list(dict.fromkeys(g.behaviour))
-    fig, axs = plt.subplots(1, len(behs), figsize=(2.6 * len(behs), 3.2), squeeze=False)
-    for ax, b in zip(axs[0], behs):
-        gg = g[g.behaviour == b]
-        y = np.arange(len(gg))
-        ax.errorbar(gg["mean"], y, xerr=[gg["mean"] - gg["ci_low"], gg["ci_high"] - gg["mean"]], fmt="o", color="#2a6fdb", ms=4)
-        for yy, st in zip(y, gg.status):
-            ax.plot([], []); ax.text(1.02, yy, st, transform=ax.get_yaxis_transform(), fontsize=6, color=STATUS_C.get(st, "#000"))
-        ax.set_yticks(y, gg["level"], fontsize=7); ax.axvline(0, color="#999", lw=0.8); ax.set_title(b.replace("_", " "), fontsize=7.5)
-    fig.suptitle(title, x=0.01, ha="left", fontweight="bold")
+    levels = sorted(g["level"].unique(), key=lambda x: (len(x), x))
+    ncol = min(4, len(behs)); nrow = int(np.ceil(len(behs) / ncol))
+    fig, axs = plt.subplots(nrow, ncol, figsize=(3.4 * ncol, 0.32 * len(levels) * nrow + 1.2 * nrow + 0.6), squeeze=False, sharey=True)
+    short = {"supported": "sup", "opposite": "opp", "absent": "abs", "inconclusive": "inc", "insufficient": "ins"}
+    for k, (ax, b) in enumerate(zip(axs.flat, behs)):
+        gg = g[g.behaviour == b].set_index("level").reindex(levels)
+        y = np.arange(len(levels))
+        ok = gg["mean"].notna().values
+        ax.errorbar(gg["mean"][ok], y[ok], xerr=[(gg["mean"] - gg["ci_low"])[ok], (gg["ci_high"] - gg["mean"])[ok]], fmt="none", ecolor="#888", lw=1)
+        for yy, (_, r) in zip(y, gg.iterrows()):
+            if pd.notna(r["mean"]):
+                ax.scatter(r["mean"], yy, color=STATUS_C.get(r.status, "#000"), s=28, zorder=3, edgecolor="black", lw=0.4)
+                ax.annotate(f"{short.get(r.status, r.status)} n={int(r.n_clusters)}", (r["mean"], yy), xytext=(0, 5),
+                            textcoords="offset points", ha="center", fontsize=5.5, color="#333")
+        ax.axvline(0, color="#999", lw=0.8); ax.set_title(b.replace("_", " "), fontsize=8)
+        ax.set_yticks(y, levels, fontsize=7); ax.set_ylim(-0.6, len(levels) - 0.4)
+    for ax in list(axs.flat)[len(behs):]:
+        ax.axis("off")
+    fig.suptitle(f"{title}: estimate and 95% CI per level (colour = status; other factors at main settings)", x=0.01, ha="left", fontweight="bold")
+    fig.tight_layout()
     runs = ";".join(g["evidence_runs"].fillna("")).split(";")
     W.save(fig, name, fig_factor, ["behaviour_cells"], [r for r in runs if r], f"Effect estimate (95% CI) by {view}.")
 

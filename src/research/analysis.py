@@ -268,8 +268,8 @@ BEHAVIOURS = [
     ("supra_competitive_pricing", "units", lambda d: d[(d.condition == "A_stable") & (d.steer_kind == "none") &
                                                        (d.experiment == "deviation_game")], "sum_collusion_index_joint",
      "positive", "collusion index under a stable high-price rival (0 = Nash profits, 1 = monopoly)", "19_collusion_index"),
-    ("best_response_alignment", "units", lambda d: d[(d.steer_kind == "none") & (d.experiment == "deviation_game")],
-     "sum_br_gap_mean", "near_zero", "chosen price minus one-shot best response to the rival's last price", "18_best_response"),
+    ("above_best_response", "units", lambda d: d[(d.steer_kind == "none") & (d.experiment == "deviation_game")],
+     "sum_br_gap_mean", "positive", "chosen price minus one-shot best response to the rival's last price (0 = aligned)", "17_best_response"),
     ("self_play_stability", "units", lambda d: d[(d.experiment == "reactive_game") & (d.condition == "self_play")],
      "sum_stability_last5_sd", "near_zero", "SD of the last 5 self-play prices", ""),
     ("steering_price_level", "steer_level", lambda d: d[(d.steer_kind == "learned") & (d.alpha > 0) & (d.steer_timing == "all")], "level_shift",
@@ -404,7 +404,10 @@ def dimension_summary(grid: pd.DataFrame) -> pd.DataFrame:
             sts = v["status"].tolist()
             if view == "history_cluster":  # per-history cells have 1 cluster each -> use sign agreement across histories
                 sgn = np.sign(m.dropna())
-                agree = float(max((sgn < 0).mean(), (sgn > 0).mean())) if len(sgn) else np.nan
+                if (v["predicted"] == "near_zero").all():   # null prediction: share of histories within the margin
+                    agree = float((m.dropna().abs() < S.DELTA_EQUIV).mean()) if len(sgn) else np.nan
+                else:
+                    agree = float(max((sgn < 0).mean(), (sgn > 0).mean())) if len(sgn) else np.nan
                 lab = ("robust" if agree >= 0.8 else "mixed" if agree >= 0.6 else "not replicated") if len(sgn) >= 4 else "insufficient evidence"
                 rows.append({"behaviour": b, "dimension": dim, "status": lab, "n_levels": len(v), "sign_agreement": agree,
                              "level_mean_min": float(m.min()), "level_mean_max": float(m.max()), "level_mean_sd": float(m.std(ddof=1)) if len(m) > 1 else None})

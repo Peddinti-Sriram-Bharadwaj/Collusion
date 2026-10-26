@@ -133,6 +133,12 @@ EXPLORATORY = [
      "the v1 prompt states the horizon"),
     ("X5", "initial price rise after a one-shot undercut (smoke observation)", "share of histories with immediate(B) > 0",
      "descriptive", "smoke batch: +0.23 with 2 histories"),
+    ("X6", "interaction specificity: persistent undercut", "DiD post_mean(C) learned +1 minus mean of random +1", "nonzero",
+     "is the steering x deviation interaction specific to the learned direction?"),
+    ("X7", "interaction specificity: recovery", "DiD recovery_gap(F delayed) learned +1 minus mean of random +1", "nonzero", ""),
+    ("X8", "interaction specificity: immediate response", "DiD immediate(B) learned +1 minus mean of random +1", "nonzero", ""),
+    ("X9", "direction dependence of H5", "DiD immediate(B) learned +1 minus learned -1", "nonzero",
+     "a direction-specific interaction should change sign with alpha"),
 ]
 
 
@@ -157,6 +163,16 @@ def exploratory(T: dict[str, pd.DataFrame], designation: str | None = "confirmat
         add("X3", pc("B_one_shot", "peak"))
         imm = pc("B_one_shot", "immediate")
         add("X5", imm, {"share_positive": float((imm > 0).mean()), "share_negative": float((imm < 0).mean())})
+    did = _base(T.get("did"), designation)
+    if did is not None and not did.empty:
+        dd = did[did.steer_timing == "all"]
+        def dc(kind, alpha, cond, m):
+            x = dd[(dd.steer_kind == kind) & (dd.alpha == alpha) & (dd.condition == cond)]
+            return _per_cluster(x[m].astype(float), x["history_cluster"])
+        add("X6", (dc("learned", 1.0, "C_persistent", "did_post_mean") - dc("random", 1.0, "C_persistent", "did_post_mean")).dropna())
+        add("X7", (dc("learned", 1.0, "F_delayed", "did_recovery_gap") - dc("random", 1.0, "F_delayed", "did_recovery_gap")).dropna())
+        add("X8", (dc("learned", 1.0, "B_one_shot", "did_immediate") - dc("random", 1.0, "B_one_shot", "did_immediate")).dropna())
+        add("X9", (dc("learned", 1.0, "B_one_shot", "did_immediate") - dc("learned", -1.0, "B_one_shot", "did_immediate")).dropna())
     if tr is not None and not tr.empty:
         a = tr[(tr.steer_kind == "none") & (tr.condition == "A_stable") & (tr.experiment == "deviation_game")]
         if not a.empty:
