@@ -10,6 +10,12 @@ This repository accompanies a research plan on distributional AGI safety risk
 agents rather than any single misaligned agent), applied to the concrete,
 empirically-studied case of algorithmic pricing collusion.
 
+New to the market/ML/AI-safety terms used below (Bertrand, Cournot,
+collusion index, Nash price, steering vector, activation patching,
+confidence interval, surveillance awareness, and everything else)?
+**[`GLOSSARY.md`](GLOSSARY.md)** explains every one of them in plain
+language, including every environment/game used across this project.
+
 ---
 
 ## Sprint submission and what is pre-existing vs. new
