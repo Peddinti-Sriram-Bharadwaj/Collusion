@@ -1,0 +1,69 @@
+[start] 2026-10-24T03:52:14Z branch=scripted-offer head=e1a097957249c189ba68fb3c9df2b6199c13f510
+C0 g00: ok in 549.3s, rounds=14, winner=Quinn
+C1 g00: ok in 353.3s, rounds=14, winner=Luke
+C2 g00: ok in 234.2s, rounds=13, winner=Luke
+C3 g00: ok in 346.9s, rounds=11, winner=Lily
+C4 g00: ok in 294.6s, rounds=13, winner=Quinn
+C1 g01: ok in 327.0s, rounds=15, winner=Luke
+C2 g01: ok in 180.9s, rounds=10, winner=Luke
+C3 g01: ok in 317.8s, rounds=15, winner=Quinn
+C4 g01: ok in 194.5s, rounds=10, winner=Quinn
+C0 g01: ok in 276.7s, rounds=12, winner=Quinn
+C2 g02: ok in 448.5s, rounds=16, winner=Luke
+C3 g02: ok in 405.1s, rounds=15, winner=Riley
+C4 g02: ok in 458.4s, rounds=19, winner=Luke
+C0 g02: ok in 488.9s, rounds=21, winner=Quinn
+C1 g02: ok in 439.1s, rounds=19, winner=Lily
+C3 g03: ok in 375.8s, rounds=11, winner=Lily
+C4 g03: ok in 172.6s, rounds=9, winner=Lily
+C0 g03: ok in 160.1s, rounds=6, winner=Lily
+C1 g03: ok in 195.8s, rounds=9, winner=Luke
+C2 g03: ok in 177.3s, rounds=7, winner=Luke
+C4 g04: ok in 340.5s, rounds=15, winner=Lily
+C0 g04: ok in 257.5s, rounds=10, winner=Lily
+C1 g04: ok in 192.0s, rounds=8, winner=Luke
+C2 g04: ok in 336.1s, rounds=12, winner=Lily
+C3 g04: ok in 336.1s, rounds=12, winner=Luke
+C0 g05: ok in 340.6s, rounds=18, winner=Quinn
+C1 g05: ok in 233.8s, rounds=12, winner=Luke
+C2 g05: ok in 305.2s, rounds=12, winner=Lily
+C3 g05: ok in 333.3s, rounds=12, winner=Riley
+C4 g05: ok in 209.0s, rounds=11, winner=Riley
+[runner] exit=0 2026-10-24T06:26:57Z
+[cleanup] 2026-10-24T06:26:57Z stopping Modal apps
+                                     Apps                                      
++-----------------------------------------------------------------------------+
+|                           | Descript |         |       | Created | Stopped  |
+| App ID                    | ion      | State   | Tasks | at      | at       |
+|---------------------------+----------+---------+-------+---------+----------|
+| ap-EMOHaohSkMjRtWGWt8lGh5 | vllm-min | stopped | 0     | 2026-10 | 2026-10- |
+|                           | istral-8 |         |       | -24     | 24 15:27 |
+|                           | b-instru |         |       | 06:18   | Korea    |
+|                           | ct-2410  |         |       | Korea   | Standard |
+|                           |          |         |       | Standar | Time     |
+|                           |          |         |       | d Time  |          |
+| ap-9W478dxv7LY4Qc40UklNCJ | vllm-qwe | stopped | 0     | 2026-10 | 2026-10- |
+|                           | n2-5-7b- |         |       | -24     | 24 15:27 |
+|                           | instruct |         |       | 06:18   | Korea    |
+|                           |          |         |       | Korea   | Standard |
+|                           |          |         |       | Standar | Time     |
+|                           |          |         |       | d Time  |          |
+| ap-pWYQGj6B8mqVxcqZMFsVAx | vllm-lla | stopped | 0     | 2026-10 | 2026-10- |
+|                           | ma-3-2-3 |         |       | -24     | 24 15:27 |
+|                           | b-instru |         |       | 06:18   | Korea    |
+|                           | ct       |         |       | Korea   | Standard |
+|                           |          |         |       | Standar | Time     |
+|                           |          |         |       | d Time  |          |
+| ap-rFYjKJJKDi4YuGlIWt2SEO | vllm-lla | stopped | 0     | 2026-10 | 2026-10- |
+|                           | ma-3-1-8 |         |       | -24     | 24 15:27 |
+|                           | b-instru |         |       | 06:17   | Korea    |
+|                           | ct       |         |       | Korea   | Standard |
+|                           |          |         |       | Standar | Time     |
+|                           |          |         |       | d Time  |          |
++-----------------------------------------------------------------------------+
+                          Active Containers in environment:                    
++------------------------------------------------------------------------------
+| Container ID                  | App ID                    | App Name | Start 
+|-------------------------------+---------------------------+----------+-------
++------------------------------------------------------------------------------
+[cleanup] done

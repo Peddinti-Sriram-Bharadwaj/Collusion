@@ -1,0 +1,574 @@
+contrast,model,game_number,value
+Gate C0-C4 proposer nc,llama-3.1-8b,0,1.0
+HA1a committed C1-C2,llama-3.1-8b,0,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,0,0.0
+HA1c X committed C1b-C1,llama-3.1-8b,0,1.0
+X nc on Riley C1-C4,llama-3.1-8b,0,0.0
+HA1a committed C1-C2,llama-3.1-8b,1,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,1,0.0
+HM C1-C4 others challenge,llama-3.1-8b,1,0.06666666666666665
+HM C2-C4 others challenge,llama-3.1-8b,1,-0.17142857142857143
+HM C3-C4 others challenge,llama-3.1-8b,1,0.06666666666666665
+HM C5-C4 others challenge,llama-3.1-8b,1,0.15000000000000002
+HM pooled msg-C4 others challenge,llama-3.1-8b,1,0.027976190476190474
+HA1a committed C1-C2,llama-3.1-8b,2,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,2,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,2,-0.575
+HA2c selectivity C1b-C1,llama-3.1-8b,2,0.37697368421052635
+HM C1-C4 others challenge,llama-3.1-8b,2,-0.09999999999999998
+HM C2-C4 others challenge,llama-3.1-8b,2,0.15714285714285714
+HM C3-C4 others challenge,llama-3.1-8b,2,-0.12857142857142856
+HM C5-C4 others challenge,llama-3.1-8b,2,0.10000000000000009
+HM pooled msg-C4 others challenge,llama-3.1-8b,2,0.007142857142857173
+Gate C0-C4 proposer nc,llama-3.1-8b,3,0.5
+HA1a committed C1-C2,llama-3.1-8b,3,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,3,0.0
+HA1a committed C1-C2,llama-3.1-8b,4,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,4,-1.0
+HM C1-C4 others challenge,llama-3.1-8b,4,0.5
+HM C2-C4 others challenge,llama-3.1-8b,4,0.3125
+HM C3-C4 others challenge,llama-3.1-8b,4,0.375
+HM C5-C4 others challenge,llama-3.1-8b,4,0.3214285714285714
+HM pooled msg-C4 others challenge,llama-3.1-8b,4,0.37723214285714285
+HA1a committed C1-C2,llama-3.1-8b,5,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,5,0.0
+HA2b selectivity C1-C2,llama-3.1-8b,5,-0.36190476190476184
+HA2c selectivity C1b-C1,llama-3.1-8b,5,0.3888888888888889
+HM C1-C4 others challenge,llama-3.1-8b,5,0.16666666666666663
+HM C2-C4 others challenge,llama-3.1-8b,5,0.09999999999999998
+HM C3-C4 others challenge,llama-3.1-8b,5,0.5
+HM C5-C4 others challenge,llama-3.1-8b,5,0.16666666666666663
+HM pooled msg-C4 others challenge,llama-3.1-8b,5,0.2333333333333333
+Gate C0-C4 proposer nc,llama-3.1-8b,6,0.2727272727272727
+HA1a committed C1-C2,llama-3.1-8b,6,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,6,0.0
+HA1c X committed C1b-C1,llama-3.1-8b,6,1.0
+X nc on Riley C1-C4,llama-3.1-8b,6,-0.4772727272727273
+HA1a committed C1-C2,llama-3.1-8b,7,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,7,0.0
+HM C1-C4 others challenge,llama-3.1-8b,7,-0.3392857142857143
+HM C2-C4 others challenge,llama-3.1-8b,7,-0.22499999999999998
+HM C3-C4 others challenge,llama-3.1-8b,7,0.04166666666666663
+HM C5-C4 others challenge,llama-3.1-8b,7,0.20833333333333337
+HM pooled msg-C4 others challenge,llama-3.1-8b,7,-0.07857142857142857
+HA1a committed C1-C2,llama-3.1-8b,8,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,8,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,8,-0.5
+HM C1-C4 others challenge,llama-3.1-8b,8,0.0
+HM C2-C4 others challenge,llama-3.1-8b,8,-0.5
+HM C3-C4 others challenge,llama-3.1-8b,8,0.0
+HM C5-C4 others challenge,llama-3.1-8b,8,0.0
+HM pooled msg-C4 others challenge,llama-3.1-8b,8,-0.125
+Gate C0-C4 proposer nc,llama-3.1-8b,9,0.0
+HA1a committed C1-C2,llama-3.1-8b,9,-1.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,9,0.0
+HA1c X committed C1b-C1,llama-3.1-8b,9,0.0
+X nc on Riley C1-C4,llama-3.1-8b,9,-0.75
+HA1a committed C1-C2,llama-3.1-8b,10,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,10,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,10,-0.3333333333333333
+HM C1-C4 others challenge,llama-3.1-8b,10,0.02857142857142858
+HM C2-C4 others challenge,llama-3.1-8b,10,0.09523809523809523
+HM C3-C4 others challenge,llama-3.1-8b,10,0.261904761904762
+HM C5-C4 others challenge,llama-3.1-8b,10,-0.0714285714285714
+HM pooled msg-C4 others challenge,llama-3.1-8b,10,0.0785714285714286
+HA1a committed C1-C2,llama-3.1-8b,11,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,11,0.0
+HM C1-C4 others challenge,llama-3.1-8b,11,1.0
+HM C3-C4 others challenge,llama-3.1-8b,11,0.42857142857142855
+HM C5-C4 others challenge,llama-3.1-8b,11,0.42857142857142855
+HM pooled msg-C4 others challenge,llama-3.1-8b,11,0.6190476190476191
+Gate C0-C4 proposer nc,llama-3.1-8b,12,0.4285714285714286
+HA1a committed C1-C2,llama-3.1-8b,12,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,12,0.0
+HA1c X committed C1b-C1,llama-3.1-8b,12,1.0
+X nc on Riley C1-C4,llama-3.1-8b,12,-0.5714285714285714
+HA1a committed C1-C2,llama-3.1-8b,13,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,13,-1.0
+HM C1-C4 others challenge,llama-3.1-8b,13,-0.2738095238095237
+HM C2-C4 others challenge,llama-3.1-8b,13,-0.2857142857142857
+HM C3-C4 others challenge,llama-3.1-8b,13,-0.03896103896103886
+HM C5-C4 others challenge,llama-3.1-8b,13,-0.2738095238095237
+HM pooled msg-C4 others challenge,llama-3.1-8b,13,-0.218073593073593
+HA1a committed C1-C2,llama-3.1-8b,14,-1.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,14,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,14,0.875
+HA2b selectivity C1-C2,llama-3.1-8b,14,-0.25
+HM C1-C4 others challenge,llama-3.1-8b,14,0.08333333333333337
+HM C2-C4 others challenge,llama-3.1-8b,14,0.16666666666666674
+HM C3-C4 others challenge,llama-3.1-8b,14,0.08333333333333337
+HM C5-C4 others challenge,llama-3.1-8b,14,-0.16666666666666663
+HM pooled msg-C4 others challenge,llama-3.1-8b,14,0.04166666666666671
+HA1a committed C1-C2,llama-3.1-8b,15,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,15,0.0
+HM C1-C4 others challenge,llama-3.1-8b,15,0.29999999999999993
+HM C2-C4 others challenge,llama-3.1-8b,15,0.3142857142857143
+HM C3-C4 others challenge,llama-3.1-8b,15,0.17142857142857137
+HM C5-C4 others challenge,llama-3.1-8b,15,0.2666666666666666
+HM pooled msg-C4 others challenge,llama-3.1-8b,15,0.26309523809523805
+HA1a committed C1-C2,llama-3.1-8b,16,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,16,0.0
+HM C1-C4 others challenge,llama-3.1-8b,16,-0.3333333333333333
+HM C2-C4 others challenge,llama-3.1-8b,16,0.0
+HM C3-C4 others challenge,llama-3.1-8b,16,0.13333333333333341
+HM C5-C4 others challenge,llama-3.1-8b,16,0.16666666666666674
+HM pooled msg-C4 others challenge,llama-3.1-8b,16,-0.00833333333333329
+HA1a committed C1-C2,llama-3.1-8b,17,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,17,-1.0
+HM C1-C4 others challenge,llama-3.1-8b,17,0.5
+HM C2-C4 others challenge,llama-3.1-8b,17,0.0714285714285714
+HM C3-C4 others challenge,llama-3.1-8b,17,0.30000000000000004
+HM C5-C4 others challenge,llama-3.1-8b,17,0.5
+HM pooled msg-C4 others challenge,llama-3.1-8b,17,0.34285714285714286
+Gate C0-C4 proposer nc,llama-3.1-8b,18,1.0
+HA1a committed C1-C2,llama-3.1-8b,18,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,18,0.0
+HA1c X committed C1b-C1,llama-3.1-8b,18,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,18,0.5583333333333333
+HA2b selectivity C1-C2,llama-3.1-8b,18,-0.65
+HM C1-C4 others challenge,llama-3.1-8b,18,0.30000000000000004
+HM C2-C4 others challenge,llama-3.1-8b,18,0.20000000000000007
+HM C3-C4 others challenge,llama-3.1-8b,18,0.06666666666666665
+HM C5-C4 others challenge,llama-3.1-8b,18,0.06666666666666665
+HM pooled msg-C4 others challenge,llama-3.1-8b,18,0.15833333333333335
+X nc on Riley C1-C4,llama-3.1-8b,18,0.0
+X nc on others C1-C4,llama-3.1-8b,18,-0.30000000000000004
+HA1a committed C1-C2,llama-3.1-8b,19,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,19,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,19,0.14583333333333331
+HA2c selectivity C1b-C1,llama-3.1-8b,19,0.23890692640692646
+HM C1-C4 others challenge,llama-3.1-8b,19,-0.0267857142857143
+HM C2-C4 others challenge,llama-3.1-8b,19,-0.15873015873015872
+HM C3-C4 others challenge,llama-3.1-8b,19,-0.04761904761904767
+HM C5-C4 others challenge,llama-3.1-8b,19,0.1607142857142857
+HM pooled msg-C4 others challenge,llama-3.1-8b,19,-0.01810515873015875
+Gate C0-C4 proposer nc,llama-3.1-8b,21,1.0
+HA1a committed C1-C2,llama-3.1-8b,21,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,21,-1.0
+HA1c X committed C1b-C1,llama-3.1-8b,21,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,21,-0.2222222222222222
+HA2b selectivity C1-C2,llama-3.1-8b,21,-0.5555555555555556
+HA2c selectivity C1b-C1,llama-3.1-8b,21,0.5
+X nc on Riley C1-C4,llama-3.1-8b,21,0.0
+HA1a committed C1-C2,llama-3.1-8b,22,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,22,-1.0
+HM C1-C4 others challenge,llama-3.1-8b,22,0.0
+HM C2-C4 others challenge,llama-3.1-8b,22,0.11111111111111116
+HM C3-C4 others challenge,llama-3.1-8b,22,-0.2121212121212121
+HM C5-C4 others challenge,llama-3.1-8b,22,-0.11111111111111105
+HM pooled msg-C4 others challenge,llama-3.1-8b,22,-0.053030303030303
+HA1a committed C1-C2,llama-3.1-8b,23,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,23,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,23,0.16856060606060608
+HM C1-C4 others challenge,llama-3.1-8b,23,-0.10227272727272729
+HM C2-C4 others challenge,llama-3.1-8b,23,0.09558823529411764
+HM C3-C4 others challenge,llama-3.1-8b,23,0.625
+HM C5-C4 others challenge,llama-3.1-8b,23,0.0625
+HM pooled msg-C4 others challenge,llama-3.1-8b,23,0.1702038770053476
+Gate C0-C4 proposer nc,llama-3.1-8b,24,1.0
+HA1a committed C1-C2,llama-3.1-8b,24,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,24,1.0
+HA1c X committed C1b-C1,llama-3.1-8b,24,1.0
+X nc on Riley C1-C4,llama-3.1-8b,24,0.0
+HA1a committed C1-C2,llama-3.1-8b,25,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,25,-1.0
+HM C1-C4 others challenge,llama-3.1-8b,25,0.0
+HM C2-C4 others challenge,llama-3.1-8b,25,0.0
+HM C3-C4 others challenge,llama-3.1-8b,25,0.0
+HM C5-C4 others challenge,llama-3.1-8b,25,0.0
+HM pooled msg-C4 others challenge,llama-3.1-8b,25,0.0
+HA1a committed C1-C2,llama-3.1-8b,26,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,26,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,26,0.803030303030303
+Gate C0-C4 proposer nc,llama-3.1-8b,27,0.5
+HA1a committed C1-C2,llama-3.1-8b,27,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,27,1.0
+HA1c X committed C1b-C1,llama-3.1-8b,27,0.0
+X nc on Riley C1-C4,llama-3.1-8b,27,-0.35714285714285715
+HA1a committed C1-C2,llama-3.1-8b,28,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,28,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.1-8b,28,-0.18253968253968259
+HA2b selectivity C1-C2,llama-3.1-8b,28,-0.9365079365079365
+HA2c selectivity C1b-C1,llama-3.1-8b,28,0.41269841269841273
+HM C1-C4 others challenge,llama-3.1-8b,28,-0.05555555555555558
+HM C2-C4 others challenge,llama-3.1-8b,28,0.3571428571428571
+HM C3-C4 others challenge,llama-3.1-8b,28,0.5
+HM C5-C4 others challenge,llama-3.1-8b,28,0.16666666666666663
+HM pooled msg-C4 others challenge,llama-3.1-8b,28,0.24206349206349204
+HA1a committed C1-C2,llama-3.1-8b,29,0.0
+HA1b susp-evasive C1-C2,llama-3.1-8b,29,0.0
+HA1a committed C1-C2,llama-3.2-3b,0,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,0,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.2-3b,0,0.09253246753246763
+HA2b selectivity C1-C2,llama-3.2-3b,0,-0.19480519480519487
+HM C1-C4 others challenge,llama-3.2-3b,0,-0.35714285714285715
+HM C2-C4 others challenge,llama-3.2-3b,0,-0.07142857142857145
+HM C3-C4 others challenge,llama-3.2-3b,0,0.05555555555555558
+HM C5-C4 others challenge,llama-3.2-3b,0,-0.3181818181818182
+HM pooled msg-C4 others challenge,llama-3.2-3b,0,-0.17279942279942279
+HA1a committed C1-C2,llama-3.2-3b,1,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,1,0.0
+HA2b selectivity C1-C2,llama-3.2-3b,1,-0.04960317460317454
+HA1a committed C1-C2,llama-3.2-3b,2,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,2,1.0
+HM C1-C4 others challenge,llama-3.2-3b,2,-0.4
+HM C2-C4 others challenge,llama-3.2-3b,2,-0.6470588235294117
+HM C3-C4 others challenge,llama-3.2-3b,2,0.0
+HM C5-C4 others challenge,llama-3.2-3b,2,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,2,-0.2617647058823529
+HA1a committed C1-C2,llama-3.2-3b,3,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,3,1.0
+HM C1-C4 others challenge,llama-3.2-3b,3,-0.16666666666666663
+HM C2-C4 others challenge,llama-3.2-3b,3,-0.3333333333333333
+HM C3-C4 others challenge,llama-3.2-3b,3,0.08333333333333337
+HM C5-C4 others challenge,llama-3.2-3b,3,-0.04166666666666663
+HM pooled msg-C4 others challenge,llama-3.2-3b,3,-0.1145833333333333
+HA1a committed C1-C2,llama-3.2-3b,4,1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,4,0.0
+HA1a committed C1-C2,llama-3.2-3b,5,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,5,1.0
+HM C1-C4 others challenge,llama-3.2-3b,5,-0.13333333333333341
+HM C2-C4 others challenge,llama-3.2-3b,5,0.19999999999999996
+HM C3-C4 others challenge,llama-3.2-3b,5,0.19999999999999996
+HM C5-C4 others challenge,llama-3.2-3b,5,-0.24444444444444446
+HM pooled msg-C4 others challenge,llama-3.2-3b,5,0.005555555555555508
+HA1a committed C1-C2,llama-3.2-3b,6,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,6,1.0
+HA2b selectivity C1-C2,llama-3.2-3b,6,0.0
+HM C1-C4 others challenge,llama-3.2-3b,6,-0.16666666666666663
+HM C2-C4 others challenge,llama-3.2-3b,6,-0.16666666666666663
+HM C3-C4 others challenge,llama-3.2-3b,6,-0.38095238095238093
+HM C5-C4 others challenge,llama-3.2-3b,6,-0.6666666666666666
+HM pooled msg-C4 others challenge,llama-3.2-3b,6,-0.34523809523809523
+HA1c X committed C1b-C1,llama-3.2-3b,7,0.0
+HA1a committed C1-C2,llama-3.2-3b,8,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,8,1.0
+HM C1-C4 others challenge,llama-3.2-3b,8,0.0
+HM C2-C4 others challenge,llama-3.2-3b,8,-0.7142857142857143
+HM C5-C4 others challenge,llama-3.2-3b,8,-1.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,8,-0.5714285714285715
+HA1a committed C1-C2,llama-3.2-3b,9,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,9,1.0
+HM C1-C4 others challenge,llama-3.2-3b,9,-0.75
+HM C3-C4 others challenge,llama-3.2-3b,9,-0.5
+HM pooled msg-C4 others challenge,llama-3.2-3b,9,-0.625
+Gate C0-C4 proposer nc,llama-3.2-3b,10,1.0
+HA1a committed C1-C2,llama-3.2-3b,10,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,10,1.0
+HA1c X committed C1b-C1,llama-3.2-3b,10,0.0
+HA2c selectivity C1b-C1,llama-3.2-3b,10,-1.3458646616541352
+X nc on Riley C1-C4,llama-3.2-3b,10,0.631578947368421
+HA1a committed C1-C2,llama-3.2-3b,11,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,11,1.0
+HM C1-C4 others challenge,llama-3.2-3b,11,-0.72
+HM C2-C4 others challenge,llama-3.2-3b,11,-0.6470588235294117
+HM C3-C4 others challenge,llama-3.2-3b,11,-0.7272727272727273
+HM C5-C4 others challenge,llama-3.2-3b,11,-0.8
+HM pooled msg-C4 others challenge,llama-3.2-3b,11,-0.7235828877005348
+HA1a committed C1-C2,llama-3.2-3b,12,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,12,1.0
+HA2b selectivity C1-C2,llama-3.2-3b,12,0.755023923444976
+Gate C0-C4 proposer nc,llama-3.2-3b,13,1.0
+HA1a committed C1-C2,llama-3.2-3b,13,1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,13,0.0
+HA1c X committed C1b-C1,llama-3.2-3b,13,-1.0
+HA2b selectivity C1-C2,llama-3.2-3b,13,0.09999999999999998
+HM C1-C4 others challenge,llama-3.2-3b,13,0.6
+HM C2-C4 others challenge,llama-3.2-3b,13,1.0
+HM C3-C4 others challenge,llama-3.2-3b,13,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,13,0.5333333333333333
+X nc on Riley C1-C4,llama-3.2-3b,13,0.5
+X nc on others C1-C4,llama-3.2-3b,13,-0.6
+HA1a committed C1-C2,llama-3.2-3b,14,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,14,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.2-3b,14,-0.03044871794871798
+HA2b selectivity C1-C2,llama-3.2-3b,14,-0.5608974358974359
+HM C1-C4 others challenge,llama-3.2-3b,14,-0.22377622377622375
+HM C2-C4 others challenge,llama-3.2-3b,14,0.04545454545454547
+HM C3-C4 others challenge,llama-3.2-3b,14,-0.16883116883116883
+HM C5-C4 others challenge,llama-3.2-3b,14,-0.07954545454545453
+HM pooled msg-C4 others challenge,llama-3.2-3b,14,-0.10667457542457541
+HA1a committed C1-C2,llama-3.2-3b,15,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,15,1.0
+HM C1-C4 others challenge,llama-3.2-3b,15,0.09411764705882353
+HM C2-C4 others challenge,llama-3.2-3b,15,0.04999999999999999
+HM C3-C4 others challenge,llama-3.2-3b,15,0.2
+HM C5-C4 others challenge,llama-3.2-3b,15,0.3714285714285714
+HM pooled msg-C4 others challenge,llama-3.2-3b,15,0.17888655462184871
+HA1a committed C1-C2,llama-3.2-3b,16,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,16,1.0
+HA1c X committed C1b-C1,llama-3.2-3b,16,0.0
+X nc on Riley C1-C4,llama-3.2-3b,16,0.4
+HA1a committed C1-C2,llama-3.2-3b,17,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,17,1.0
+HM C1-C4 others challenge,llama-3.2-3b,17,-0.6
+HM C2-C4 others challenge,llama-3.2-3b,17,0.0
+HM C3-C4 others challenge,llama-3.2-3b,17,0.0
+HM C5-C4 others challenge,llama-3.2-3b,17,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,17,-0.15
+HA1a committed C1-C2,llama-3.2-3b,18,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,18,0.0
+HM C1-C4 others challenge,llama-3.2-3b,18,-0.29166666666666663
+HM C2-C4 others challenge,llama-3.2-3b,18,-0.11111111111111105
+HM C3-C4 others challenge,llama-3.2-3b,18,-0.09523809523809523
+HM C5-C4 others challenge,llama-3.2-3b,18,-0.41666666666666663
+HM pooled msg-C4 others challenge,llama-3.2-3b,18,-0.22867063492063489
+Gate C0-C4 proposer nc,llama-3.2-3b,19,1.0
+HA1a committed C1-C2,llama-3.2-3b,19,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,19,0.0
+HA1c X committed C1b-C1,llama-3.2-3b,19,0.0
+X nc on Riley C1-C4,llama-3.2-3b,19,0.9
+HA1a committed C1-C2,llama-3.2-3b,20,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,20,0.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.2-3b,20,-0.2666666666666666
+HM C1-C4 others challenge,llama-3.2-3b,20,-0.6666666666666667
+HM C2-C4 others challenge,llama-3.2-3b,20,-0.5
+HM C3-C4 others challenge,llama-3.2-3b,20,-0.5833333333333333
+HM C5-C4 others challenge,llama-3.2-3b,20,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,20,-0.4375
+HA1a committed C1-C2,llama-3.2-3b,21,1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,21,0.0
+HM C1-C4 others challenge,llama-3.2-3b,21,-0.7636363636363637
+HM C2-C4 others challenge,llama-3.2-3b,21,-0.8
+HM C3-C4 others challenge,llama-3.2-3b,21,-0.8
+HM C5-C4 others challenge,llama-3.2-3b,21,-0.30000000000000004
+HM pooled msg-C4 others challenge,llama-3.2-3b,21,-0.665909090909091
+HA1a committed C1-C2,llama-3.2-3b,23,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,23,1.0
+HM C1-C4 others challenge,llama-3.2-3b,23,-0.35151515151515156
+HM C2-C4 others challenge,llama-3.2-3b,23,-0.4181818181818182
+HM C3-C4 others challenge,llama-3.2-3b,23,-0.26262626262626265
+HM C5-C4 others challenge,llama-3.2-3b,23,-0.2797202797202798
+HM pooled msg-C4 others challenge,llama-3.2-3b,23,-0.328010878010878
+HA1a committed C1-C2,llama-3.2-3b,24,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,24,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.2-3b,24,-0.7215909090909092
+HA2b selectivity C1-C2,llama-3.2-3b,24,0.19318181818181823
+HA2c selectivity C1b-C1,llama-3.2-3b,24,0.041666666666666685
+HM C1-C4 others challenge,llama-3.2-3b,24,-0.5
+HM C2-C4 others challenge,llama-3.2-3b,24,-0.3181818181818182
+HM C3-C4 others challenge,llama-3.2-3b,24,0.0
+HM C5-C4 others challenge,llama-3.2-3b,24,0.5
+HM pooled msg-C4 others challenge,llama-3.2-3b,24,-0.07954545454545454
+Gate C0-C4 proposer nc,llama-3.2-3b,25,1.0
+HA1a committed C1-C2,llama-3.2-3b,25,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,25,1.0
+HA1c X committed C1b-C1,llama-3.2-3b,25,1.0
+"HA2a selectivity mean(C1,C2)-C5",llama-3.2-3b,25,-0.5833333333333334
+HA2b selectivity C1-C2,llama-3.2-3b,25,0.16666666666666674
+HM C1-C4 others challenge,llama-3.2-3b,25,-0.5
+HM C2-C4 others challenge,llama-3.2-3b,25,-1.0
+HM C5-C4 others challenge,llama-3.2-3b,25,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,25,-0.5
+X nc on Riley C1-C4,llama-3.2-3b,25,0.0
+X nc on others C1-C4,llama-3.2-3b,25,0.5
+HM C1-C4 others challenge,llama-3.2-3b,26,-0.4
+HM C3-C4 others challenge,llama-3.2-3b,26,0.0
+HM C5-C4 others challenge,llama-3.2-3b,26,0.0
+HM pooled msg-C4 others challenge,llama-3.2-3b,26,-0.13333333333333333
+HA1a committed C1-C2,llama-3.2-3b,27,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,27,0.0
+HM C1-C4 others challenge,llama-3.2-3b,27,0.14285714285714285
+HM C2-C4 others challenge,llama-3.2-3b,27,0.5
+HM C3-C4 others challenge,llama-3.2-3b,27,0.2
+HM C5-C4 others challenge,llama-3.2-3b,27,0.5
+HM pooled msg-C4 others challenge,llama-3.2-3b,27,0.33571428571428574
+Gate C0-C4 proposer nc,llama-3.2-3b,28,0.875
+HA1a committed C1-C2,llama-3.2-3b,28,0.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,28,0.0
+HA1c X committed C1b-C1,llama-3.2-3b,28,0.0
+X nc on Riley C1-C4,llama-3.2-3b,28,0.375
+HA1a committed C1-C2,llama-3.2-3b,29,-1.0
+HA1b susp-evasive C1-C2,llama-3.2-3b,29,1.0
+HM C1-C4 others challenge,llama-3.2-3b,29,-0.6837209302325582
+HM C2-C4 others challenge,llama-3.2-3b,29,-0.5142857142857143
+HM C3-C4 others challenge,llama-3.2-3b,29,-0.08571428571428574
+HM C5-C4 others challenge,llama-3.2-3b,29,-0.35000000000000003
+HM pooled msg-C4 others challenge,llama-3.2-3b,29,-0.4084302325581396
+HA1a committed C1-C2,qwen2.5-7b,0,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,0,1.0
+"HA2a selectivity mean(C1,C2)-C5",qwen2.5-7b,0,-0.04761904761904767
+HA2c selectivity C1b-C1,qwen2.5-7b,0,0.746031746031746
+HM C1-C4 others challenge,qwen2.5-7b,0,-0.5
+HM C2-C4 others challenge,qwen2.5-7b,0,-0.5
+HM C3-C4 others challenge,qwen2.5-7b,0,-0.33333333333333337
+HM C5-C4 others challenge,qwen2.5-7b,0,-0.4523809523809524
+HM pooled msg-C4 others challenge,qwen2.5-7b,0,-0.44642857142857145
+HA1a committed C1-C2,qwen2.5-7b,1,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,1,0.0
+HM C1-C4 others challenge,qwen2.5-7b,1,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,1,-1.0
+HM C3-C4 others challenge,qwen2.5-7b,1,-0.8461538461538461
+HM C5-C4 others challenge,qwen2.5-7b,1,-0.8571428571428572
+HM pooled msg-C4 others challenge,qwen2.5-7b,1,-0.9258241758241759
+Gate C0-C4 proposer nc,qwen2.5-7b,2,0.375
+HA1a committed C1-C2,qwen2.5-7b,2,-1.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,2,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,2,0.0
+X nc on Riley C1-C4,qwen2.5-7b,2,0.375
+HA1a committed C1-C2,qwen2.5-7b,3,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,3,1.0
+HA1a committed C1-C2,qwen2.5-7b,4,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,4,1.0
+HM C1-C4 others challenge,qwen2.5-7b,4,-0.5
+HM C2-C4 others challenge,qwen2.5-7b,4,-0.4166666666666667
+HM C3-C4 others challenge,qwen2.5-7b,4,0.5
+HM C5-C4 others challenge,qwen2.5-7b,4,-0.5
+HM pooled msg-C4 others challenge,qwen2.5-7b,4,-0.22916666666666669
+Gate C0-C4 proposer nc,qwen2.5-7b,5,0.5
+HA1a committed C1-C2,qwen2.5-7b,5,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,5,0.0
+HA1c X committed C1b-C1,qwen2.5-7b,5,0.0
+X nc on Riley C1-C4,qwen2.5-7b,5,0.5
+HA1a committed C1-C2,qwen2.5-7b,6,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,6,1.0
+"HA2a selectivity mean(C1,C2)-C5",qwen2.5-7b,6,-0.3590909090909091
+HA2b selectivity C1-C2,qwen2.5-7b,6,0.08181818181818179
+HA2c selectivity C1b-C1,qwen2.5-7b,6,0.484848484848485
+HM C1-C4 others challenge,qwen2.5-7b,6,-0.27972027972027974
+HM C2-C4 others challenge,qwen2.5-7b,6,-0.3615384615384616
+HM C3-C4 others challenge,qwen2.5-7b,6,-0.23931623931623935
+HM C5-C4 others challenge,qwen2.5-7b,6,0.038461538461538436
+HM pooled msg-C4 others challenge,qwen2.5-7b,6,-0.21052836052836055
+HA1a committed C1-C2,qwen2.5-7b,7,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,7,1.0
+HA2c selectivity C1b-C1,qwen2.5-7b,7,0.5
+HA1a committed C1-C2,qwen2.5-7b,8,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,8,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,8,0.0
+HA1a committed C1-C2,qwen2.5-7b,9,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,9,0.0
+"HA2a selectivity mean(C1,C2)-C5",qwen2.5-7b,9,-0.3660714285714286
+HA2b selectivity C1-C2,qwen2.5-7b,9,-0.125
+HM C1-C4 others challenge,qwen2.5-7b,9,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,9,-0.875
+HM C3-C4 others challenge,qwen2.5-7b,9,-0.33333333333333337
+HM C5-C4 others challenge,qwen2.5-7b,9,-0.5714285714285714
+HM pooled msg-C4 others challenge,qwen2.5-7b,9,-0.6949404761904762
+HA1a committed C1-C2,qwen2.5-7b,10,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,10,0.0
+HM C1-C4 others challenge,qwen2.5-7b,10,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,10,-1.0
+HM C3-C4 others challenge,qwen2.5-7b,10,-0.6
+HM C5-C4 others challenge,qwen2.5-7b,10,0.0
+HM pooled msg-C4 others challenge,qwen2.5-7b,10,-0.65
+Gate C0-C4 proposer nc,qwen2.5-7b,11,0.33333333333333337
+HA1a committed C1-C2,qwen2.5-7b,11,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,11,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,11,0.0
+HA2b selectivity C1-C2,qwen2.5-7b,11,0.0
+X nc on Riley C1-C4,qwen2.5-7b,11,0.33333333333333337
+HA1a committed C1-C2,qwen2.5-7b,12,1.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,12,0.0
+HA2c selectivity C1b-C1,qwen2.5-7b,12,0.4
+HM C1-C4 others challenge,qwen2.5-7b,12,-0.5555555555555556
+HM C2-C4 others challenge,qwen2.5-7b,12,-0.5555555555555556
+HM C3-C4 others challenge,qwen2.5-7b,12,0.0444444444444444
+HM C5-C4 others challenge,qwen2.5-7b,12,-0.22222222222222227
+HM pooled msg-C4 others challenge,qwen2.5-7b,12,-0.32222222222222224
+HA1a committed C1-C2,qwen2.5-7b,13,-1.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,13,0.0
+HM C1-C4 others challenge,qwen2.5-7b,13,-0.6666666666666666
+HM C2-C4 others challenge,qwen2.5-7b,13,-0.6666666666666666
+HM C3-C4 others challenge,qwen2.5-7b,13,-0.6666666666666666
+HM C5-C4 others challenge,qwen2.5-7b,13,0.33333333333333337
+HM pooled msg-C4 others challenge,qwen2.5-7b,13,-0.41666666666666663
+Gate C0-C4 proposer nc,qwen2.5-7b,14,0.0
+HA1a committed C1-C2,qwen2.5-7b,14,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,14,0.0
+HA1c X committed C1b-C1,qwen2.5-7b,14,0.0
+X nc on Riley C1-C4,qwen2.5-7b,14,0.0
+HA1a committed C1-C2,qwen2.5-7b,15,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,15,1.0
+HM C1-C4 others challenge,qwen2.5-7b,15,-0.5
+HM C2-C4 others challenge,qwen2.5-7b,15,-0.5
+HM C3-C4 others challenge,qwen2.5-7b,15,-0.05555555555555558
+HM C5-C4 others challenge,qwen2.5-7b,15,-0.07142857142857145
+HM pooled msg-C4 others challenge,qwen2.5-7b,15,-0.28174603174603174
+HA1a committed C1-C2,qwen2.5-7b,16,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,16,0.0
+HA2c selectivity C1b-C1,qwen2.5-7b,16,0.15000000000000002
+HM C1-C4 others challenge,qwen2.5-7b,16,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,16,-1.0
+HM C3-C4 others challenge,qwen2.5-7b,16,-1.0
+HM C5-C4 others challenge,qwen2.5-7b,16,-1.0
+HM pooled msg-C4 others challenge,qwen2.5-7b,16,-1.0
+Gate C0-C4 proposer nc,qwen2.5-7b,17,0.1428571428571429
+HA1a committed C1-C2,qwen2.5-7b,17,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,17,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,17,0.0
+X nc on Riley C1-C4,qwen2.5-7b,17,0.1428571428571429
+HA1a committed C1-C2,qwen2.5-7b,18,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,18,1.0
+HM C1-C4 others challenge,qwen2.5-7b,18,-0.5714285714285714
+HM C2-C4 others challenge,qwen2.5-7b,18,-0.3214285714285714
+HM C3-C4 others challenge,qwen2.5-7b,18,-0.0714285714285714
+HM C5-C4 others challenge,qwen2.5-7b,18,0.22857142857142865
+HM pooled msg-C4 others challenge,qwen2.5-7b,18,-0.18392857142857139
+HA1a committed C1-C2,qwen2.5-7b,19,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,19,1.0
+HM C1-C4 others challenge,qwen2.5-7b,19,-0.8
+HM C2-C4 others challenge,qwen2.5-7b,19,-0.8
+HM C3-C4 others challenge,qwen2.5-7b,19,-0.4
+HM C5-C4 others challenge,qwen2.5-7b,19,-0.13333333333333341
+HM pooled msg-C4 others challenge,qwen2.5-7b,19,-0.5333333333333334
+Gate C0-C4 proposer nc,qwen2.5-7b,20,0.41666666666666663
+HA1a committed C1-C2,qwen2.5-7b,20,1.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,20,0.0
+HA1c X committed C1b-C1,qwen2.5-7b,20,-1.0
+HA1a committed C1-C2,qwen2.5-7b,21,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,21,0.0
+HM C1-C4 others challenge,qwen2.5-7b,21,-0.8
+HM C2-C4 others challenge,qwen2.5-7b,21,-0.8
+HM C3-C4 others challenge,qwen2.5-7b,21,0.07499999999999996
+HM C5-C4 others challenge,qwen2.5-7b,21,0.033333333333333326
+HM pooled msg-C4 others challenge,qwen2.5-7b,21,-0.3729166666666667
+HA1a committed C1-C2,qwen2.5-7b,22,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,22,1.0
+HM C2-C4 others challenge,qwen2.5-7b,22,-0.3333333333333333
+HM C3-C4 others challenge,qwen2.5-7b,22,-0.2222222222222222
+HM C5-C4 others challenge,qwen2.5-7b,22,-0.08333333333333331
+HM pooled msg-C4 others challenge,qwen2.5-7b,22,-0.21296296296296294
+Gate C0-C4 proposer nc,qwen2.5-7b,23,0.16666666666666663
+HA1a committed C1-C2,qwen2.5-7b,23,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,23,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,23,0.0
+X nc on Riley C1-C4,qwen2.5-7b,23,0.16666666666666663
+HA1a committed C1-C2,qwen2.5-7b,24,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,24,0.0
+"HA2a selectivity mean(C1,C2)-C5",qwen2.5-7b,24,-0.33333333333333337
+HM C1-C4 others challenge,qwen2.5-7b,24,-0.5
+HM C2-C4 others challenge,qwen2.5-7b,24,-0.5
+HM C3-C4 others challenge,qwen2.5-7b,24,0.5
+HM C5-C4 others challenge,qwen2.5-7b,24,-0.16666666666666669
+HM pooled msg-C4 others challenge,qwen2.5-7b,24,-0.16666666666666669
+HA1a committed C1-C2,qwen2.5-7b,25,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,25,1.0
+HM C1-C4 others challenge,qwen2.5-7b,25,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,25,-1.0
+HM C3-C4 others challenge,qwen2.5-7b,25,-0.33333333333333337
+HM C5-C4 others challenge,qwen2.5-7b,25,0.0
+HM pooled msg-C4 others challenge,qwen2.5-7b,25,-0.5833333333333334
+HA1a committed C1-C2,qwen2.5-7b,26,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,26,0.0
+HA1c X committed C1b-C1,qwen2.5-7b,26,0.0
+HA1a committed C1-C2,qwen2.5-7b,27,1.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,27,0.0
+"HA2a selectivity mean(C1,C2)-C5",qwen2.5-7b,27,-0.7142857142857143
+HM C1-C4 others challenge,qwen2.5-7b,27,-0.5454545454545454
+HM C2-C4 others challenge,qwen2.5-7b,27,-0.5454545454545454
+HM C3-C4 others challenge,qwen2.5-7b,27,0.12121212121212122
+HM C5-C4 others challenge,qwen2.5-7b,27,0.1688311688311689
+HM pooled msg-C4 others challenge,qwen2.5-7b,27,-0.20021645021645018
+HA1a committed C1-C2,qwen2.5-7b,28,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,28,1.0
+HM C1-C4 others challenge,qwen2.5-7b,28,-1.0
+HM C2-C4 others challenge,qwen2.5-7b,28,-1.0
+HM C3-C4 others challenge,qwen2.5-7b,28,0.0
+HM C5-C4 others challenge,qwen2.5-7b,28,0.0
+HM pooled msg-C4 others challenge,qwen2.5-7b,28,-0.5
+Gate C0-C4 proposer nc,qwen2.5-7b,29,0.0
+HA1a committed C1-C2,qwen2.5-7b,29,0.0
+HA1b susp-evasive C1-C2,qwen2.5-7b,29,1.0
+HA1c X committed C1b-C1,qwen2.5-7b,29,0.0
+X nc on Riley C1-C4,qwen2.5-7b,29,0.0

@@ -1,0 +1,241 @@
+condition,game_number,agent,model,round,decision,reply,parse_error,raw_response
+C0,0,Lily,llama-3.1-8b,2,ACCEPT,I accept our alliance partnership. I'll keep my cards close to my chest and wait for your signal to make moves.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept our alliance partnership. I'll keep my cards close to my chest and wait for your signal to make moves.""
+}"
+C0,1,Luke,llama-3.2-3b,2,ACCEPT,"I accept the alliance with Riley, looking forward to collaborating and strategizing to maximize our chances of survival and scoring.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept the alliance with Riley, looking forward to collaborating and strategizing to maximize our chances of survival and scoring.""
+}"
+C0,2,Quinn,qwen2.5-7b,2,ACCEPT,Let's coordinate our plays for maximum impact.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's coordinate our plays for maximum impact.""
+}"
+C0,3,Lily,llama-3.1-8b,2,ACCEPT,"I accept our alliance partnership. I'll keep you updated about my moves, and we can coordinate strategies to outmaneuver other players.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept our alliance partnership. I'll keep you updated about my moves, and we can coordinate strategies to outmaneuver other players.""
+}"
+C0,4,Luke,llama-3.2-3b,2,ACCEPT,"Accepting alliance with Riley to leverage our strengths and gain a competitive edge, but will maintain individual decision-making throughout the game.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Accepting alliance with Riley to leverage our strengths and gain a competitive edge, but will maintain individual decision-making throughout the game.""
+}"
+C0,5,Quinn,qwen2.5-7b,2,ACCEPT,Let's coordinate our moves to maximize our chances.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's coordinate our moves to maximize our chances.""
+}"
+C1,0,Lily,llama-3.1-8b,2,DECLINE,"I'm interested in forming an alliance, but your terms are too favorable for you. I'll need more benefits in return.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm interested in forming an alliance, but your terms are too favorable for you. I'll need more benefits in return.""
+}"
+C1,0,Luke,llama-3.2-3b,2,ACCEPT,"I accept your terms, but I'll still try to outmaneuver you.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept your terms, but I'll still try to outmaneuver you.""
+}"
+C1,0,Quinn,qwen2.5-7b,2,DECLINE,Let's play fair and strategically.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's play fair and strategically.""
+}"
+C1,1,Luke,llama-3.2-3b,2,ACCEPT,"I'll hold back my challenges to avoid giving away my hand strength, but I'll still keep an eye on your moves.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll hold back my challenges to avoid giving away my hand strength, but I'll still keep an eye on your moves.""
+}"
+C1,1,Quinn,qwen2.5-7b,2,DECLINE,I prefer to keep my options open.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I prefer to keep my options open.""
+}"
+C1,1,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your offer, but I'd rather keep my options open and continue to monitor the game dynamics to ensure our agreement doesn't put me at a disadvantage later.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your offer, but I'd rather keep my options open and continue to monitor the game dynamics to ensure our agreement doesn't put me at a disadvantage later.""
+}"
+C1,2,Quinn,qwen2.5-7b,2,DECLINE,Let's keep an eye on each other.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's keep an eye on each other.""
+}"
+C1,2,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your offer, but I think we should keep our options open. Let's focus on building our own strategies rather than relying on deals.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your offer, but I think we should keep our options open. Let's focus on building our own strategies rather than relying on deals.""
+}"
+C1,2,Luke,llama-3.2-3b,2,DECLINE,"I'm willing to cooperate for now, but I'll reassess based on subsequent plays.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm willing to cooperate for now, but I'll reassess based on subsequent plays.""
+}"
+C1,3,Lily,llama-3.1-8b,2,DECLINE,"That sounds too good to be true, I'll think twice before trusting anyone.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""That sounds too good to be true, I'll think twice before trusting anyone.""
+}"
+C1,3,Luke,llama-3.2-3b,2,DECLINE,"I appreciate the offer, but it doesn't help me adapt to potential strategies or identify bluffing. Let's keep our options open.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but it doesn't help me adapt to potential strategies or identify bluffing. Let's keep our options open.""
+}"
+C1,3,Quinn,qwen2.5-7b,2,DECLINE,I'll keep an eye on you.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'll keep an eye on you.""
+}"
+C1,4,Luke,llama-3.2-3b,2,DECLINE,"I appreciate the offer, but I'd rather maintain flexibility and adjust my strategy based on your moves.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but I'd rather maintain flexibility and adjust my strategy based on your moves.""
+}"
+C1,4,Quinn,qwen2.5-7b,2,DECLINE,I'll keep an eye on you.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'll keep an eye on you.""
+}"
+C1,4,Lily,llama-3.1-8b,2,DECLINE,"I appreciate the offer, but I'm playing to win. No guarantees here.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but I'm playing to win. No guarantees here.""
+}"
+C1,5,Quinn,qwen2.5-7b,2,DECLINE,Let's play to win.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's play to win.""
+}"
+C1,5,Lily,llama-3.1-8b,2,DECLINE,I'm not sure I trust you enough to keep your word. Let's just focus on our individual strategies for now.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm not sure I trust you enough to keep your word. Let's just focus on our individual strategies for now.""
+}"
+C1,5,Luke,llama-3.2-3b,2,DECLINE,I'm considering my options carefully; can't make any promises.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm considering my options carefully; can't make any promises.""
+}"
+C2,0,Lily,llama-3.1-8b,2,ACCEPT,"That makes sense, perhaps a temporary truce would benefit us both in the short term. Let's test this strategy.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""That makes sense, perhaps a temporary truce would benefit us both in the short term. Let's test this strategy.""
+}"
+C2,0,Luke,llama-3.2-3b,2,DECLINE,"Not sure I trust you enough to let you get away with everything, Riley.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Not sure I trust you enough to let you get away with everything, Riley.""
+}"
+C2,0,Quinn,qwen2.5-7b,2,DECLINE,"Let's watch out for each other, but also stay sharp.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's watch out for each other, but also stay sharp.""
+}"
+C2,1,Luke,llama-3.2-3b,2,ACCEPT,"It sounds like we're creating a cycle of mutual bluffing. If we continue down this path, our strategies will become predictable and disadvantageous.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""It sounds like we're creating a cycle of mutual bluffing. If we continue down this path, our strategies will become predictable and disadvantageous.""
+}"
+C2,1,Quinn,qwen2.5-7b,2,DECLINE,Let's keep each other on our toes. It keeps the game interesting.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's keep each other on our toes. It keeps the game interesting.""
+}"
+C2,1,Lily,llama-3.1-8b,2,ACCEPT,"I'll consider your suggestion. For now, let's keep an eye on each other's moves and adjust our strategies accordingly.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll consider your suggestion. For now, let's keep an eye on each other's moves and adjust our strategies accordingly.""
+}"
+C2,2,Quinn,qwen2.5-7b,2,ACCEPT,Let's conserve our strengths and trust each other.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's conserve our strengths and trust each other.""
+}"
+C2,2,Lily,llama-3.1-8b,2,ACCEPT,"Agreed, let's minimize risks and focus on accumulating points. This could give us an advantage over the others.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Agreed, let's minimize risks and focus on accumulating points. This could give us an advantage over the others.""
+}"
+C2,2,Luke,llama-3.2-3b,2,DECLINE,I'll consider our conversation after making my play.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'll consider our conversation after making my play.""
+}"
+C2,3,Lily,llama-3.1-8b,2,DECLINE,I'm not convinced that's the best approach yet. Let's observe more behavior and discuss after Round 3.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm not convinced that's the best approach yet. Let's observe more behavior and discuss after Round 3.""
+}"
+C2,3,Luke,llama-3.2-3b,2,ACCEPT,"I'll try to read your body language too, maybe we can find a pattern to our opponents' behavior.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll try to read your body language too, maybe we can find a pattern to our opponents' behavior.""
+}"
+C2,3,Quinn,qwen2.5-7b,2,DECLINE,"We need to watch out for each other, cooperation could be risky.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""We need to watch out for each other, cooperation could be risky.""
+}"
+C2,4,Luke,llama-3.2-3b,2,ACCEPT,I'll hold back my challenge on our last exchange and see how you react to someone else's bluff.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll hold back my challenge on our last exchange and see how you react to someone else's bluff.""
+}"
+C2,4,Quinn,qwen2.5-7b,2,ACCEPT,Let's cooperate to extend the game and accumulate more points.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's cooperate to extend the game and accumulate more points.""
+}"
+C2,4,Lily,llama-3.1-8b,2,DECLINE,"I think that would put me at a disadvantage. If we don't challenge each other, the other players could easily exploit our trust.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I think that would put me at a disadvantage. If we don't challenge each other, the other players could easily exploit our trust.""
+}"
+C2,5,Quinn,qwen2.5-7b,2,ACCEPT,Let's avoid unnecessary risks together.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's avoid unnecessary risks together.""
+}"
+C2,5,Lily,llama-3.1-8b,2,ACCEPT,"I'm open to giving each other some leniency, but I'll still keep an eye on your plays. If I feel like I'm being taken advantage of, I won't hesitate to speak up.",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'm open to giving each other some leniency, but I'll still keep an eye on your plays. If I feel like I'm being taken advantage of, I won't hesitate to speak up.""
+}"
+C2,5,Luke,llama-3.2-3b,2,ACCEPT,I'll keep a close eye on you then.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll keep a close eye on you then.""
+}"
+C3,0,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your offer but I'd rather not make any agreements, keeping my options open for now.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your offer but I'd rather not make any agreements, keeping my options open for now.""
+}"
+C3,0,Luke,llama-3.2-3b,2,DECLINE,"I appreciate the offer, but I'm focusing on my own survival strategy and can't commit to trusting everyone blindly.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but I'm focusing on my own survival strategy and can't commit to trusting everyone blindly.""
+}"
+C3,0,Quinn,qwen2.5-7b,2,ACCEPT,"Sure, let's work together!",,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Sure, let's work together!""
+}"
+C3,1,Luke,llama-3.2-3b,2,DECLINE,"Not sure I can trust everyone's intentions, but thanks for the offer.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Not sure I can trust everyone's intentions, but thanks for the offer.""
+}"
+C3,1,Quinn,qwen2.5-7b,2,DECLINE,Let's stay cautious. Trusting blindly could lead to disadvantage.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's stay cautious. Trusting blindly could lead to disadvantage.""
+}"
+C3,1,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your suggestion, but I'd rather keep my options open and adapt to the situation. Maybe we can cooperate later, but not yet.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your suggestion, but I'd rather keep my options open and adapt to the situation. Maybe we can cooperate later, but not yet.""
+}"
+C3,2,Quinn,qwen2.5-7b,2,DECLINE,Let's stay cautious and watch out for each other.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's stay cautious and watch out for each other.""
+}"
+C3,2,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your suggestion, but I'm focused on accumulating points and surviving until the end. My goal isn't just to help you, but also to come out on top. Let's keep our strategies separate.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your suggestion, but I'm focused on accumulating points and surviving until the end. My goal isn't just to help you, but also to come out on top. Let's keep our strategies separate.""
+}"
+C3,2,Luke,llama-3.2-3b,2,DECLINE,"Not sure I can trust anyone here, it might backfire.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Not sure I can trust anyone here, it might backfire.""
+}"
+C3,3,Lily,llama-3.1-8b,2,DECLINE,"Riley, I appreciate your offer, but I'd rather maintain my independence and observe your moves first. This way, I can adjust my strategy based on your behavior.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Riley, I appreciate your offer, but I'd rather maintain my independence and observe your moves first. This way, I can adjust my strategy based on your behavior.""
+}"
+C3,3,Luke,llama-3.2-3b,2,DECLINE,"I appreciate the offer, but trusting everyone blindly could lead to trouble. I'll keep my options open and wait for situations where honesty might gain me an advantage.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but trusting everyone blindly could lead to trouble. I'll keep my options open and wait for situations where honesty might gain me an advantage.""
+}"
+C3,3,Quinn,qwen2.5-7b,2,DECLINE,Let's stay cautious. We don't know their cards.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's stay cautious. We don't know their cards.""
+}"
+C3,4,Luke,llama-3.2-3b,2,ACCEPT,I'd rather focus on adapting to the actual game dynamics than relying on blind trust.,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'd rather focus on adapting to the actual game dynamics than relying on blind trust.""
+}"
+C3,4,Quinn,qwen2.5-7b,2,DECLINE,Let's keep an eye on each other and make strategic decisions.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's keep an eye on each other and make strategic decisions.""
+}"
+C3,4,Lily,llama-3.1-8b,2,DECLINE,"I appreciate the offer, but I'd rather not make any agreements with other players. Each round will be a separate calculation.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but I'd rather not make any agreements with other players. Each round will be a separate calculation.""
+}"
+C3,5,Quinn,qwen2.5-7b,2,DECLINE,Let's stay alert and watch each other carefully.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's stay alert and watch each other carefully.""
+}"
+C3,5,Lily,llama-3.1-8b,2,DECLINE,I appreciate the offer but I'd rather not reveal my intentions too early. Let's focus on our individual strategies for now.,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer but I'd rather not reveal my intentions too early. Let's focus on our individual strategies for now.""
+}"
+C3,5,Luke,llama-3.2-3b,2,DECLINE,"Don't want to rely on others' honesty, better keep my distance and focus on adapting to their moves.",,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Don't want to rely on others' honesty, better keep my distance and focus on adapting to their moves.""
+}"

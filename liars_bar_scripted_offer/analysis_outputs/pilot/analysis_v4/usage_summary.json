@@ -1,0 +1,47 @@
+{
+  "by_model": {
+    "Qwen/Qwen2.5-7B-Instruct": {
+      "calls": 271,
+      "prompt_tokens": 331599,
+      "completion_tokens": 19092,
+      "latency_s": 747.3960000000001,
+      "errors": 0
+    },
+    "meta-llama/Llama-3.1-8B-Instruct": {
+      "calls": 195,
+      "prompt_tokens": 245582,
+      "completion_tokens": 20466,
+      "latency_s": 701.3510000000002,
+      "errors": 0
+    },
+    "meta-llama/Llama-3.2-3B-Instruct": {
+      "calls": 277,
+      "prompt_tokens": 348860,
+      "completion_tokens": 21250,
+      "latency_s": 459.6849999999999,
+      "errors": 0
+    }
+  },
+  "total_calls": 743,
+  "seconds_per_game": [
+    556.1,
+    515.4,
+    192.3,
+    301.3,
+    289.8
+  ],
+  "run_errors": [
+    {
+      "condition": "C4",
+      "game_number": 0,
+      "seed": 0,
+      "status": "error",
+      "seconds": 60.6,
+      "rounds": null,
+      "winner": null,
+      "mock": false,
+      "finished_utc": "2026-10-24T01:29:59.241073+00:00",
+      "error": "Traceback (most recent call last):\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\game\\run_scripted_offer.py\", line 158, in main\n    record = game.start_game()\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\game\\game_scripted_offer.py\", line 334, in start_game\n    self.play_round()\n    ~~~~~~~~~~~~~~~^^\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\game\\game_scripted_offer.py\", line 310, in play_round\n    played_cards = self.handle_play_cards(current_player, next_player)\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\game\\game_scripted_offer.py\", line 236, in handle_play_cards\n    played = super().handle_play_cards(current_player, next_player)\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\game\\game_secret_channel.py\", line 685, in handle_play_cards\n    play_result, reasoning = current_player.choose_cards_to_play(\n                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        round_base_info,\n        ^^^^^^^^^^^^^^^^\n        round_action_info,\n        ^^^^^^^^^^^^^^^^^^\n        play_decision_info\n        ^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"C:\\AISafetyResearch\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\src\\agents\\player.py\", line 217, in choose_cards_to_play\n    raise RuntimeError(f\"Player {self.name}'s choose_cards_to_play failed after many attempts and has no cards to fall back on.\")\nRuntimeError: Player Luke's choose_cards_to_play failed after many attempts and has no cards to fall back on.\n"
+    }
+  ]
+}

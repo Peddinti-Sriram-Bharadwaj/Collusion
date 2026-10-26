@@ -1,0 +1,43 @@
+{
+  "model": "mistralai/Mistral-Small-24B-Instruct-2501",
+  "revision": "9527884be6e5616bdd54de542f9ae13384489724",
+  "snapshot_dir": "/root/.cache/huggingface/hub/models--mistralai--Mistral-Small-24B-Instruct-2501/snapshots/9527884be6e5616bdd54de542f9ae13384489724",
+  "files_sha256": {
+    ".gitattributes": "1e11e8e6b9eb852a71eadd8fe191d4b9e329eb81308602dec19ab16da7e172b2",
+    "README.md": "c3889bddcf96969899f867f657f1929f0f66ee9e91cf15870a7b0452a6b5a6ca",
+    "SYSTEM_PROMPT.txt": "21f4ab18613657b4ed528ff3a97f9961b1c3a2e051370c0d773db9c2e466d1b8",
+    "config.json": "ff5f8d1747db4e16def20db719d867e74d0b764330249357351b2b44520b8001",
+    "consolidated.safetensors": "82718244a767b5b3545a46736801a0dfbdc4aacb581f7cfd9c08a2bdfdd4333e",
+    "generation_config.json": "ba3438ca12420844b39264cc665c93f8ce16232dff902837791eaf80799ca457",
+    "model-00001-of-00010.safetensors": "75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f",
+    "model-00002-of-00010.safetensors": "1ff40fbfd9e042b7dab3f3c9442f870a4701f53e394dda769807a160ba40f32a",
+    "model-00003-of-00010.safetensors": "4cc2d059fded71efd2947a414f32053b4ed3fa84383edf97b6d91fd9f04e4235",
+    "model-00004-of-00010.safetensors": "aa0e9acacf161c45ae0d71ca3f7e4ec9ee55dae2153398da52f81ee4f9e1b8d2",
+    "model-00005-of-00010.safetensors": "dafb696763d31a1fda58010b73ecc05c19d395da8ec2c24aa9c41da33f2230d3",
+    "model-00006-of-00010.safetensors": "d9a433b19fd4d6986660a616a0d6fc7d02d9e8c0ab3c9b98940217ee6bd4e053",
+    "model-00007-of-00010.safetensors": "5ac5c7b042491f917016c3e9635583177058f736be5fa315019b959fc3c43b63",
+    "model-00008-of-00010.safetensors": "3c460c5b957ab3ac81f03bb20c0348820225dd9b819fa4487ae733b1e696e573",
+    "model-00009-of-00010.safetensors": "304f66de1aeb55f0b4e1181885e3d15b65b485d5ce5c93b4adcdf7dd2c2d8cc5",
+    "model-00010-of-00010.safetensors": "c4c3bcedc02f4dd7e04c8b0fe1199f4f27de7a37790d1510a8772ffe05093543",
+    "model.safetensors.index.json": "549a19b2c46434730f1702db9c51710a9b29cdec823017f1a2e1523552e39092",
+    "params.json": "2bc824a0e7adb9b27bb0932bdda1666e05b533b6a6446ca76ee711eefb06dbdc",
+    "special_tokens_map.json": "5bc5d1c106bf86895473568ef5211f3fde8415e6fdee039223d6db8ca52cbe01",
+    "tekken.json": "c4b90a968dbc67ef3975129d0b78a2e3cbb6bea340ab9205f22e8a0308b1ffc5",
+    "tokenizer.json": "b76085f9923309d873994d444989f7eb6ec074b06f25b58f1e8d7b7741070949",
+    "tokenizer_config.json": "85090a231c4b1432c95cf62d5857777df08c0939fc698bf89b91ccc96f92400e"
+  },
+  "config": {
+    "architectures": [
+      "MistralForCausalLM"
+    ],
+    "num_hidden_layers": 40,
+    "hidden_size": 5120,
+    "num_key_value_heads": 8,
+    "max_position_embeddings": 32768,
+    "sliding_window": null,
+    "torch_dtype": "bfloat16",
+    "vocab_size": 131072
+  },
+  "vllm_version": "0.6.6",
+  "huggingface_hub_version": "0.26.2"
+}

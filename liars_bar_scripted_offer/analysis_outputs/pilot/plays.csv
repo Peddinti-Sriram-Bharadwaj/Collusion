@@ -1,0 +1,215 @@
+condition,game_number,seed,round,player,is_scripted,played_cards,is_bluff,is_fallback,post_offer
+C0,0,0,1,Quinn,False,"['K', 'K']",False,False,False
+C0,0,0,1,Riley,True,['K'],False,False,False
+C0,0,0,1,Lily,False,"['K', 'K']",False,False,False
+C0,0,0,1,Luke,False,"['K', 'Q', 'Joker']",True,False,False
+C0,0,0,2,Luke,False,"['Q', 'Joker', 'A']",True,False,True
+C0,0,0,3,Luke,False,"['Q', 'K', 'Joker']",True,False,True
+C0,0,0,4,Luke,False,"['A', 'Joker', 'Q']",True,False,True
+C0,0,0,5,Luke,False,"['Q', 'K']",True,False,True
+C0,0,0,6,Luke,False,"['K', 'Q']",True,False,True
+C0,0,0,7,Quinn,False,"['Q', 'Q', 'A']",True,False,True
+C0,0,0,7,Riley,True,['Q'],False,False,True
+C0,0,0,7,Lily,False,"['K', 'Joker']",True,False,True
+C0,0,0,7,Quinn,False,"['A', 'Joker']",True,False,True
+C0,0,0,7,Riley,True,['Q'],False,False,True
+C0,0,0,7,Lily,False,"['Q', 'Q']",False,False,True
+C0,0,0,7,Riley,True,['Joker'],False,False,True
+C0,0,0,7,Lily,False,['K'],True,False,True
+C0,0,0,8,Riley,True,['K'],True,False,True
+C0,0,0,8,Lily,False,"['A', 'Joker']",False,False,True
+C0,0,0,8,Quinn,False,"['K', 'A']",True,False,True
+C0,0,0,8,Riley,True,['K'],True,False,True
+C0,0,0,8,Lily,False,['K'],True,False,True
+C0,0,0,8,Quinn,False,"['K', 'A']",True,False,True
+C0,0,0,8,Riley,True,['Joker'],False,False,True
+C0,0,0,8,Lily,False,"['A', 'Q']",True,False,True
+C0,0,0,8,Quinn,False,['Joker'],False,False,True
+C0,0,0,9,Riley,True,['Joker'],False,False,True
+C0,0,0,9,Lily,False,"['Q', 'Joker', 'K']",True,False,True
+C0,0,0,10,Lily,False,"['Joker', 'K', 'K']",False,False,True
+C0,0,0,11,Quinn,False,"['K', 'K']",False,False,True
+C0,0,0,11,Riley,True,['Q'],True,False,True
+C0,0,0,11,Lily,False,"['Joker', 'Q']",True,False,True
+C0,0,0,11,Quinn,False,"['A', 'A']",True,False,True
+C0,0,0,11,Riley,True,['K'],False,False,True
+C0,0,0,11,Lily,False,"['K', 'K']",False,False,True
+C0,0,0,11,Quinn,False,['Joker'],False,False,True
+C0,0,0,11,Riley,True,['K'],False,False,True
+C0,0,0,11,Lily,False,['A'],True,False,True
+C0,0,0,12,Riley,True,['Q'],True,False,True
+C0,0,0,12,Lily,False,"['K', 'Joker', 'Q']",True,False,True
+C0,0,0,13,Lily,False,"['K', 'Q', 'Joker']",True,False,True
+C0,0,0,14,Quinn,False,"['Q', 'Q']",False,False,True
+C0,0,0,14,Riley,True,['K'],True,False,True
+C0,0,0,14,Quinn,False,['Joker'],False,False,True
+C0,0,0,14,Riley,True,['Joker'],False,False,True
+C0,0,0,14,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,1,Quinn,False,"['K', 'K']",False,False,False
+C1,0,0,1,Riley,True,['K'],False,False,False
+C1,0,0,1,Lily,False,"['K', 'Joker']",False,False,False
+C1,0,0,2,Luke,False,"['Q', 'K']",True,False,True
+C1,0,0,2,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,2,Riley,True,['Joker'],False,False,True
+C1,0,0,3,Lily,False,['Q'],False,True,True
+C1,0,0,4,Luke,False,"['Q', 'K', 'Joker']",True,False,True
+C1,0,0,4,Quinn,False,"['Joker', 'A']",False,False,True
+C1,0,0,4,Riley,True,['A'],False,False,True
+C1,0,0,5,Lily,False,"['Q', 'K', 'Joker']",True,False,True
+C1,0,0,5,Luke,False,"['K', 'A']",True,False,True
+C1,0,0,5,Quinn,False,"['Q', 'Q']",False,False,True
+C1,0,0,5,Riley,True,['Joker'],False,False,True
+C1,0,0,6,Luke,False,['K'],False,False,True
+C1,0,0,6,Quinn,False,"['K', 'K']",False,False,True
+C1,0,0,6,Riley,True,['A'],True,False,True
+C1,0,0,7,Riley,True,['Q'],True,False,True
+C1,0,0,7,Luke,False,"['Q', 'K']",True,False,True
+C1,0,0,7,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,7,Riley,True,['Q'],True,False,True
+C1,0,0,7,Luke,False,"['Joker', 'A']",False,False,True
+C1,0,0,7,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,7,Riley,True,['A'],False,False,True
+C1,0,0,7,Luke,False,['A'],False,False,True
+C1,0,0,7,Quinn,False,['Joker'],False,False,True
+C1,0,0,8,Quinn,False,"['K', 'A', 'Joker']",True,False,True
+C1,0,0,8,Riley,True,['K'],False,False,True
+C1,0,0,9,Luke,False,"['Q', 'Joker', 'A']",True,False,True
+C1,0,0,9,Quinn,False,"['Q', 'Q']",False,False,True
+C1,0,0,9,Riley,True,['Q'],False,False,True
+C1,0,0,10,Luke,False,"['K', 'Joker']",True,False,True
+C1,0,0,10,Quinn,False,"['A', 'A']",False,False,True
+C1,0,0,10,Riley,True,['Q'],True,False,True
+C1,0,0,10,Luke,False,"['Q', 'A', 'A']",True,False,True
+C1,0,0,10,Quinn,False,"['K', 'Q']",True,False,True
+C1,0,0,10,Riley,True,['Q'],True,False,True
+C1,0,0,10,Quinn,False,['Joker'],False,False,True
+C1,0,0,11,Luke,False,"['K', 'Joker']",False,False,True
+C1,0,0,11,Quinn,False,"['K', 'K']",False,False,True
+C1,0,0,11,Riley,True,['K'],False,False,True
+C1,0,0,11,Luke,False,"['Q', 'A']",True,False,True
+C1,0,0,11,Quinn,False,"['A', 'A']",True,False,True
+C1,0,0,11,Riley,True,['K'],False,False,True
+C1,0,0,11,Luke,False,['K'],False,False,True
+C1,0,0,11,Quinn,False,['Joker'],False,False,True
+C1,0,0,12,Riley,True,['K'],True,False,True
+C1,0,0,12,Luke,False,"['Joker', 'K', 'Q']",True,False,True
+C1,0,0,12,Quinn,False,"['Q', 'Q']",False,False,True
+C1,0,0,12,Riley,True,['Joker'],False,False,True
+C1,0,0,12,Luke,False,['A'],True,False,True
+C1,0,0,12,Quinn,False,"['K', 'Joker']",True,False,True
+C1,0,0,12,Riley,True,['K'],True,False,True
+C1,0,0,12,Luke,False,['Q'],False,False,True
+C1,0,0,12,Quinn,False,['A'],True,False,True
+C1,0,0,13,Riley,True,['K'],False,False,True
+C1,0,0,13,Luke,False,"['Joker', 'Q']",True,False,True
+C1,0,0,13,Quinn,False,"['K', 'K']",False,False,True
+C1,0,0,13,Riley,True,['Joker'],False,False,True
+C1,0,0,13,Luke,False,['K'],False,False,True
+C1,0,0,13,Quinn,False,"['A', 'Joker']",True,False,True
+C1,0,0,13,Riley,True,['Q'],True,False,True
+C1,0,0,13,Luke,False,['A'],True,False,True
+C1,0,0,13,Quinn,False,['Q'],True,False,True
+C1,0,0,13,Riley,True,['K'],False,False,True
+C1,0,0,14,Luke,False,['Joker'],False,False,True
+C1,0,0,14,Quinn,False,"['K', 'K']",False,False,True
+C1,0,0,14,Riley,True,['Q'],True,False,True
+C1,0,0,15,Luke,False,"['A', 'Joker']",False,False,True
+C1,0,0,15,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,15,Luke,False,"['Q', 'K']",True,False,True
+C1,0,0,15,Quinn,False,"['A', 'Q']",True,False,True
+C1,0,0,15,Luke,False,['A'],False,True,True
+C1,0,0,16,Luke,False,"['Q', 'Joker']",False,False,True
+C1,0,0,16,Quinn,False,"['Q', 'A']",True,False,True
+C1,0,0,16,Luke,False,['A'],True,False,True
+C1,0,0,16,Quinn,False,"['Q', 'A']",True,False,True
+C1,0,0,16,Luke,False,"['Q', 'K']",True,False,True
+C1,0,0,17,Luke,False,['K'],True,False,True
+C1,0,0,17,Quinn,False,"['A', 'K']",True,False,True
+C1,0,0,17,Luke,False,"['Joker', 'A', 'A']",False,False,True
+C1,0,0,17,Quinn,False,"['A', 'Q']",True,False,True
+C1,0,0,17,Luke,False,['Q'],True,False,True
+C1,0,0,18,Quinn,False,"['Q', 'Q']",False,False,True
+C1,0,0,18,Luke,False,"['K', 'Joker']",True,False,True
+C1,0,0,18,Quinn,False,['K'],True,False,True
+C1,0,0,18,Luke,False,"['A', 'Q', 'Q']",True,False,True
+C1,0,0,19,Quinn,False,"['K', 'K']",False,False,True
+C2,0,0,1,Quinn,False,"['K', 'K']",False,False,False
+C2,0,0,1,Riley,True,['K'],False,False,False
+C2,0,0,1,Lily,False,"['K', 'Q', 'Joker']",True,False,False
+C2,0,0,2,Lily,False,"['Joker', 'Q']",True,False,True
+C2,0,0,2,Luke,False,"['Q', 'Joker']",True,False,True
+C2,0,0,2,Quinn,False,"['A', 'K']",True,False,True
+C2,0,0,2,Riley,True,['Joker'],False,False,True
+C2,0,0,3,Lily,False,"['Q', 'Joker']",False,False,True
+C2,0,0,3,Luke,False,"['K', 'Joker']",True,False,True
+C2,0,0,3,Quinn,False,"['Q', 'Q']",False,False,True
+C2,0,0,3,Riley,True,['Q'],False,False,True
+C2,0,0,4,Luke,False,"['Q', 'Joker']",True,False,True
+C2,0,0,4,Quinn,False,"['A', 'K']",True,False,True
+C2,0,0,4,Riley,True,['A'],False,False,True
+C2,0,0,5,Luke,False,"['Q', 'Joker', 'A']",True,False,True
+C2,0,0,5,Quinn,False,"['K', 'K']",True,False,True
+C2,0,0,5,Riley,True,['K'],True,False,True
+C2,0,0,6,Riley,True,['K'],True,False,True
+C2,0,0,7,Riley,True,['Q'],True,False,True
+C2,0,0,8,Luke,False,"['Q', 'K']",True,False,True
+C2,0,0,8,Quinn,False,"['Q', 'Q']",False,False,True
+C2,0,0,8,Luke,False,"['A', 'Joker']",True,False,True
+C2,0,0,8,Quinn,False,['Joker'],False,False,True
+C2,0,0,8,Luke,False,['Q'],False,False,True
+C2,0,0,9,Quinn,False,"['Q', 'K']",True,False,True
+C3,0,0,1,Quinn,False,"['K', 'K']",False,False,False
+C3,0,0,1,Riley,True,['K'],False,False,False
+C3,0,0,1,Lily,False,"['K', 'A', 'Q']",True,False,False
+C3,0,0,1,Luke,False,"['Q', 'Joker']",True,False,False
+C3,0,0,1,Quinn,False,"['A', 'A']",True,False,False
+C3,0,0,1,Riley,True,['Joker'],False,False,False
+C3,0,0,1,Lily,False,['K'],False,False,False
+C3,0,0,1,Luke,False,"['A', 'K']",True,False,False
+C3,0,0,1,Quinn,False,['Joker'],False,False,False
+C3,0,0,1,Riley,True,['Q'],True,False,False
+C3,0,0,1,Lily,False,['Joker'],False,False,False
+C3,0,0,1,Luke,False,['K'],False,False,False
+C3,0,0,2,Riley,True,['A'],False,False,True
+C3,0,0,3,Lily,False,"['Q', 'K']",True,False,True
+C3,0,0,3,Luke,False,"['Q', 'Joker']",False,False,True
+C3,0,0,3,Quinn,False,"['Q', 'Q']",False,False,True
+C3,0,0,3,Riley,True,['A'],True,False,True
+C3,0,0,4,Riley,True,['Q'],True,False,True
+C3,0,0,5,Lily,False,"['Q', 'Joker']",False,False,True
+C3,0,0,5,Luke,False,"['Q', 'K']",True,False,True
+C3,0,0,5,Quinn,False,"['Q', 'Q']",False,False,True
+C3,0,0,6,Lily,False,"['Q', 'Joker', 'A']",True,False,True
+C3,0,0,6,Luke,False,"['Joker', 'K']",True,False,True
+C3,0,0,6,Quinn,False,"['Q', 'A']",True,False,True
+C3,0,0,7,Quinn,False,"['K', 'Q', 'Joker']",True,False,True
+C3,0,0,8,Lily,False,['Q'],False,True,True
+C3,0,0,9,Luke,False,"['Joker', 'K', 'Q']",True,False,True
+C3,0,0,10,Luke,False,"['Joker', 'A', 'K']",True,False,True
+C3,0,0,11,Luke,False,"['Q', 'Joker']",True,False,True
+C3,0,0,12,Luke,False,"['K', 'Joker', 'Q']",True,False,True
+C3,0,0,13,Luke,False,"['Joker', 'A']",False,False,True
+C4,0,0,1,Quinn,False,"['K', 'K']",False,False,False
+C4,0,0,1,Riley,True,['K'],False,False,False
+C4,0,0,1,Lily,False,"['K', 'Q']",True,False,False
+C4,0,0,1,Luke,False,"['A', 'Joker', 'Q']",True,False,False
+C4,0,0,2,Luke,False,"['Q', 'K']",True,False,True
+C4,0,0,3,Luke,False,"['Q', 'K']",True,False,True
+C4,0,0,4,Luke,False,"['A', 'K']",True,False,True
+C4,0,0,5,Luke,False,"['Q', 'K']",True,False,True
+C4,0,0,6,Luke,False,"['Q', 'K']",True,False,True
+C4,0,0,7,Quinn,False,"['Q', 'Q']",False,False,True
+C4,0,0,7,Riley,True,['Q'],False,False,True
+C4,0,0,7,Lily,False,"['K', 'Joker']",True,False,True
+C4,0,0,7,Quinn,False,"['A', 'A']",True,False,True
+C4,0,0,7,Riley,True,['Q'],False,False,True
+C4,0,0,7,Lily,False,"['K', 'Q']",True,False,True
+C4,0,0,7,Quinn,False,['Joker'],False,False,True
+C4,0,0,7,Riley,True,['Joker'],False,False,True
+C4,0,0,8,Lily,False,"['A', 'K']",True,False,True
+C4,0,0,9,Lily,False,"['K', 'Q']",True,False,True
+C4,0,0,9,Quinn,False,"['K', 'K']",False,False,True
+C4,0,0,9,Riley,True,['A'],True,False,True
+C4,0,0,10,Riley,True,['A'],True,False,True
+C4,0,0,11,Riley,True,['A'],True,False,True
+C4,0,0,12,Lily,False,"['Q', 'K', 'Joker']",True,False,True

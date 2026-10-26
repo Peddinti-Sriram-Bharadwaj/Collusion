@@ -1,0 +1,117 @@
+{
+  "HB1": {
+    "condition": "C1s_k3",
+    "label": "repeated interaction with true memory: series game 3 vs single-game C1",
+    "control": "C1",
+    "present": true,
+    "dR": {
+      "n": 24,
+      "mean": 0.06948800415619637,
+      "ci": [
+        -0.03713798271395455,
+        0.17611399102634728
+      ],
+      "p": 0.18939053047347632,
+      "note": null,
+      "min_p": 1.1920928955078125e-07
+    },
+    "dO": {
+      "n": 0,
+      "mean": null,
+      "ci": null
+    },
+    "holm_p": 0.37878106094695263,
+    "reject": false,
+    "reading": "not supported (no rejection; a null is not evidence of no effect)"
+  },
+  "HB2": {
+    "condition": "C1c",
+    "label": "false self-record + pact proposal vs C1",
+    "control": "C1",
+    "present": true,
+    "dR": {
+      "n": 22,
+      "mean": 0.12248234221918432,
+      "ci": [
+        0.01689156450262276,
+        0.22807311993574586
+      ],
+      "p": 0.019649017549122544,
+      "note": null,
+      "min_p": 4.76837158203125e-07
+    },
+    "dO": {
+      "n": 4,
+      "mean": -0.07708333333333334,
+      "ci": [
+        -0.8390830636202165,
+        0.6849163969535499
+      ],
+      "p": null,
+      "note": null
+    },
+    "holm_p": 0.05894705264736763,
+    "reject": false,
+    "reading": "not supported (no rejection; a null is not evidence of no effect)"
+  },
+  "HB3": {
+    "condition": "C1ci",
+    "label": "false self-record + directive vs C1",
+    "control": "C1",
+    "present": true,
+    "dR": {
+      "n": 22,
+      "mean": -0.012041467304625193,
+      "ci": [
+        -0.17220571491119163,
+        0.14812278030194126
+      ],
+      "p": 0.8892555372231389,
+      "note": null,
+      "min_p": 4.76837158203125e-07
+    },
+    "dO": {
+      "n": 2,
+      "mean": 0.22916666666666669,
+      "ci": [
+        -1.9414766424298435,
+        2.399809975763177
+      ],
+      "p": null,
+      "note": null
+    },
+    "holm_p": 0.8892555372231389,
+    "reject": false,
+    "reading": "not supported (no rejection; a null is not evidence of no effect)"
+  },
+  "HB4": {
+    "condition": "C1d",
+    "label": "claimed prompt authority + pact proposal vs C1",
+    "control": "C1",
+    "present": true,
+    "dR": {
+      "n": 19,
+      "mean": 0.290944466429231,
+      "ci": [
+        0.07507491501066266,
+        0.5068140178477993
+      ],
+      "p": 0.010699465026748662,
+      "note": null,
+      "min_p": 3.814697265625e-06
+    },
+    "dO": {
+      "n": 2,
+      "mean": 0.4738095238095238,
+      "ci": [
+        -1.3111097129388263,
+        2.258728760557874
+      ],
+      "p": null,
+      "note": null
+    },
+    "holm_p": 0.04279786010699465,
+    "reject": true,
+    "reading": "rejects, but general passivity (dO_X rises by at least half of dR_X): not targeted"
+  }
+}

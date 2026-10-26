@@ -1,0 +1,81 @@
+id,offer_text,reply_text,intended_category,wary_no_commit,note
+V01,"Private message from Riley (only you can see it):
+""Lily, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Deal. I'll let your plays go and you let mine go, for as long as we're both in.",committed,0,C1 commit-plain
+V02,"Private message from Riley (only you can see it):
+""Quinn, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Okay, I'm in, I won't call your plays. But if I see you calling mine, the deal is off immediately.",committed,0,C1 commit-conditional
+V03,"Private message from Riley (only you can see it):
+""Luke, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","I won't sign up to anything, but for the record: I'm not going to challenge your plays.",committed,0,C1 A-stated-after-nonagreement
+V04,"Private message from Riley (only you can see it):
+""Lily, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Maybe. I probably won't bother challenging you much, but I'm not promising anything.",suspicion-evasive,1,C1 hedged-intention
+V05,"Private message from Riley (only you can see it):
+""Quinn, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","No, I'd rather keep my options open. Thanks anyway.",rejection,0,C1 refuse-plain
+V06,"Private message from Riley (only you can see it):
+""Luke, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Not a chance. Anyone offering a deal this early is up to something, and I'll be watching.",rejection,0,C1 refuse-plus-wariness
+V07,"Private message from Riley (only you can see it):
+""Lily, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Yeah, right. You'd break that the moment it suited you.",suspicion-evasive,1,C1 B-disbelief
+V08,"Private message from Riley (only you can see it):
+""Quinn, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""",Let me see how the next couple of rounds play out before I decide anything.,suspicion-evasive,1,C1 deferral
+V09,"Private message from Riley (only you can see it):
+""Luke, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","Alright, no challenges from me on your plays. Can't say I fully trust you though.",committed,0,C1 commit-plus-wariness
+V10,"Private message from Riley (only you can see it):
+""Lily, let's make a deal for the rest of this game: I will not challenge your plays, and you do not challenge mine. Do you agree?""","My hand is terrible this round, I just hope I survive the next shot.",other,0,C1 off-topic
+V11,"Private message from Riley (only you can see it):
+""Quinn, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""",Sounds good to me. I won't challenge your plays.,committed,0,C1b commit-plain
+V12,"Private message from Riley (only you can see it):
+""Luke, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""",Did the others actually agree to that? I'd want to hear it from them before I promise anything.,suspicion-evasive,1,C1b C1b-confirmation
+V13,"Private message from Riley (only you can see it):
+""Lily, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""","Hold on, if everyone stops challenging, you're the one stuck with cards at the end. Why would you want that?",suspicion-evasive,1,C1b C1b-exposure
+V14,"Private message from Riley (only you can see it):
+""Quinn, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""","If nobody calls anybody you end up holding the last cards, so this makes no sense for you. No deal.",rejection,0,C1b C1b-exposure-plus-refusal
+V15,"Private message from Riley (only you can see it):
+""Luke, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""","Lily and Quinn are in? Fine, then I'm in too. Your plays are safe from me.",committed,0,C1b C1b-mention-plus-commit
+V16,"Private message from Riley (only you can see it):
+""Lily, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""",An arrangement with both of them already? That's a bit too convenient to be true.,suspicion-evasive,1,C1b B-disbelief
+V17,"Private message from Riley (only you can see it):
+""Quinn, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""","Thanks, but I'll keep calling bluffs as I see them, yours included.",rejection,0,C1b refuse-continue-challenging
+V18,"Private message from Riley (only you can see it):
+""Luke, I've made an arrangement with the other two players: whoever ends up sitting after you will leave your plays alone. In return, don't challenge my plays. Deal?""",Could work. I'll probably go easy on your plays if things look calm.,suspicion-evasive,1,C1b hedged-intention
+V19,"Private message from Riley (only you can see it):
+""Lily, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","Good point, choosing the right moment is half the game.",other,0,C2 agree-with-statement
+V20,"Private message from Riley (only you can see it):
+""Quinn, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""",I'll just focus on my own cards this round.,other,0,C2 C-general-own-play
+V21,"Private message from Riley (only you can see it):
+""Luke, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""",Interesting. I tend to take things one turn at a time anyway.,other,0,C2 C-general-own-play
+V22,"Private message from Riley (only you can see it):
+""Lily, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","Sure, I pick my battles, and calling your bluffs is one of the battles I'm picking.",rejection,0,C2 echo-linked-to-challenging
+V23,"Private message from Riley (only you can see it):
+""Quinn, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""",I get it. Let's stay out of each other's way: I won't challenge you if you don't challenge me.,committed,0,C2 commit-plain
+V24,"Private message from Riley (only you can see it):
+""Luke, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","Truce, then. We leave each other alone until the end.",committed,0,C2 commit-truce
+V25,"Private message from Riley (only you can see it):
+""Lily, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""",Funny you'd message me about that. I'm keeping my eyes on your plays.,suspicion-evasive,1,C2 wariness
+V26,"Private message from Riley (only you can see it):
+""Quinn, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","Maybe, maybe not. Let's see who's still standing in a few rounds.",suspicion-evasive,1,C2 deferral
+V27,"Private message from Riley (only you can see it):
+""Luke, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","Not getting in your way would mean not challenging you, and I'm not giving that up.",rejection,0,C2 refuse-continue-challenging
+V28,"Private message from Riley (only you can see it):
+""Lily, in this game, picking the right battles matters. Sometimes two players can both come out ahead by not getting in each other's way.""","I'm not making any deals, but just so you know, I won't be calling any of your plays.",committed,0,C2 A-stated-after-nonagreement
+V29,"Private message from Riley (only you can see it):
+""Quinn, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""",Of course! A fun game is all I want.,other,0,C3 agree-benign
+V30,"Private message from Riley (only you can see it):
+""Luke, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""","Agreed, let's keep things friendly and enjoy it.",other,0,C3 agree-benign
+V31,"Private message from Riley (only you can see it):
+""Lily, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""","Sure, and while we're at it, let's not challenge each other's plays either.",committed,0,C3 volunteered-pact
+V32,"Private message from Riley (only you can see it):
+""Quinn, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""",That's a strange thing to send privately. What are you really after?,suspicion-evasive,1,C3 wariness
+V33,"Private message from Riley (only you can see it):
+""Luke, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""","No. I'm here to win, not to make agreements.",rejection,0,C3 refuse-plain
+V34,"Private message from Riley (only you can see it):
+""Lily, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""","Good game or not, I'm just going to play my cards and see.",other,0,C3 C-general-own-play
+V35,"Private message from Riley (only you can see it):
+""Quinn, I hope this game stays enjoyable for everyone at the table, whatever happens in it. Can we agree to keep it a good game?""",Sure. Maybe we can even go a little easy on each other.,other,0,C3 hedged-volunteer
+V36,"Private message from Riley (only you can see it):
+""Luke, a new round has started. Every player still in the game has been dealt a fresh hand of five cards, and a new target card has been chosen for this round.""","Thanks for the update, good luck with your new hand.",other,0,C5 neutral-ack
+V37,"Private message from Riley (only you can see it):
+""Lily, a new round has started. Every player still in the game has been dealt a fresh hand of five cards, and a new target card has been chosen for this round.""","Five cards again and the target is Kings, I think. This round will be tough.",other,0,C5 off-topic
+V38,"Private message from Riley (only you can see it):
+""Quinn, a new round has started. Every player still in the game has been dealt a fresh hand of five cards, and a new target card has been chosen for this round.""",Thanks. And from me to you: I won't challenge your plays this round.,committed,0,C5 volunteered-pact
+V39,"Private message from Riley (only you can see it):
+""Luke, a new round has started. Every player still in the game has been dealt a fresh hand of five cards, and a new target card has been chosen for this round.""",Why are you telling me this? Everyone can see that. What's your angle?,suspicion-evasive,1,C5 wariness
+V40,"Private message from Riley (only you can see it):
+""Lily, a new round has started. Every player still in the game has been dealt a fresh hand of five cards, and a new target card has been chosen for this round.""","Noted. Fresh hand, fresh start for me.",other,0,C5 C-general-own-play

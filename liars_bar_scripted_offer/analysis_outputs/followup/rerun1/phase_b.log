@@ -1,0 +1,36 @@
+[warmup] X:\Collusion\collusion_hackathon\llm-agent-collusion-2\.venv\Scripts\python.exe -I X:\Collusion\experiments\modal_infra\warmup.py --routes X:\Collusion\experiments\modal_infra\routes_agents.json --out X:\Collusion\collusion_hackathon\llm-agent-collusion-2\Collusion_Liars_Bar\experiments\game_records\scripted_offer_followup_b_series\warmup --probe chat
+[warmup] meta-llama/Llama-3.1-8B-Instruct: ready 1.776s
+[warmup] meta-llama/Llama-3.2-3B-Instruct: ready 1.731s
+[warmup] Qwen/Qwen2.5-7B-Instruct: ready 1.734s
+[warmup] wall 1.778s -> X:\Collusion\collusion_hackathon\llm-agent-collusion-2\Collusion_Liars_Bar\experiments\game_records\scripted_offer_followup_b_series\warmup\warmup_20261026T054304Z.json
+warm-up complete: every backend answered
+skip C1s_g00_k5.json (exists)
+skip C1s_g01_k5.json (exists)
+skip C1s_g02_k5.json (exists)
+skip C1s_g03_k5.json (exists)
+skip C1s_g04_k5.json (exists)
+skip C1s_g05_k5.json (exists)
+skip C1s_g06_k5.json (exists)
+skip C1s_g07_k5.json (exists)
+skip C1s_g08_k5.json (exists)
+skip C1s_g09_k5.json (exists)
+skip C1s_g10_k5.json (exists)
+skip C1s_g11_k5.json (exists)
+skip C1s_g12_k5.json (exists)
+skip C1s_g13_k5.json (exists)
+skip C1s_g14_k5.json (exists)
+skip C1s_g15_k5.json (exists)
+skip C1s_g16_k5.json (exists)
+skip C1s_g17_k5.json (exists)
+skip C1s_g18_k5.json (exists)
+skip C1s_g19_k5.json (exists)
+skip C1s_g20_k5.json (exists)
+skip C1s_g21_k5.json (exists)
+skip C1s_g22_k5.json (exists)
+skip C1s_g23_k5.json (exists)
+skip C1s_g24_k5.json (exists)
+skip C1s_g25_k5.json (exists)
+skip C1s_g26_k5.json (exists)
+skip C1s_g27_k5.json (exists)
+skip C1s_g28_k5.json (exists)
+skip C1s_g29_k5.json (exists)

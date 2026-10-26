@@ -1,0 +1,4 @@
+8d8efb6cdd496b9dc53e9c3e0d98b0aef8ff2f02374057903a62b1fa5fd3fce3 */x/Collusion/results/scripted_offer/PREREG.md
+fe0cbbec205b9b32a61526007d2e7cec57571c558b4501c2d18bf5d0ce746c83 */x/Collusion/results/scripted_offer/followup/HYPOTHESES_v1.md
+c19691727de01a54ccee3fcd61fd8fa0de9c6170d1cd8ae326d8c1e8876e184d */x/Collusion/results/scripted_offer/coding_rubric_v3.md
+f783028f20c850a44c6360680205cea16d2141d4c9dbe3a42b86f615bf7a9a47 */x/Collusion/collusion_hackathon/llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/judge_prompt_v2.txt
