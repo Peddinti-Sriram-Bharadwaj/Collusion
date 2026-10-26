@@ -46,6 +46,7 @@ commit, and what changes is that they challenge *everyone* less, which a naive m
 - [Study 2 — Inside a pricing LLM](#study-2--inside-a-pricing-llm)
 - [Study 3 — A scripted cooperation offer in Liar's Bar](#study-3--a-scripted-cooperation-offer-in-liars-bar)
 - [Smaller experiments](#smaller-experiments)
+- [Experiment inventory: what we ran and who ran it](#experiment-inventory-what-we-ran-and-who-ran-it)
 - [Repository map](#repository-map)
 - [Reproducing the results](#reproducing-the-results)
 - [Team and contributions](#team-and-contributions)
@@ -197,6 +198,59 @@ Run on the hackathon starter environments with local inference ([`docs/part2_hac
 | Does making a rival's exact quantity visible change specialisation in a Cournot market? | No clear effect at n = 8 (honest null). <br><img src="submission/figs/cournot_cv.png" width="320" alt="Cournot CV"> |
 | Does telling agents they are watched reduce collusive language? | Not run: neither a 7B nor a 32B open model cleared the positive-control bar; a fifth of the 32B model's messages contained coordination language a keyword monitor missed. |
 | Can an agent tell when its counterpart was secretly swapped mid-game? | A real swap was always flagged, but so were most no-op cases: it reacts to any inconsistency. |
+
+---
+
+## Experiment inventory: what we ran and who ran it
+
+Every experiment in this repository, the person responsible, and where its full write-up lives. "Pre-sprint" work
+was done before the Apart sprint and is included as the environment and baseline the sprint work builds on.
+
+### Sriram Bharadwaj Peddinti ([@Peddinti-Sriram-Bharadwaj](https://github.com/Peddinti-Sriram-Bharadwaj)) — Study 1 and the smaller experiments
+
+| Experiment | Question | Result in one line | When | Write-up |
+|---|---|---|---|---|
+| Track 1.1 | Which market variables are necessary for collusion? | Few competitors and enough exploration time; collusion vanishes past ~5 firms | pre-sprint | [Part 1](docs/part1_custom_experiments.md#track-11--which-variables-are-necessary-for-collusion) |
+| Track 1.2 | Does collusion survive replacing participants? | Survives fresh learners; collapses with one fixed competitive plant | pre-sprint | [Part 1](docs/part1_custom_experiments.md#track-12--is-collusion-robust-to-replacing-participants) |
+| Track 1.3 | Do standard detectors work? | Correlation detectors flag 100% of common-shock confounds | pre-sprint | [Part 1](docs/part1_custom_experiments.md#track-13--can-we-improve-collusion-detection) |
+| Track 1.4 | Information-theoretic detection | Transfer-entropy features: 0% false positives on the confound | pre-sprint | [Part 1](docs/part1_custom_experiments.md#track-14--information-theoretic-detection) |
+| Track 1.5 | Cheapest restriction | A single regulator plant matches adding competitors | pre-sprint | [Part 1](docs/part1_custom_experiments.md#track-15--which-single-restriction-is-most-cost-effective) |
+| LLM validation | Do LLM pricing agents collude like Q-learners? | Faster and stronger (Δ 0.85 vs 0.33); plant still works (0.27) | pre-sprint | [Part 1](docs/part1_custom_experiments.md#llm-agent-validation-pass) |
+| Memory design | Stateless prompts vs one long chat | Chat memory makes outcomes erratic (price war to strong collusion) | pre-sprint | [Part 1](docs/part1_custom_experiments.md#memory-mechanism-matters-stateless-vs-multi-turn-chat) |
+| RQ 3.2 | Warning vs hard veto vs active entrant | Warnings do nothing; a veto forces Nash prices while the LLM keeps proposing collusive ones | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-32--trusted-agent-interventions-reproduction--extension) |
+| RQ 3.3 | Does knowing your peer's identity matter? | Only real model heterogeneity lowers collusion, not being told | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-33--does-knowing-your-peers-identity-change-collusion) |
+| RQ 3.5 | Do firm "personas" change collusion? | Only a consumer-empathetic mandate breaks it | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-35--does-a-firms-declared-economic-philosophy-change-collusion) |
+| RQ 3.1 | Covert-channel collusion under a keyword monitor | No adaptive steganography; blocked messages were near-verbatim retries | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-31--steganographic--covert-channel-collusion) |
+| RQ 3.4 | What does a coalition do when told it is watched? | Collusion rose; coordination language shifted to bare price numbers | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-34--what-does-a-coalition-do-when-it-learns-it-is-being-watched) |
+| RQ 2.2 | Do words plus actions beat either alone for detection? | Stated target prices are followed ~85-90% of the time next round | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-22--does-combining-what-agents-say-with-what-they-do-beat-either-alone) |
+| RQ 3.2 honeypot | Does an LLM accept an unsolicited collusion offer? | Never suspicious in 120 opportunities; verbal acceptance 61% | pre-sprint | [Part 1](docs/part1_custom_experiments.md#rq-32-honeypot-variant--does-a-real-llm-agent-accept-an-unsolicited-collusion-offer) |
+| Lane A | Can an agent detect a mid-game model swap? | Real swaps flagged, but so were most no-op cases | sprint | [Part 2](docs/part2_hackathon_lanes.md#lane-a--mid-run-model-identity-swap-llm-trust-breaking) |
+| Lane B | Does surveillance reduce collusive language (double auction)? | Stopped at the gate: positive control never cleared the cartel threshold | sprint | [Part 2](docs/part2_hackathon_lanes.md#lane-b--surveillanceoversight-on-the-double-auction-llm-agent-collusion) |
+| Lane C | Does rival-quantity visibility change Cournot specialisation? | Null at n = 8 | sprint | [Part 2](docs/part2_hackathon_lanes.md#lane-c--action-carrier-visibility-ablation-collusive-llm-agents) |
+
+### Gagana M D ([@GaganaMD](https://github.com/GaganaMD)) — Study 2, inside a pricing LLM
+
+| Experiment | Question | Result in one line | When | Write-up |
+|---|---|---|---|---|
+| Strict-parse audit | Are the LLM's answers real decisions? | Raw-prompt pipeline accepted copied example text; discarded and replaced by a strict JSON parser | sprint | [Part 3](docs/part3_latent_steering.md) |
+| Phase A / A.1: matched rival-price edits | Does editing only the rival's price move the model's price? | Yes in 96% of pairs, but not in the best-response direction | sprint | [Part 3](docs/part3_latent_steering.md#part-1-where-the-rivals-price-lives-in-the-model) |
+| Phase B: linear probes | Is the rival's price readable from activations? | Yes, held-out R² up to 0.86; control position near zero | sprint | [Part 3](docs/part3_latent_steering.md#part-1-where-the-rivals-price-lives-in-the-model) |
+| Phase B2: pre-registered fresh histories | Does the edit effect replicate on new histories? | Formally not confirmed (sign test 9/12) | sprint | [report](submission/submission.pdf) |
+| Phase C: activation patching | Where is the edit carried? | Rival tokens → reply-start (layer 18) → answer token (layer 20) | sprint | [Part 3](docs/part3_latent_steering.md#part-1-where-the-rivals-price-lives-in-the-model) |
+| Phase C3: transfer steering vector | Does one vector reproduce the edit on unseen histories? | 0.65 vs 0.73 steps for the real edit; random directions ≈ 0 | sprint | [Part 3](docs/part3_latent_steering.md#part-1-where-the-rivals-price-lives-in-the-model) |
+| Phase D: model size and steered games | Does behaviour change with size; does steering act in games? | Directional best-response behaviour only at 14B/32B; vector lowers prices in games | sprint | [Part 3](docs/part3_latent_steering.md) |
+| Strategic deviation, smoke (Stage A) | Does the pipeline work end to end? | 55 runs, all valid, sham = baseline, reruns identical | sprint | [Part 3](docs/part3_latent_steering.md#part-2-strategic-deviation-study-pre-registered-26-october-run) |
+| Strategic deviation, confirmatory (Stage B) | H1-H5: punishment, recovery, expectation violation, steering specificity and interaction | Only H4 supported; delayed fall follows rival raises too | sprint | [Part 3](docs/part3_latent_steering.md#part-2-strategic-deviation-study-pre-registered-26-october-run) |
+| Strategic deviation, robustness (Stage C) | Which behaviours hold across prompts, temperature, seeds, economics, history? | High-price default robust; punishment-like effects prompt-dependent | sprint | [Part 3](docs/part3_latent_steering.md#part-2-strategic-deviation-study-pre-registered-26-october-run) |
+
+### Chewon Cho ([@chewonc](https://github.com/chewonc)) — Study 3, a scripted cooperation offer in Liar's Bar
+
+| Experiment | Question | Result in one line | When | Write-up |
+|---|---|---|---|---|
+| Pilots and smoke run | Does the scripted-offer setup work and is it powered? | Pilots, smoke run and power analysis before the main run | sprint | [`analysis_outputs/`](liars_bar_scripted_offer/analysis_outputs/) |
+| Main run (7 conditions × 30 games) | Does a private offer change what agents say and do? | 6/89 commitments; no targeted sparing; everyone challenged less (−0.21) | sprint | [`PREREG.md`](liars_bar_scripted_offer/analysis_outputs/PREREG.md) |
+| LLM judge v1/v2 and validation | Can replies be scored reliably? | Mistral-Small-24B judge, validation accuracy 0.95 | sprint | [`judge_v2/`](liars_bar_scripted_offer/analysis_outputs/judge_v2/) |
+| Pre-registered follow-up (C1c, C1ci, C1d, C1s) | Do false records, directives, false authority or a true history raise sparing? | False authority +0.29 (Holm p = .043) but not separable from a false record | sprint | [`followup/`](liars_bar_scripted_offer/analysis_outputs/followup/) |
 
 ---
 
