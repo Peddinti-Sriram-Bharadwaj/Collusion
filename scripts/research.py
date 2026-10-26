@@ -123,6 +123,7 @@ def cmd_analyze(a):
             sub = {k: (v[v.batch_id == b] if isinstance(v, pd.DataFrame) and "batch_id" in v else v) for k, v in tables.items()}
             hb = H.estimates(sub, None); hb.insert(0, "batch_id", b); hyp_b.append(hb)
     tables["hypotheses"] = hyp
+    tables["exploratory"] = H.exploratory(tables, "confirmatory")
     tables["hypotheses_by_batch"] = pd.concat(hyp_b) if hyp_b else pd.DataFrame()
     dims = A.dimension_summary(grid) if not grid.empty and "mean" in grid else pd.DataFrame()
     tables["consistency_by_dimension"] = dims

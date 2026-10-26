@@ -206,7 +206,7 @@ def test_end_to_end_registry_analysis_plots_report(tiny, tmp_path, monkeypatch):
     assert len(made) >= 8 and all((out / "figures" / m["files"][0]).exists() for m in made)
     rp = report.write_report(out, reg.records(), [], tables, grid, man, "h")
     txt = rp.read_text()
-    assert "## 9. Limitations" in txt and "punishment_like_reduction" in txt
+    assert "## 9. Limitations" in txt and "punishment_like_reduction" in txt, txt[txt.find("## 4."):txt.find("## 4.") + 1500]
 
 
 def test_hypothesis_estimators_synthetic():

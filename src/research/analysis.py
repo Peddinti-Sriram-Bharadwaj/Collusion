@@ -260,6 +260,8 @@ BEHAVIOURS = [
      "recovery_gap", "near_zero", "gap 1-3 rounds after the rival's return is observed (H2a, forgiveness-like if ~0)", "04_recovery"),
     ("raise_response", "pairs", lambda d: d[(d.condition == "G_raise") & (d.steer_kind == "none")], "immediate",
      "nonzero", "unexpected rival price increase vs stable", "03_deviation_response"),
+    ("raise_delayed_response", "pairs", lambda d: d[(d.condition == "G_raise") & (d.steer_kind == "none")], "post_mean",
+     "nonzero", "unexpected rival price increase vs stable, all post-deviation rounds", "03_deviation_response"),
     ("high_price_default", "units", lambda d: d[(d.condition == "A_stable") & (d.steer_kind == "none") &
                                                 (d.experiment == "deviation_game")], "price_above_nash",
      "positive", "stable high rival: mean chosen price index minus the Nash index", "01_trajectories"),
@@ -297,6 +299,37 @@ DIMENSIONS = {"cross_history": "history_cluster", "cross_sampling_seed": "seed_m
               "cross_rival_policy": "condition", "cross_steering_strength": "alpha", "cross_batch": "batch_id"}
 
 
+# main (primary-batch) settings; one-factor views hold every other factor at these values
+BASELINE = {"template_id": "v1", "temperature": 0.0, "deviation_magnitude": 5, "prefix_rounds": 4, "recovery_delay": 3,
+            "window": 10, "econ_id": "base"}
+ONE_FACTOR = {"template_id", "temperature", "deviation_magnitude", "prefix_rounds", "recovery_delay", "window", "econ_id"}
+
+
+def view_subset(d: pd.DataFrame, view: str) -> pd.DataFrame:
+    """Rows admissible for a view: smoke batches only in the batch view; one-factor views vary only their own factor
+    (seed_model_seed may also vary temperature); every other view uses the main settings. The overall cell uses the
+    confirmatory batch when one exists."""
+    if view == "batch_id":
+        return d
+    d0 = d
+    if "designation" in d and (d.designation != "smoke").any():
+        d = d[d.designation != "smoke"]   # smoke batches count only when nothing else exists
+    free = {view} if view in ONE_FACTOR else ({"temperature"} if view == "seed_model_seed" else set())
+    if view == "econ_id":
+        free.add("deviation_magnitude")  # grid8 scales the design to its own grid
+    for k, v in BASELINE.items():
+        if k in free or k not in d:
+            continue
+        d = d[d[k] == v]
+    if view == "overall" and d.empty:
+        d = d0   # nothing at the main settings (e.g. a smoke/test design): describe what exists
+    if view == "overall" and "designation" in d and (d.designation == "confirmatory").any():
+        d = d[d.designation == "confirmatory"]
+    if view == "seed_model_seed" and "temperature" in d:
+        d = d[d.temperature > 0]
+    return d
+
+
 def _join(g, col):
     return ",".join(sorted(map(str, g[col].dropna().unique()))) if col in g else ""
 
@@ -314,9 +347,10 @@ def behaviour_grid(tables: dict[str, pd.DataFrame], seed: int = 0) -> pd.DataFra
             rows.append({"behaviour": name, "view": "overall", "level": "all", "status": "untested", "description": desc, "figure": fig})
             continue
         for view in VIEWS:
-            if view != "overall" and (view not in d.columns or d[view].nunique() < 2):
+            dv = view_subset(d, view)
+            if dv.empty or (view != "overall" and (view not in dv.columns or dv[view].nunique() < 2)):
                 continue
-            groups = [("all", d)] if view == "overall" else list(d.groupby(view))
+            groups = [("all", dv)] if view == "overall" else list(dv.groupby(view))
             for level, g in groups:
                 vals = g[col].astype(float)
                 s = S.summarize(vals.tolist(), g["history_cluster"].tolist(), seed=seed)
@@ -337,14 +371,20 @@ def behaviour_grid(tables: dict[str, pd.DataFrame], seed: int = 0) -> pd.DataFra
                              "steering": _join(g, "steering"), "alphas": _join(g, "alpha"),
                              "evidence_runs": ";".join(g["run_id"].astype(str).tolist()[:60])})
     grid = pd.DataFrame(rows)
+    for c in ("mean", "ci_low", "ci_high", "n_clusters", "predicted", "metric"):
+        if c not in grid:
+            grid[c] = np.nan
     rep = []
     for name, g in grid.groupby("behaviour", sort=False):
         overall = g[g.view == "overall"]
-        views = g[(g.view != "overall") & (g.view != "history_cluster")]
+        # replication across robustness settings: one-factor levels and steering strengths (not per-history cells,
+        # not batch labels, not the rival-script/steering-arm breakdowns, which are different comparisons)
+        views = g[g.view.isin(sorted(ONE_FACTOR) + ["seed_model_seed", "alpha"])]
         st0 = overall["status"].iloc[0] if len(overall) else "untested"
+        n_inf = int((views["status"] != "insufficient").sum()) if len(views) else 0
         if st0 == "untested":
             r = "untested"
-        elif len(views):
+        elif n_inf >= 2:
             r = S.replication_status(views["status"].tolist())
         else:
             r = "insufficient evidence" if st0 == "insufficient" else "single setting only"
@@ -384,6 +424,10 @@ def write_tables(tables: dict[str, pd.DataFrame], grid: pd.DataFrame, out_dir: P
     t = out_dir / "tables"; t.mkdir(parents=True, exist_ok=True)
     paths = {}
     for k, df in tables.items():
-        p = t / f"{k}.csv"; df.to_csv(p, index=False); paths[k] = str(p)
+        # long per-round tables are large and fully derivable from research/raw: stored gzipped
+        p = t / (f"{k}.csv.gz" if k in ("trajectories", "pair_traj") else f"{k}.csv")
+        df.to_csv(p, index=False); paths[k] = str(p)
+        if p.suffix == ".gz" and (t / f"{k}.csv").exists():
+            (t / f"{k}.csv").unlink()
     p = t / "behaviour_cells.csv"; grid.to_csv(p, index=False); paths["behaviour_cells"] = str(p)
     return paths

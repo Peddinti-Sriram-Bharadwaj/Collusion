@@ -69,6 +69,10 @@ def write_report(out_dir: Path, records: list, legacy: list, tables: dict, grid:
                   f"generic price direction {_fmt(h4.get('generic_level'))}, learned minus generic {_fmt(h4.get('learned_minus_generic'))}.", ""]
     else:
         L += ["No confirmatory batch registered yet.", ""]
+    ex = tables.get("exploratory")
+    if ex is not None and not ex.empty:
+        L += ["### Exploratory contrasts (same confirmatory data; not pre-registered, not multiplicity-adjusted)", "",
+              md_table(ex[[c for c in ["code", "name", "mean", "ci_low", "ci_high", "n_clusters", "status", "share_positive"] if c in ex]], 3), ""]
     hb = tables.get("hypotheses_by_batch")
     if hb is not None and not hb.empty:
         L += ["Same estimators per batch (exploratory and smoke batches are descriptive only):", "",

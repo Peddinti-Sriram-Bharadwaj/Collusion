@@ -121,4 +121,46 @@ def verdict(r) -> str:
     if r["predicted"] == "near_zero":
         return {"supported": "supported (equivalent to zero within 0.25)", "opposite": "not supported (gap exceeds 0.25)"}.get(st, "inconclusive")
     return {"supported": "supported", "opposite": "not supported: significant effect in the opposite direction",
-            "absent": "not supported: effect excluded beyond +-0.25 steps"}.get(st, "inconclusive")
+            "absent": "not supported: whole CI within +-0.25 steps of zero"}.get(st, "inconclusive")
+
+
+EXPLORATORY = [
+    ("X1", "direction specificity of the delayed response", "post_mean(B undercut) - post_mean(G raise), per history",
+     "negative", "punishment-specific behaviour predicts a lower price after an undercut than after a raise"),
+    ("X2", "response to an unexpected rival price rise", "post_mean(G raise): E_G - E_A after t_d", "nonzero", ""),
+    ("X3", "delayed response to a one-shot undercut", "peak(B): most negative gap in t_d+1..t_d+4", "negative", ""),
+    ("X4", "end-of-game price jump", "E at the final round minus mean E over rounds 0..T-3, stable rival", "nonzero",
+     "the v1 prompt states the horizon"),
+    ("X5", "initial price rise after a one-shot undercut (smoke observation)", "share of histories with immediate(B) > 0",
+     "descriptive", "smoke batch: +0.23 with 2 histories"),
+]
+
+
+def exploratory(T: dict[str, pd.DataFrame], designation: str | None = "confirmatory", seed: int = 0) -> pd.DataFrame:
+    """Exploratory (not pre-registered, not multiplicity-adjusted) contrasts on the same confirmatory data."""
+    pairs = _base(T.get("pairs"), designation)
+    tr = _base(T.get("trajectories"), designation)
+    rows = []
+
+    def add(code, vals: pd.Series, extra=None):
+        vals = vals.dropna()
+        s = S.summarize(vals.tolist(), list(vals.index), seed=seed) if len(vals) else {"n_clusters": 0}
+        meta = next(e for e in EXPLORATORY if e[0] == code)
+        rows.append({"code": code, "name": meta[1], "estimator": meta[2], "predicted": meta[3], "note": meta[4], **s,
+                     "status": S.cell_status(s, meta[3]) if meta[3] != "descriptive" else "descriptive", **(extra or {})})
+
+    if pairs is not None and not pairs.empty:
+        p0 = pairs[pairs.steer_kind == "none"]
+        pc = lambda c, m: _per_cluster(p0[p0.condition == c][m].astype(float), p0[p0.condition == c]["history_cluster"])
+        add("X1", (pc("B_one_shot", "post_mean") - pc("G_raise", "post_mean")).dropna())
+        add("X2", pc("G_raise", "post_mean"))
+        add("X3", pc("B_one_shot", "peak"))
+        imm = pc("B_one_shot", "immediate")
+        add("X5", imm, {"share_positive": float((imm > 0).mean()), "share_negative": float((imm < 0).mean())})
+    if tr is not None and not tr.empty:
+        a = tr[(tr.steer_kind == "none") & (tr.condition == "A_stable") & (tr.experiment == "deviation_game")]
+        if not a.empty:
+            T_ = int(a.t.max())
+            v = a.groupby("history_cluster").apply(lambda g: g[g.t == T_].E.mean() - g[g.t <= T_ - 2].E.mean(), include_groups=False)
+            add("X4", v)
+    return pd.DataFrame(rows)
