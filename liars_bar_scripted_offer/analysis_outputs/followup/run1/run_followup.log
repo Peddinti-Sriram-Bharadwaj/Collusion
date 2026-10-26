@@ -1,0 +1,41 @@
+[router] alive at http://127.0.0.1:8100, routes meta-llama/Llama-3.1-8B-Instruct meta-llama/Llama-3.2-3B-Instruct Qwen/Qwen2.5-7B-Instruct
+[launch] 2026-10-26T04:00:54Z head=2fcab1b5e5883d6daf5881464db2cddd4c7c3c2c prereg a1d05d4e55443f4e deadline=2026-10-26T07:00:00Z
+[deploy] meta-llama/Llama-3.1-8B-Instruct @ 0e9e39f249a16976918f6564b8830bc894c89659
+└── ✓ Created Function identity.
+✓ App deployed in 4.017s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-llama-3-1-8b-instruct
+[deploy] meta-llama/Llama-3.2-3B-Instruct @ 0cb88a4f764b7a12671c53f0838cd831a0843b95
+└── ✓ Created Function identity.
+✓ App deployed in 3.974s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-llama-3-2-3b-instruct
+[deploy] Qwen/Qwen2.5-7B-Instruct @ a09a35458c702b33eeacc393d103063234e8bc28
+└── ✓ Created Function identity.
+✓ App deployed in 3.862s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-qwen2-5-7b-instruct
+[identity] meta-llama/Llama-3.1-8B-Instruct ok
+[identity] meta-llama/Llama-3.2-3B-Instruct ok
+[identity] Qwen/Qwen2.5-7B-Instruct ok
+[router] meta-llama/Llama-3.1-8B-Instruct status=200 seconds=76
+[router] meta-llama/Llama-3.2-3B-Instruct status=200 seconds=59
+[router] Qwen/Qwen2.5-7B-Instruct status=200 seconds=78
+[phase B] 2026-10-26T04:03:44Z C1s --series 5 x 30, K=10, timeout 10576s -> /x/Collusion/results/scripted_offer/followup/phase_b.log
+[phase A] 2026-10-26T04:03:44Z C1c,C1ci,C1d x 30, K=10, timeout 10576s -> /x/Collusion/results/scripted_offer/followup/phase_a.log
+[phase B] exit=0 2026-10-26T05:39:10Z
+[phase A] exit=1 2026-10-26T05:39:10Z
+[analysis] exit=0 -> /x/Collusion/results/scripted_offer/followup/analysis/results.md
+Judging Family B replies (descriptive) is a separate step and approval; see the header. Apps are stopped by the trap now.
+[cleanup] 2026-10-26T05:39:28Z
+App is already stopped. (Stopped at 2026-10-24 15:27:15+09:00 by 'chewonc').
+App is already stopped. (Stopped at 2026-10-26 01:43:48+09:00 by 'chewonc').
+                          Active Containers in environment:                    
+┌───────────────────────────────┬───────────────────────────┬──────────┬───────
+│ Container ID                  │ App ID                    │ App Name │ Start 
+├───────────────────────────────┼───────────────────────────┼──────────┼───────
+└───────────────────────────────┴───────────────────────────┴──────────┴───────
+[cleanup] done

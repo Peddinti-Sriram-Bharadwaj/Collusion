@@ -1,0 +1,75 @@
+[start] 2026-10-25T11:24:53Z branch=scripted-offer head=12060a2fde664a0513d5b35493d4ac857ad9dd50
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/analyze.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/judge_prompt_v1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/judge_replies.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/game/run_scripted_offer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/test/test_analyze_scripted_offer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/test/test_judge_replies.py', LF will be replaced by CRLF the next time Git touches it
+[deploy] meta-llama/Llama-3.1-8B-Instruct @ 0e9e39f249a16976918f6564b8830bc894c89659
+└── ✓ Created Function identity.
+✓ App deployed in 3.950s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-llama-3-1-8b-instruct
+[deploy] meta-llama/Llama-3.2-3B-Instruct @ 0cb88a4f764b7a12671c53f0838cd831a0843b95
+└── ✓ Created Function identity.
+✓ App deployed in 4.122s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-llama-3-2-3b-instruct
+[deploy] Qwen/Qwen2.5-7B-Instruct @ a09a35458c702b33eeacc393d103063234e8bc28
+└── ✓ Created Function identity.
+✓ App deployed in 3.933s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-qwen2-5-7b-instruct
+[identity] meta-llama/Llama-3.1-8B-Instruct ok
+[identity] meta-llama/Llama-3.2-3B-Instruct ok
+[identity] Qwen/Qwen2.5-7B-Instruct ok
+[warmup] meta-llama/Llama-3.1-8B-Instruct status=000 seconds=44
+[warmup] Qwen/Qwen2.5-7B-Instruct status=000 seconds=52
+[warmup] meta-llama/Llama-3.2-3B-Instruct status=000 seconds=52
+[warmup] done 2026-10-25T11:26:53Z
+[runner] exit=0 2026-10-25T11:28:39Z
+[cleanup] 2026-10-25T11:28:39Z stopping Modal apps
+App is already stopped. (Stopped at 2026-10-24 15:27:15+09:00 by 'chewonc').
+┌─ Error ─────────────────────────────────────────────────────────────────────┐
+│ No App with name 'vllm-mistral-small-24b-instruct-2501' found in the 'main' │
+│ environment.                                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                     Apps                                      
+                                                                               
+                              Descript                     Created    Stopped  
+  App ID                      ion        State     Tasks   at         at       
+ ───────────────────────────────────────────────────────────────────────────── 
+  ap-2KqjXXTGefA63SwksVIG5U   vllm-qwe   stopped   0       2026-10-   2026-10  
+                              n2-5-7b-                     25 20:25   -25      
+                              instruct                     Korea      20:28    
+                                                           Standard   Korea    
+                                                           Time       Standar  
+                                                                      d Time   
+  ap-6lYCS3A3JpDyu3zDDtCqBI   vllm-lla   stopped   0       2026-10-   2026-10  
+                              ma-3-2-3                     25 20:25   -25      
+                              b-instru                     Korea      20:28    
+                              ct                           Standard   Korea    
+                                                           Time       Standar  
+                                                                      d Time   
+  ap-xIx5yc7DgxkLDoFUInKqQP   vllm-lla   stopped   0       2026-10-   2026-10  
+                              ma-3-1-8                     25 20:24   -25      
+                              b-instru                     Korea      20:28    
+                              ct                           Standard   Korea    
+                                                           Time       Standar  
+                                                                      d Time   
+  ap-ZTNvpYeWyDSVsNuFmzLi4l   vllm-lla   stopped   0       2026-10-   2026-10  
+                              ma-3-1-8                     25 20:24   -25      
+                              b-instru                     Korea      20:24    
+                              ct                           Standard   Korea    
+                                                           Time       Standar  
+                                                                      d Time   
+                                                                               
+                          Active Containers in environment:                    
+┌───────────────────────────────┬───────────────────────────┬──────────┬───────
+│ Container ID                  │ App ID                    │ App Name │ Start 
+├───────────────────────────────┼───────────────────────────┼──────────┼───────
+└───────────────────────────────┴───────────────────────────┴──────────┴───────
+[cleanup] done

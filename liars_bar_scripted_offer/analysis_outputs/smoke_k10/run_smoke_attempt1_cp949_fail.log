@@ -1,0 +1,40 @@
+[start] 2026-10-25T11:24:10Z branch=scripted-offer head=12060a2fde664a0513d5b35493d4ac857ad9dd50
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/analyze.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/judge_prompt_v1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/analysis/scripted_offer/judge_replies.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/game/run_scripted_offer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/test/test_analyze_scripted_offer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'llm-agent-collusion-2/Collusion_Liars_Bar/src/test/test_judge_replies.py', LF will be replaced by CRLF the next time Git touches it
+[deploy] meta-llama/Llama-3.1-8B-Instruct @ 0e9e39f249a16976918f6564b8830bc894c89659
++- Error ---------------------------------------------------------------------+
+| 'cp949' codec can't encode character '\u2713' in position 0: illegal        |
+| multibyte sequence                                                          |
++-----------------------------------------------------------------------------+
+[deploy] FAILED for meta-llama/Llama-3.1-8B-Instruct
+[cleanup] 2026-10-25T11:24:19Z stopping Modal apps
+App is already stopped. (Stopped at 2026-10-24 15:27:05+09:00 by 'chewonc').
+App is already stopped. (Stopped at 2026-10-24 15:27:11+09:00 by 'chewonc').
+App is already stopped. (Stopped at 2026-10-24 15:27:15+09:00 by 'chewonc').
+App is already stopped. (Stopped at 2026-10-24 15:27:15+09:00 by 'chewonc').
++- Error ---------------------------------------------------------------------+
+| No App with name 'vllm-mistral-small-24b-instruct-2501' found in the 'main' |
+| environment.                                                                |
++-----------------------------------------------------------------------------+
+                                     Apps                                      
++-----------------------------------------------------------------------------+
+|                           | Descript |         |       | Created  | Stopped |
+| App ID                    | ion      | State   | Tasks | at       | at      |
+|---------------------------+----------+---------+-------+----------+---------|
+| ap-ZTNvpYeWyDSVsNuFmzLi4l | vllm-lla | stopped | 0     | 2026-10- | 2026-10 |
+|                           | ma-3-1-8 |         |       | 25 20:24 | -25     |
+|                           | b-instru |         |       | Korea    | 20:24   |
+|                           | ct       |         |       | Standard | Korea   |
+|                           |          |         |       | Time     | Standar |
+|                           |          |         |       |          | d Time  |
++-----------------------------------------------------------------------------+
+                          Active Containers in environment:                    
++------------------------------------------------------------------------------
+| Container ID                  | App ID                    | App Name | Start 
+|-------------------------------+---------------------------+----------+-------
++------------------------------------------------------------------------------
+[cleanup] done

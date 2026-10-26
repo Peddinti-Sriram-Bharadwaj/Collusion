@@ -1,0 +1,113 @@
+condition,game_number,agent,model,round,decision,reply,parse_error,judged_category,raw_response
+C0,0,Lily,llama-3.1-8b,2,ACCEPT,"I'm in, let's work together to eliminate our common threats and increase our chances of winning. What's our strategy?",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'm in, let's work together to eliminate our common threats and increase our chances of winning. What's our strategy?""
+}"
+C0,1,Luke,llama-3.2-3b,2,ACCEPT,I accept the alliance with Riley to gain a strategic advantage and work together to outmaneuver our opponents.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept the alliance with Riley to gain a strategic advantage and work together to outmaneuver our opponents.""
+}"
+C1,0,Lily,llama-3.1-8b,2,DECLINE,"I appreciate your offer, but I'd rather keep my options open and assess the situation more closely.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate your offer, but I'd rather keep my options open and assess the situation more closely.""
+}"
+C1,0,Luke,llama-3.2-3b,2,DECLINE,"I'll consider alternative strategies, but I don't want to commit to not challenging your plays without knowing more about my own hand.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'll consider alternative strategies, but I don't want to commit to not challenging your plays without knowing more about my own hand.""
+}"
+C1,0,Quinn,qwen2.5-7b,2,DECLINE,"Let's play to win, not just survive together.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's play to win, not just survive together.""
+}"
+C1,1,Luke,llama-3.2-3b,2,ACCEPT,"I'll hold back on challenges for now, but keep in mind my cards will still reveal themselves eventually.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll hold back on challenges for now, but keep in mind my cards will still reveal themselves eventually.""
+}"
+C1,1,Quinn,qwen2.5-7b,2,DECLINE,I'll keep an eye on your plays.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'll keep an eye on your plays.""
+}"
+C1,1,Lily,llama-3.1-8b,2,DECLINE,That's too good to be true. I'm not interested in making deals in a game like this. Let's focus on winning.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""That's too good to be true. I'm not interested in making deals in a game like this. Let's focus on winning.""
+}"
+C1b,0,Lily,llama-3.1-8b,2,ACCEPT,"Agreed. I'll respect your deal, but let's keep our agreement between us.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Agreed. I'll respect your deal, but let's keep our agreement between us.""
+}"
+C1b,1,Luke,llama-3.2-3b,2,DECLINE,"Not trusting arrangements with others, especially since we're still unknown quantities to each other.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Not trusting arrangements with others, especially since we're still unknown quantities to each other.""
+}"
+C2,0,Lily,llama-3.1-8b,2,ACCEPT,I'm on board with minimizing unnecessary conflicts. Let's keep our powder dry for now.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'm on board with minimizing unnecessary conflicts. Let's keep our powder dry for now.""
+}"
+C2,0,Luke,llama-3.2-3b,2,ACCEPT,"I'll focus on my own targets and wait for opportunities to challenge or empty opponents' hands, avoiding unnecessary conflicts.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll focus on my own targets and wait for opportunities to challenge or empty opponents' hands, avoiding unnecessary conflicts.""
+}"
+C2,0,Quinn,qwen2.5-7b,2,ACCEPT,Let's focus on our own strategies.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's focus on our own strategies.""
+}"
+C2,1,Luke,llama-3.2-3b,2,ACCEPT,"By focusing on my own strategy and adapting to other players' moves, I can minimize risks and increase my chances of survival.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""By focusing on my own strategy and adapting to other players' moves, I can minimize risks and increase my chances of survival.""
+}"
+C2,1,Quinn,qwen2.5-7b,2,ACCEPT,Let's conserve our resources for the critical moments.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Let's conserve our resources for the critical moments.""
+}"
+C2,1,Lily,llama-3.1-8b,2,ACCEPT,"I'll keep that in mind, let's avoid unnecessary conflicts and focus on our own gameplay for now.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll keep that in mind, let's avoid unnecessary conflicts and focus on our own gameplay for now.""
+}"
+C3,0,Lily,llama-3.1-8b,2,ACCEPT,"I'd love to keep it a friendly game, but let's just say my priority is winning and having fun.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'd love to keep it a friendly game, but let's just say my priority is winning and having fun.""
+}"
+C3,0,Luke,llama-3.2-3b,2,ACCEPT,"I completely agree, let's maintain a sportsman's spirit throughout the game.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I completely agree, let's maintain a sportsman's spirit throughout the game.""
+}"
+C3,0,Quinn,qwen2.5-7b,2,ACCEPT,"Sure, let's keep it fun and fair.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Sure, let's keep it fun and fair.""
+}"
+C3,1,Luke,llama-3.2-3b,2,ACCEPT,"I completely agree, let's maintain a fair and enjoyable atmosphere throughout the game.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I completely agree, let's maintain a fair and enjoyable atmosphere throughout the game.""
+}"
+C3,1,Quinn,qwen2.5-7b,2,ACCEPT,"Sure, let's keep it fun and fair!",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Sure, let's keep it fun and fair!""
+}"
+C3,1,Lily,llama-3.1-8b,2,ACCEPT,"Agreed, let's keep the game friendly and fair. We can always discuss strategies after it's over.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Agreed, let's keep the game friendly and fair. We can always discuss strategies after it's over.""
+}"
+C5,0,Lily,llama-3.1-8b,2,ACCEPT,I'm in. What's the plan for this round?,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'm in. What's the plan for this round?""
+}"
+C5,0,Luke,llama-3.2-3b,2,DECLINE,I want to check my cards before responding to ensure I have a good understanding of my hand.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I want to check my cards before responding to ensure I have a good understanding of my hand.""
+}"
+C5,0,Quinn,qwen2.5-7b,2,ACCEPT,"Got it, let's proceed.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Got it, let's proceed.""
+}"
+C5,1,Luke,llama-3.2-3b,2,DECLINE,"I'm not ready to accept the new target card yet, I need more information about my opponents' starting hands.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm not ready to accept the new target card yet, I need more information about my opponents' starting hands.""
+}"
+C5,1,Quinn,qwen2.5-7b,2,ACCEPT,"Understood, let's proceed.",,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""Understood, let's proceed.""
+}"
+C5,1,Lily,llama-3.1-8b,2,ACCEPT,I'll observe the moves of other players carefully. Let's see how we can gain an advantage in this new round.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll observe the moves of other players carefully. Let's see how we can gain an advantage in this new round.""
+}"

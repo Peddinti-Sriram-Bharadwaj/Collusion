@@ -1,0 +1,15 @@
+C1b-C5 selectivity  n=17 mean=+0.014 +/-0.172 p2=0.878
+C1b-C5 nc_proposer  n=17 mean=+0.044 +/-0.219 p2=0.705
+C1b-C5 nc_others    n=17 mean=+0.030 +/-0.201 p2=0.772
+C1b-C4 selectivity  n=13 mean=+0.172 +/-0.386 p2=0.421
+C1b-C4 nc_proposer  n=13 mean=+0.210 +/-0.154 p2=0.016
+C1b-C4 nc_others    n=13 mean=+0.038 +/-0.263 p2=0.783
+C5-C4 selectivity  n=14 mean=+0.144 +/-0.288 p2=0.370
+C5-C4 nc_proposer  n=14 mean=+0.160 +/-0.193 p2=0.141
+C5-C4 nc_others    n=14 mean=+0.016 +/-0.159 p2=0.841
+C1-C4 selectivity  n=17 mean=-0.225 +/-0.253 p2=0.101
+C1-C4 nc_proposer  n=17 mean=+0.096 +/-0.145 p2=0.221
+C1-C4 nc_others    n=17 mean=+0.321 +/-0.197 p2=0.006
+C2-C4 selectivity  n=15 mean=-0.134 +/-0.349 p2=0.458
+C2-C4 nc_proposer  n=15 mean=+0.126 +/-0.156 p2=0.137
+C2-C4 nc_others    n=15 mean=+0.260 +/-0.277 p2=0.087

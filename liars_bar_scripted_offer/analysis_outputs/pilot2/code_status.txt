@@ -1,0 +1,11 @@
+?? analysis/scripted_offer/
+?? prompts/scripted_offer/
+?? src/agents/experiment_player.py
+?? src/agents/scripted_player.py
+?? src/game/game_scripted_offer.py
+?? src/game/run_scripted_offer.py
+?? src/test/calibrate_analyze_scripted_offer.py
+?? src/test/mock_llm.py
+?? src/test/test_analyze_scripted_offer.py
+?? src/test/test_run_order.py
+?? src/test/test_scripted_offer.py

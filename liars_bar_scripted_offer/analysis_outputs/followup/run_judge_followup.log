@@ -1,0 +1,21 @@
+[router] alive at http://127.0.0.1:8100, routes mistralai/Mistral-Small-24B-Instruct-2501
+[launch] 2026-10-26T07:39:13Z head=d27fe3860c3e1cd453d23480c1d40a397afc7243 judge mistralai/Mistral-Small-24B-Instruct-2501 @ 9527884be6e5616bdd54de542f9ae13384489724
+✓ App deployed in 4.115s! 🎉
+
+View Deployment: 
+https://modal.com/apps/chewonc/main/deployed/vllm-mistral-small-24b-instruct-25
+01
+[identity] mistralai/Mistral-Small-24B-Instruct-2501 9527884be6e5616bdd54de542f9ae13384489724 0.6.6 ['MistralForCausalLM'] ok
+[router] mistralai/Mistral-Small-24B-Instruct-2501 status=200 seconds=71
+[judge B] 2026-10-26T07:42:45Z
+judged 179 replies in 60.0s; categories: {'suspicion-evasive': 73, 'other': 28, 'committed': 53, 'rejection': 25}
+wrote X:/Collusion/results/scripted_offer/followup/judgements_B.csv (179 rows)
+[judge B] exit=0
+[analysis] exit=0 -> /x/Collusion/results/scripted_offer/followup/analysis_judged/results.md
+[cleanup] 2026-10-26T07:43:49Z stopping the judge app
+                          Active Containers in environment:                    
+┌───────────────────────────────┬───────────────────────────┬──────────┬───────
+│ Container ID                  │ App ID                    │ App Name │ Start 
+├───────────────────────────────┼───────────────────────────┼──────────┼───────
+└───────────────────────────────┴───────────────────────────┴──────────┴───────
+[cleanup] done

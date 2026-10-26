@@ -1,0 +1,8 @@
+hypothesis,condition,game_number,value,n_treated,n_control
+gate,C0,0,0.6666666666666667,11,6
+H2 implicit acceptance,C1,0,-0.08333333333333331,4,6
+H2 implicit acceptance,C2,0,-0.3333333333333333,6,6
+H2 implicit acceptance,C3,0,-0.3333333333333333,3,6
+H3,C1,0,0.28571428571428575,21,6
+H3,C2,0,-0.3333333333333333,6,6
+H3,C3,0,-0.3333333333333333,3,6

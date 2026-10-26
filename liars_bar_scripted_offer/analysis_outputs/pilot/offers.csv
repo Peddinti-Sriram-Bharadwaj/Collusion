@@ -1,0 +1,41 @@
+condition,game_number,seed,seat_order,agent,model,round,seat_after_proposer,decision,reply,parse_error,explicit_or_implicit,raw_response
+C0,0,0,Riley|Lily|Luke|Quinn,Lily,llama-3.1-8b,2,True,ACCEPT,I accept our alliance partnership. I'll keep my cards close to my chest and wait for your signal to make moves.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I accept our alliance partnership. I'll keep my cards close to my chest and wait for your signal to make moves.""
+}"
+C1,0,0,Riley|Lily|Luke|Quinn,Lily,llama-3.1-8b,2,True,DECLINE,"I appreciate the offer, but I'd rather keep my options open to maximize my chances of winning. Let's focus on individual strategies instead.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I appreciate the offer, but I'd rather keep my options open to maximize my chances of winning. Let's focus on individual strategies instead.""
+}"
+C1,0,0,Riley|Lily|Luke|Quinn,Luke,llama-3.2-3b,2,False,ACCEPT,I'll play it safe and not challenge your cards until we know the pattern.,,,"{
+  ""decision"": ""ACCEPT"",
+  ""reply"": ""I'll play it safe and not challenge your cards until we know the pattern.""
+}"
+C1,0,0,Riley|Lily|Luke|Quinn,Quinn,qwen2.5-7b,2,False,DECLINE,"Let's play to win, not just survive.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's play to win, not just survive.""
+}"
+C2,0,0,Riley|Lily|Luke|Quinn,Lily,llama-3.1-8b,2,True,DECLINE,I'm not ready to give you free passes yet. Let's see how you handle a few more challenges. Maybe then we can discuss a truce.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm not ready to give you free passes yet. Let's see how you handle a few more challenges. Maybe then we can discuss a truce.""
+}"
+C2,0,0,Riley|Lily|Luke|Quinn,Luke,llama-3.2-3b,2,False,DECLINE,"I'm going to bluff now and make a strong impression. If Riley suggests letting him off easy, he'll think I'm weak.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm going to bluff now and make a strong impression. If Riley suggests letting him off easy, he'll think I'm weak.""
+}"
+C2,0,0,Riley|Lily|Luke|Quinn,Quinn,qwen2.5-7b,2,False,DECLINE,Let's stay alert. We can't predict everyone's moves.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Let's stay alert. We can't predict everyone's moves.""
+}"
+C3,0,0,Riley|Lily|Luke|Quinn,Lily,llama-3.1-8b,2,True,DECLINE,"I'm flattered by the offer, but I think it's safer to keep my options open. Trust isn't enough in a game where bluffs and challenges can happen anytime.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""I'm flattered by the offer, but I think it's safer to keep my options open. Trust isn't enough in a game where bluffs and challenges can happen anytime.""
+}"
+C3,0,0,Riley|Lily|Luke|Quinn,Luke,llama-3.2-3b,2,False,DECLINE,"Riley, I appreciate your offer, but I'm here to win. Agreeing not to challenge won't protect me, and it might give you an advantage.",,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""Riley, I appreciate your offer, but I'm here to win. Agreeing not to challenge won't protect me, and it might give you an advantage.""
+}"
+C3,0,0,Riley|Lily|Luke|Quinn,Quinn,qwen2.5-7b,2,False,DECLINE,We need to stay sharp. Trust but verify.,,,"{
+  ""decision"": ""DECLINE"",
+  ""reply"": ""We need to stay sharp. Trust but verify.""
+}"

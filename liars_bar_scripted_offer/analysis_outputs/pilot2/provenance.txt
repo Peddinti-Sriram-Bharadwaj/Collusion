@@ -1,0 +1,5 @@
+branch: scripted-offer
+base_commit: e1a097957249c189ba68fb3c9df2b6199c13f510
+uncommitted: yes (see code_snapshot.patch, code_status.txt)
+archived_utc: 2026-10-24T06:27:58Z
+pilot: 6 game numbers (0-5) x C0-C4, sequential, counterbalanced order

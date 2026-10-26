@@ -1,0 +1,10 @@
+2026-10-25T17:08:42Z
+Traceback (most recent call last):
+  File "X:\Collusion\results\scripted_offer\main\exploratory\reply_behaviour.py", line 330, in <module>
+    main()
+  File "X:\Collusion\results\scripted_offer\main\exploratory\reply_behaviour.py", line 326, in main
+    print("\n".join(L))
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2212' in position 938: illegal multibyte sequence
+exit=1
+
+Note (2026-10-26): the final print to the console failed (cp949 cannot encode U+2212). It came after reply_behaviour_results.md and reply_behaviour_recipients.csv were written, so the analysis completed. It was not rerun, and stdout is not captured here; the results file is the output.

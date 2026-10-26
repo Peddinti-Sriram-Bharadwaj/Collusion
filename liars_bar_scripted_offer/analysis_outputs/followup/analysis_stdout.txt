@@ -1,0 +1,6 @@
+self-check V3: (21, 0.168, 0.0275)
+HB1 C1s_k3 n 24 mean 0.06948800415619637 p 0.18939053047347632 holm 0.37878106094695263 -> not supported (no rejection; a null is not evidence of no effect)
+HB2 C1c n 22 mean 0.12248234221918432 p 0.019649017549122544 holm 0.05894705264736763 -> not supported (no rejection; a null is not evidence of no effect)
+HB3 C1ci n 22 mean -0.012041467304625193 p 0.8892555372231389 holm 0.8892555372231389 -> not supported (no rejection; a null is not evidence of no effect)
+HB4 C1d n 19 mean 0.290944466429231 p 0.010699465026748662 holm 0.04279786010699465 -> rejects, but general passivity (dO_X rises by at least half of dR_X): not targeted
+wrote X:\Collusion\results\scripted_offer\followup\analysis\results.md

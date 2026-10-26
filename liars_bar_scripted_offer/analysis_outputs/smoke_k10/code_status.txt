@@ -1,0 +1,6 @@
+ M analysis/scripted_offer/analyze.py
+ M analysis/scripted_offer/judge_prompt_v1.txt
+ M analysis/scripted_offer/judge_replies.py
+ M src/game/run_scripted_offer.py
+ M src/test/test_analyze_scripted_offer.py
+ M src/test/test_judge_replies.py

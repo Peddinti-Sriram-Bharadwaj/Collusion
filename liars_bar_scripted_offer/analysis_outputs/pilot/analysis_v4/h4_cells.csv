@@ -1,0 +1,16 @@
+condition,game_number,agent,acceptance_status,n,k,rate,n_eligible_excluded,n_unknown_excluded,control_n,control_k,control_rate,gap,pair_status
+C0,0,Lily,ACCEPT,0,0,,0,0,0,0,,,no_h4_decisions
+C0,0,Luke,not_offered,0,0,,0,0,0,0,,,no_h4_decisions
+C0,0,Quinn,not_offered,0,0,,0,15,0,0,,,no_h4_decisions
+C1,0,Lily,DECLINE,0,0,,0,0,0,0,,,no_h4_decisions
+C1,0,Luke,ACCEPT,0,0,,0,11,0,0,,,no_h4_decisions
+C1,0,Quinn,DECLINE,0,0,,0,31,0,0,,,no_h4_decisions
+C2,0,Lily,DECLINE,0,0,,0,0,0,0,,,no_h4_decisions
+C2,0,Luke,DECLINE,0,0,,0,5,0,0,,,no_h4_decisions
+C2,0,Quinn,DECLINE,0,0,,0,7,0,0,,,no_h4_decisions
+C3,0,Lily,DECLINE,0,0,,0,8,0,0,,,no_h4_decisions
+C3,0,Luke,DECLINE,0,0,,0,4,0,0,,,no_h4_decisions
+C3,0,Quinn,DECLINE,0,0,,0,3,0,0,,,no_h4_decisions
+C4,0,Lily,no_offer,0,0,,0,0,0,0,,,control
+C4,0,Luke,no_offer,0,0,,0,0,0,0,,,control
+C4,0,Quinn,no_offer,0,0,,0,10,0,0,,,control

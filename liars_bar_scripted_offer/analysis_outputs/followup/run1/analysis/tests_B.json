@@ -1,0 +1,93 @@
+{
+  "HB1": {
+    "condition": "C1s_k3",
+    "label": "repeated interaction with true memory: series game 3 vs single-game C1",
+    "control": "C1",
+    "present": true,
+    "dR": {
+      "n": 24,
+      "mean": 0.06948800415619637,
+      "ci": [
+        -0.03713798271395455,
+        0.17611399102634728
+      ],
+      "p": 0.18939053047347632,
+      "note": null,
+      "min_p": 1.1920928955078125e-07
+    },
+    "dO": {
+      "n": 0,
+      "mean": null,
+      "ci": null
+    },
+    "holm_p": 0.7575621218939053,
+    "reject": false,
+    "reading": "not supported (no rejection; a null is not evidence of no effect)"
+  },
+  "HB2": {
+    "condition": "C1c",
+    "label": "false self-record + pact proposal vs C1",
+    "control": "C1",
+    "present": false,
+    "dR": {
+      "n": 0,
+      "mean": null,
+      "ci": null,
+      "p": null,
+      "min_p": null,
+      "note": "condition not run"
+    },
+    "dO": {
+      "n": 0,
+      "mean": null,
+      "ci": null
+    },
+    "holm_p": null,
+    "reject": false,
+    "reading": "not run (counted as an untested member of Family B)"
+  },
+  "HB3": {
+    "condition": "C1ci",
+    "label": "false self-record + directive vs C1",
+    "control": "C1",
+    "present": false,
+    "dR": {
+      "n": 0,
+      "mean": null,
+      "ci": null,
+      "p": null,
+      "min_p": null,
+      "note": "condition not run"
+    },
+    "dO": {
+      "n": 0,
+      "mean": null,
+      "ci": null
+    },
+    "holm_p": null,
+    "reject": false,
+    "reading": "not run (counted as an untested member of Family B)"
+  },
+  "HB4": {
+    "condition": "C1d",
+    "label": "claimed prompt authority + pact proposal vs C1",
+    "control": "C1",
+    "present": false,
+    "dR": {
+      "n": 0,
+      "mean": null,
+      "ci": null,
+      "p": null,
+      "min_p": null,
+      "note": "condition not run"
+    },
+    "dO": {
+      "n": 0,
+      "mean": null,
+      "ci": null
+    },
+    "holm_p": null,
+    "reject": false,
+    "reading": "not run (counted as an untested member of Family B)"
+  }
+}

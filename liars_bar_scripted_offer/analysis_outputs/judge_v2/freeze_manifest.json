@@ -1,0 +1,26 @@
+{
+  "status": "ok",
+  "n_items": 40,
+  "ground_truth": "author_expected_category (sealed)",
+  "frozen_utc": "2026-10-25T16:28:06.918663+00:00",
+  "sha256": {
+    "coding_rubric_v3.md": "c19691727de01a54ccee3fcd61fd8fa0de9c6170d1cd8ae326d8c1e8876e184d",
+    "judge_prompt_v2.txt": "f783028f20c850a44c6360680205cea16d2141d4c9dbe3a42b86f615bf7a9a47",
+    "items.csv": "aafeb083e25ceadf7bfd3c4ff8d84b8b5051fb57e0472eb0899d70352720e141",
+    "design_SEALED.csv": "4630e3efcbc4c24f6031c1ac3746866f9c2424559e870cb5bdbedbecae5a658a",
+    "make_items.py": "b2cb35053f5bfb6799917d658aa472824b34d68bebd66136bfdb9a943d8ecec9",
+    "validation_set_v2.csv": "4e628b30d9e24086b59db173cea26ada50b7152aef828a81a9e75c73eb0a9c14",
+    "freeze_report.md": "6904aec2ffc3916e145bf7f9d0dde915def46c2a5672dab0cf246810a8d710c0",
+    "freeze_judge_v2.py": "b5434bb90a24529f01163d956c7fdfe30006f818edc86513062d4dd7b1730790"
+  },
+  "paths": {
+    "coding_rubric_v3.md": "X:\\Collusion\\results\\scripted_offer\\coding_rubric_v3.md",
+    "judge_prompt_v2.txt": "X:\\Collusion\\collusion_hackathon\\llm-agent-collusion-2\\Collusion_Liars_Bar\\analysis\\scripted_offer\\judge_prompt_v2.txt",
+    "items.csv": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\items.csv",
+    "design_SEALED.csv": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\design_SEALED.csv",
+    "make_items.py": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\make_items.py",
+    "validation_set_v2.csv": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\validation_set_v2.csv",
+    "freeze_report.md": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\freeze_report.md",
+    "freeze_judge_v2.py": "X:\\Collusion\\results\\scripted_offer\\judge_v2\\freeze_judge_v2.py"
+  }
+}
