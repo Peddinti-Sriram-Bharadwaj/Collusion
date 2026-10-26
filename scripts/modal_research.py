@@ -98,10 +98,11 @@ def bundle(batch_id: str) -> dict:
     src = Path(OUT) / batch_id
     dst = Path(OUT) / f"{batch_id}.tar.gz"
     files = sorted(p for p in src.glob("*.json"))
-    with tarfile.open(dst.with_suffix(".tmp"), "w:gz") as tf:
+    tmp = src.parent / f".{batch_id}.{os.getpid()}.tmp"   # unique temp name: concurrent bundles cannot clobber each other
+    with tarfile.open(tmp, "w:gz") as tf:
         for f in files:
             tf.add(f, arcname=f"{batch_id}/{f.name}")
-    os.replace(dst.with_suffix(".tmp"), dst)
+    os.replace(tmp, dst)
     RESULTS.commit()
     return {"files": len(files), "bytes": dst.stat().st_size}
 

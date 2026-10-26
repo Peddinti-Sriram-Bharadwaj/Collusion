@@ -57,7 +57,13 @@ def cmd_sync(a):
     from src.research.runner import register_results
     reg = Registry()
     tmp = Path(tempfile.mkdtemp())
-    if a.bundle:
+    r = subprocess.CompletedProcess([], 0, "", "")
+    if a.from_tar:
+        with tarfile.open(a.from_tar) as tf:
+            tf.extractall(tmp, filter="data")
+    elif a.bundle:
+        # the bundle step can exceed a short client timeout: run `modal run --detach scripts/modal_research.py::bundle
+        # --batch-id <b>` first, then `modal volume get ... research/<b>.tar.gz` and `sync --from-tar <file>`
         b = subprocess.run(["modal", "run", "scripts/modal_research.py::bundle", "--batch-id", a.batch],
                            capture_output=True, text=True, timeout=170)
         r = subprocess.run(["modal", "volume", "get", "--force", "collusion-latent-results", f"research/{a.batch}.tar.gz", str(tmp)],
@@ -183,6 +189,7 @@ def main():
     p = sub.add_parser("cost"); p.add_argument("--batch", required=True); p.add_argument("--since", required=True)
     p.add_argument("--until"); p.set_defaults(fn=cmd_cost)
     p = sub.add_parser("sync"); p.add_argument("--batch", required=True); p.add_argument("--bundle", action="store_true")
+    p.add_argument("--from-tar", help="register from a locally downloaded research/<batch>.tar.gz")
     p.set_defaults(fn=cmd_sync)
     p = sub.add_parser("analyze"); p.add_argument("--formats", default="png,svg,pdf"); p.set_defaults(fn=cmd_analyze)
     sub.add_parser("legacy-import").set_defaults(fn=cmd_legacy)
