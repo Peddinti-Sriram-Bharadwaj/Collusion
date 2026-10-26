@@ -176,6 +176,81 @@ We report two detailed experimental threads on tacit collusion in pricing agents
 \item Oversight is Not Compliance. ICML 2026.
 \end{enumerate}
 
+\section*{Appendix: Glossary of Terms}
+
+\subsection*{Market and economics concepts}
+\textbf{Tacit collusion.} Prices or outcomes that look coordinated without any agent ever communicating an agreement, as opposed to an explicit cartel.
+
+\textbf{Supra-competitive pricing.} A price above what a competitive market would produce.
+
+\textbf{Nash price / Nash equilibrium.} The price each seller would charge under pure, uncoordinated self-interest; the competitive benchmark.
+
+\textbf{Monopoly price.} The price a single firm would charge if it owned the entire market; the benchmark for full collusion.
+
+\textbf{Collusion index ($\Delta$).} $\Delta = (\text{actual profit} - \text{Nash profit})/(\text{monopoly profit} - \text{Nash profit})$. 0 = competitive, 1 = fully collusive.
+
+\textbf{Marginal cost.} The cost of producing one additional unit.
+
+\textbf{Market share.} The fraction of total sales a firm captures.
+
+\textbf{Logit demand.} A demand rule where customers split smoothly between sellers by price rather than all switching at once to the cheapest option.
+
+\textbf{Double auction.} A market where buyers and sellers each submit offers, with trades occurring when an offer and ask match.
+
+\subsection*{Environments used in this project}
+\textbf{Bertrand pricing game.} Firms simultaneously set a price each round from a fixed grid; demand splits by the logit rule. The main environment for the tracks in Section 4.1.
+
+\textbf{Cournot game.} Firms set quantities rather than prices; price falls out of total quantity produced. Used in the visibility-ablation lane (Section 5).
+
+\textbf{Market division / specialization.} In the Cournot setting, firms tacitly retreating into one product each rather than competing on both; measured by the coefficient of variation (CV) of a firm's own quantities across products.
+
+\textbf{Liar's Bar.} A multiplayer bluffing game (players challenge each other's claims) used to test whether a trusted agent can expose willingness to collude.
+
+\textbf{Diner's Dilemma.} A repeated two-player trust game (private plan, public announcement, final action) used to measure commitment-breaking and swap detection.
+
+\subsection*{Machine learning and interpretability concepts}
+\textbf{Tabular Q-learning.} A non-LLM learning method that keeps a table of expected reward per situation/action and updates it from experience.
+
+\textbf{Exploration vs.\ exploitation.} The trade-off between trying new actions and sticking with ones known to work.
+
+\textbf{Activations / hidden states.} An LLM's internal numerical representation at each layer while processing a prompt.
+
+\textbf{Linear probe.} A small auxiliary model trained to decode a specific piece of information directly from an LLM's activations.
+
+\textbf{Activation patching.} Swapping activations between two matched prompts at a chosen layer/position to test whether that site causally carries a given effect.
+
+\textbf{Steering vector.} A direction added into a model's activations at a chosen site to push its output in a predictable direction.
+
+\textbf{Specificity (steering).} Whether a steering vector's effect is tied to the specific feature it was built from, or rides along a more general direction the model already has.
+
+\subsection*{Statistics}
+\textbf{Confidence interval (CI).} A range likely to contain the true value given the collected data; overlapping CIs between two groups generally mean no confidently distinguishable difference.
+
+\textbf{p-value / Holm correction.} A p-value measures how surprising a result would be under no real effect; the Holm correction tightens the significance threshold when testing multiple hypotheses at once.
+
+\textbf{Pre-registration.} Fixing hypotheses and success criteria before running the main batch of an experiment, to prevent post-hoc reinterpretation of results.
+
+\textbf{Spearman correlation ($\rho$).} A $-1$ to $1$ measure of whether two variables move together in rank order.
+
+\textbf{Coefficient of variation (CV).} A measure of spread relative to the mean; used as the specialization measure in the Cournot lane.
+
+\subsection*{AI-safety vocabulary}
+\textbf{Distributional risk.} Risk arising from how many independently "reasonable" AI systems interact in aggregate, rather than from any single system's misbehavior.
+
+\textbf{AI control / oversight.} Techniques for constraining an AI system's behavior without relying solely on trusting its stated intentions, e.g.\ a trusted system monitoring or editing an untrusted one.
+
+\textbf{Surveillance / evaluation awareness.} Whether an agent's behavior changes specifically because it knows it is being watched or evaluated.
+
+\textbf{Sandbagging.} An AI system deliberately underperforming during evaluation to appear less capable than it is.
+
+\textbf{Steganographic / covert-channel collusion.} Coordination carried out through disguised signals (paraphrased language, timing, actions) that evade a straightforward monitor.
+
+\textbf{Action-carrier / side channel.} Coordination conveyed through an action rather than an explicit message, which a message-only monitor would miss.
+
+\textbf{Positive / negative control.} A condition expected to clearly show the effect under study (confirms the setup works) or clearly not show it (confirms the measurement isn't pure noise), respectively.
+
+\textbf{Decision gate.} A rule fixed in advance for when to stop a line of experiments rather than continue once a precondition has failed.
+
 \section*{LLM Usage Statement}
 Claude (Anthropic) was used during this project to draft experiment code, debug infrastructure (Modal, vLLM, Ollama), run and monitor background experiments, and draft this report from the underlying experiment logs, analysis scripts, and progress notes supplied by the authors. Numerical results reported here are taken from those underlying outputs rather than generated by the drafting process; the authors reviewed and are responsible for the final claims.
 
